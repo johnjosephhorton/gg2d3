@@ -89,7 +89,7 @@ d3.csv("by_month_data.csv", function(data) {
       rotate: rotate
     };
   };
-  labels = [l(10, 0.85, "Months since first job on oDesk", false), l(10, 1.1, "Average hourly wage earned in that period,\nas multiple of first period wage", true), l(3, 1.9, "# of contractors = 90,000", false)];
+  labels = [l(10, 0.85, "Months since first job on oDesk", false), l(10, 1.1, "Average hourly wage earned in that period, as multiple of first period wage", true), l(3, 1.9, "# of contractors = 90,000", false)];
   return vis.selectAll("g.text").data(labels).enter().append("text").attr("x", function(d) {
     return x(d.x);
   }).attr("y", function(d) {

@@ -128,28 +128,25 @@ d3.csv "by_month_data.csv",(data)->
       .attr("y1",(d)-> y(d.mean-2*d.se))
       .attr("y2",(d)-> y(d.mean+2*d.se))
 
+  #Labeling function for passing info around
   l = (x,y,text,rotate)->
       x: x
       y: y
       text: text
       rotate: rotate
 
+  #Label data
   labels =[l(10,0.85,"Months since first job on oDesk",false),
-    l(10,1.1,"""Average hourly wage earned in that period,
-    as multiple of first period wage""",true),
-          l(3,1.9,"# of contractors = 90,000",false)
-  ]
+          l(10,1.1,"Average hourly wage earned in that period, as multiple of first period wage",true),
+          l(3,1.9,"# of contractors = 90,000",false)]
 
+  #Adding in the labels.
   vis.selectAll("g.text")
     .data(labels)
     .enter().append("text")
     .attr("x", (d)-> x(d.x))
     .attr("y", (d)-> y(d.y))
     .attr("transform",
+      #The rotation and translation here is very hacky. I don't much like it.
       (d)-> if d.rotate then "rotate(-90)translate(-550,-420)" else "rotate(0)")
     .text((d)-> d.text)
-
-    # <p id="x-label" class="label"> Months since first job on oDesk</p>
-    # <pf id="y-label" class="label"> Average hourly wage earned in that
-    # period, as multiple of first period wage</p>
-    # <p id="contractors" class="label"> # of contractors = 90000</p>
