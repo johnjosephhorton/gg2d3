@@ -4,10 +4,10 @@ w = 482;
 
 h = 482;
 
-p = 20;
+p = 40;
 
 d3.csv("by_month_data.csv", function(data) {
-  var d, errors, format, formatted, label, means, months, paddingX, paddingY, vis, x, xRules, y, yRules;
+  var d, errors, format, formatted, l, labels, means, months, paddingX, paddingY, vis, x, xRules, y, yRules;
   format = function(d) {
     return {
       month: parseInt(d['start_month']),
@@ -81,12 +81,26 @@ d3.csv("by_month_data.csv", function(data) {
   }).attr("y2", function(d) {
     return y(d.mean + 2 * d.se);
   });
-  label = function(x, y, string) {
+  l = function(x, y, text, rotate) {
     return {
       x: x,
       y: y,
-      string: string
+      text: text,
+      rotate: rotate
     };
   };
-  return xRules = vis.selectAll("g.xRule").data().enter().append("g").attr("class", "rule");
+  labels = [l(10, 0.85, "Months since first job on oDesk", false), l(10, 1.1, "Average hourly wage earned in that period,\nas multiple of first period wage", true), l(3, 1.9, "# of contractors = 90,000", false)];
+  return vis.selectAll("g.text").data(labels).enter().append("text").attr("x", function(d) {
+    return x(d.x);
+  }).attr("y", function(d) {
+    return y(d.y);
+  }).attr("transform", function(d) {
+    if (d.rotate) {
+      return "rotate(-90)translate(-550,-420)";
+    } else {
+      return "rotate(0)";
+    }
+  }).text(function(d) {
+    return d.text;
+  });
 });
