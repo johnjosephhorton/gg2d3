@@ -5,6 +5,26 @@ h = 482
 
 #Padding
 p = 40
+formatted =[]
+seWidth = 2
+
+#Pulling out variables that are used later on
+vis = null
+x = null
+y = null
+errors = null
+
+$("#se-slider").slider(
+  value : seWidth
+  min : 0.25
+  max : 4
+  step: 0.1
+  slide : (event,ui)->
+    seWidth =ui.value
+    $("#se-value").text("SE Width: #{seWidth}")
+    redrawErrorBars()
+)
+
 
 
 #Grab the data and graph it
@@ -27,6 +47,7 @@ d3.csv "by_month_data.csv",(data)->
   #the eye
   paddingX = 1
   paddingY = 0.1
+  paddingYTop = 0.1
   #Setting up the scaling function for x
   x=d3.scale.linear()
     .domain([_.min(months)-paddingX,_.max(months)+paddingX])
@@ -34,7 +55,7 @@ d3.csv "by_month_data.csv",(data)->
 
   #Setting up the scaling function for y
   y=d3.scale.linear()
-    .domain([_.min(means)-paddingY,_.max(means)+paddingY])
+    .domain([_.min(means)-paddingY,_.max(means)+paddingY+paddingYTop])
     .range([h, 0])
 
   #Creating the main line and setting up for later graphics
@@ -94,40 +115,6 @@ d3.csv "by_month_data.csv",(data)->
    .attr("d", d3.svg.line()
      .x((d)-> x(d.month))
      .y((d)-> y(d.mean)))
-
-  #Object to draw the error labels
-  errors = vis.selectAll("g.error")
-    .data(formatted)
-    .enter().append("g")
-    .attr("class","errors")
-
-  #Draw the top part of the error bar
-  errors.append("circle")
-      .attr("cx",(d)-> x(d.month))
-      .attr("cy",(d)-> y(d.mean))
-      .attr("r",2)
-
-  #Draw the top part of the error bar
-  errors.append("line")
-      .attr("x1",(d)-> x(d.month-0.3))
-      .attr("x2",(d)-> x(d.month+0.3))
-      .attr("y1",(d)-> y(d.mean+2*d.se))
-      .attr("y2",(d)-> y(d.mean+2*d.se))
-
-  #Draw the bottom part of the error bar
-  errors.append("line")
-      .attr("x1",(d)-> x(d.month-0.3))
-      .attr("x2",(d)-> x(d.month+0.3))
-      .attr("y1",(d)-> y(d.mean-2*d.se))
-      .attr("y2",(d)-> y(d.mean-2*d.se))
-
-  #Draw the middle part of the error bar
-  errors.append("line")
-      .attr("x1",(d)-> x(d.month))
-      .attr("x2",(d)-> x(d.month))
-      .attr("y1",(d)-> y(d.mean-2*d.se))
-      .attr("y2",(d)-> y(d.mean+2*d.se))
-
   #Labeling function for passing info around
   l = (x,y,text,rotate)->
       x: x
@@ -150,3 +137,40 @@ d3.csv "by_month_data.csv",(data)->
       #The rotation and translation here is very hacky. I don't much like it.
       (d)-> if d.rotate then "rotate(-90)translate(-550,-420)" else "rotate(0)")
     .text((d)-> d.text)
+
+  errors = vis.selectAll("g.error")
+    .data(formatted)
+    .enter().append("g")
+    .attr("class","errors")
+
+  redrawErrorBars()
+
+#The dynamic function that looks for the seWidth value to recalculate the width of the error bars
+redrawErrorBars = ()->
+  errors.selectAll("line").remove()
+  #Draw the circle of the error bar
+  errors.append("circle")
+      .attr("cx",(d)-> x(d.month))
+      .attr("cy",(d)-> y(d.mean))
+      .attr("r",2)
+
+  #Draw the top part of the error bar
+  errors.append("line")
+      .attr("x1",(d)-> x(d.month-0.3))
+      .attr("x2",(d)-> x(d.month+0.3))
+      .attr("y1",(d)-> y(d.mean+seWidth*d.se))
+      .attr("y2",(d)-> y(d.mean+seWidth*d.se))
+
+  #Draw the bottom part of the error bar
+  errors.append("line")
+      .attr("x1",(d)-> x(d.month-0.3))
+      .attr("x2",(d)-> x(d.month+0.3))
+      .attr("y1",(d)-> y(d.mean-seWidth*d.se))
+      .attr("y2",(d)-> y(d.mean-seWidth*d.se))
+
+  #Draw the middle part of the error bar
+  errors.append("line")
+      .attr("x1",(d)-> x(d.month))
+      .attr("x2",(d)-> x(d.month))
+      .attr("y1",(d)-> y(d.mean-seWidth*d.se))
+      .attr("y2",(d)-> y(d.mean+seWidth*d.se))

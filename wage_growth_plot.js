@@ -1,4 +1,4 @@
-var h, p, w;
+var errors, formatted, h, p, redrawErrorBars, seWidth, vis, w, x, y;
 
 w = 482;
 
@@ -6,8 +6,32 @@ h = 482;
 
 p = 40;
 
+formatted = [];
+
+seWidth = 2;
+
+vis = null;
+
+x = null;
+
+y = null;
+
+errors = null;
+
+$("#se-slider").slider({
+  value: seWidth,
+  min: 0.25,
+  max: 4,
+  step: 0.1,
+  slide: function(event, ui) {
+    seWidth = ui.value;
+    $("#se-value").text("SE Width: " + seWidth);
+    return redrawErrorBars();
+  }
+});
+
 d3.csv("by_month_data.csv", function(data) {
-  var d, errors, format, formatted, l, labels, means, months, paddingX, paddingY, vis, x, xRules, y, yRules;
+  var d, format, l, labels, means, months, paddingX, paddingY, paddingYTop, xRules, yRules;
   format = function(d) {
     return {
       month: parseInt(d['start_month']),
@@ -28,8 +52,9 @@ d3.csv("by_month_data.csv", function(data) {
   means = _.pluck(formatted, 'mean');
   paddingX = 1;
   paddingY = 0.1;
+  paddingYTop = 0.1;
   x = d3.scale.linear().domain([_.min(months) - paddingX, _.max(months) + paddingX]).range([0, w]);
-  y = d3.scale.linear().domain([_.min(means) - paddingY, _.max(means) + paddingY]).range([h, 0]);
+  y = d3.scale.linear().domain([_.min(means) - paddingY, _.max(means) + paddingY + paddingYTop]).range([h, 0]);
   vis = d3.select('body').data([formatted]).append('svg').attr("width", w + p * 2).attr("height", h + p * 2).append('g').attr("transform", "translate(" + p + "," + p + ")");
   xRules = vis.selectAll("g.xRule").data(x.ticks(10)).enter().append("g").attr("class", "rule");
   xRules.append("line").attr("x1", x).attr("x2", x).attr("y1", 0).attr("y2", h - 1);
@@ -48,39 +73,6 @@ d3.csv("by_month_data.csv", function(data) {
   }).y(function(d) {
     return y(d.mean);
   }));
-  errors = vis.selectAll("g.error").data(formatted).enter().append("g").attr("class", "errors");
-  errors.append("circle").attr("cx", function(d) {
-    return x(d.month);
-  }).attr("cy", function(d) {
-    return y(d.mean);
-  }).attr("r", 2);
-  errors.append("line").attr("x1", function(d) {
-    return x(d.month - 0.3);
-  }).attr("x2", function(d) {
-    return x(d.month + 0.3);
-  }).attr("y1", function(d) {
-    return y(d.mean + 2 * d.se);
-  }).attr("y2", function(d) {
-    return y(d.mean + 2 * d.se);
-  });
-  errors.append("line").attr("x1", function(d) {
-    return x(d.month - 0.3);
-  }).attr("x2", function(d) {
-    return x(d.month + 0.3);
-  }).attr("y1", function(d) {
-    return y(d.mean - 2 * d.se);
-  }).attr("y2", function(d) {
-    return y(d.mean - 2 * d.se);
-  });
-  errors.append("line").attr("x1", function(d) {
-    return x(d.month);
-  }).attr("x2", function(d) {
-    return x(d.month);
-  }).attr("y1", function(d) {
-    return y(d.mean - 2 * d.se);
-  }).attr("y2", function(d) {
-    return y(d.mean + 2 * d.se);
-  });
   l = function(x, y, text, rotate) {
     return {
       x: x,
@@ -90,7 +82,7 @@ d3.csv("by_month_data.csv", function(data) {
     };
   };
   labels = [l(10, 0.85, "Months since first job on oDesk", false), l(10, 1.1, "Average hourly wage earned in that period, as multiple of first period wage", true), l(3, 1.9, "# of contractors = 90,000", false)];
-  return vis.selectAll("g.text").data(labels).enter().append("text").attr("x", function(d) {
+  vis.selectAll("g.text").data(labels).enter().append("text").attr("x", function(d) {
     return x(d.x);
   }).attr("y", function(d) {
     return y(d.y);
@@ -103,4 +95,42 @@ d3.csv("by_month_data.csv", function(data) {
   }).text(function(d) {
     return d.text;
   });
+  errors = vis.selectAll("g.error").data(formatted).enter().append("g").attr("class", "errors");
+  return redrawErrorBars();
 });
+
+redrawErrorBars = function() {
+  errors.selectAll("line").remove();
+  errors.append("circle").attr("cx", function(d) {
+    return x(d.month);
+  }).attr("cy", function(d) {
+    return y(d.mean);
+  }).attr("r", 2);
+  errors.append("line").attr("x1", function(d) {
+    return x(d.month - 0.3);
+  }).attr("x2", function(d) {
+    return x(d.month + 0.3);
+  }).attr("y1", function(d) {
+    return y(d.mean + seWidth * d.se);
+  }).attr("y2", function(d) {
+    return y(d.mean + seWidth * d.se);
+  });
+  errors.append("line").attr("x1", function(d) {
+    return x(d.month - 0.3);
+  }).attr("x2", function(d) {
+    return x(d.month + 0.3);
+  }).attr("y1", function(d) {
+    return y(d.mean - seWidth * d.se);
+  }).attr("y2", function(d) {
+    return y(d.mean - seWidth * d.se);
+  });
+  return errors.append("line").attr("x1", function(d) {
+    return x(d.month);
+  }).attr("x2", function(d) {
+    return x(d.month);
+  }).attr("y1", function(d) {
+    return y(d.mean - seWidth * d.se);
+  }).attr("y2", function(d) {
+    return y(d.mean + seWidth * d.se);
+  });
+};
