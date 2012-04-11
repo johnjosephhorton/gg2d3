@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Wage Growth Plot</title>
+    <script type="text/javascript" src="../js/d3.v2.min.js"></script>
+    <script type="text/javascript"
+    src="/js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-ui-1.8.18.custom.min.js"></script>
+    <script type="text/javascript" src="../js/underscore.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/smoothness/jquery-ui-1.8.18.custom.css">
+    <style type="text/css">
+body {
+  font: 10px sans-serif;
+}
+
+.rule line {
+  stroke: #eee;
+  shape-rendering: crispEdges;
+}
+
+.errors line {
+  stroke: #000;
+  shape-rendering: crispEdges;
+  stroke-width: 1px;
+}
+
+.rule line.axis {
+  stroke: #000;
+}
+
+.line {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1px;
+}
+
+circle.line {
+  fill: #ff;
+}
+
+.label{
+position: relative;
+}
+
+#se-slider{
+width: 482px;
+}
+    </style>
+  </head>
+  <body>
+    <div id="se-slider"></div>
+    <div id="se-value">SE Width: 2</div>
+    <script type="text/javascript" src="wage_growth_plot.js"></script>
+  </body>
+</html>
