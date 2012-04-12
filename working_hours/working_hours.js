@@ -1,10 +1,16 @@
-var data, drawChart, h, sum, w;
+var clock, country, data, drawChart, h, p, setUpCountries, sum, vis, w;
 
 w = 482;
 
 h = 482;
 
+p = 40;
+
 data = new Object;
+
+country = "Canada";
+
+clock = null;
 
 sum = function(numbers) {
   return _.reduce(numbers, function(a, b) {
@@ -12,9 +18,11 @@ sum = function(numbers) {
   });
 };
 
+vis = d3.select("#chart").append("svg").attr("width", w).attr("height", h).append('g').attr("transform", "translate(" + (w / 2) + "," + (h / 2) + ")");
+
 drawChart = function() {
-  var a, instance, line, number, percents, row, summed, total, transposed, vis;
-  instance = data["Canada"];
+  var i, instance, line, max, number, percents, radialPercents, ref, rim, row, summed, total, transposed, x, y;
+  instance = data[country];
   transposed = _.zip.apply(this, instance);
   summed = (function() {
     var _i, _len, _results;
@@ -35,26 +43,55 @@ drawChart = function() {
     }
     return _results;
   })();
-  percents = (function() {
-    var _i, _len, _results;
+  radialPercents = (function() {
+    var _i, _len, _ref, _results;
+    _ref = _.range(24);
     _results = [];
-    for (_i = 0, _len = percents.length; _i < _len; _i++) {
-      a = percents[_i];
-      _results.push([a, a]);
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      i = _ref[_i];
+      _results.push([percents[i] * Math.cos(2 * Math.PI * i / 24 - Math.PI / 2), percents[i] * Math.sin(2 * Math.PI * i / 24 - Math.PI / 2)]);
     }
     return _results;
   })();
-  console.log(percents);
   line = d3.svg.line();
-  vis = d3.select("#chart").append("svg").attr("width", w).attr("height", h);
-  vis.append("rect").attr("width", w).attr("height", h);
-  return vis.append("path").data([percents]).attr("class", "line");
+  max = _.max(percents);
+  $("#total").text("Average total number of workers is " + total);
+  x = d3.scale.linear().domain([0, max]).range([0, w / 2]);
+  y = d3.scale.linear().domain([0, max]).range([0, h / 2]);
+  if (clock) vis.select("g.time").remove();
+  clock = vis.selectAll("g.time").data([radialPercents]).enter().append("g").attr("class", "time");
+  clock.append("path").attr("class", "line").attr("d", d3.svg.line().interpolate("cardinal-closed").x(function(d) {
+    return x(d[0]);
+  }).y(function(d) {
+    return y(d[1]);
+  }));
+  rim = max * 0.9;
+  ref = vis.selectAll("g.ref").data([[0, 0], [0, -rim, "0"], [rim, 0, "6"], [0, rim, "12"], [-rim, 0, "18"]]).enter().append("g").attr("class", "ref");
+  ref.append("circle").attr("cx", function(d) {
+    return x(d[0]);
+  }).attr("cy", function(d) {
+    return y(d[1]);
+  }).attr("r", 10);
+  return ref.append("text").attr("x", function(d) {
+    return x(d[0]);
+  }).attr("y", function(d) {
+    return y(d[1]);
+  }).attr("dy", ".5em").attr("text-anchor", "middle").text(function(d) {
+    return d[2];
+  });
+};
+
+setUpCountries = function() {
+  return d3.select("#country").on("change", function() {
+    country = this.value;
+    return drawChart();
+  }).selectAll("option").data(_.keys(data)).enter().append("option").attr("value", String).text(String);
 };
 
 d3.csv("all_working_hours.csv", function(rawdata) {
   var addToData, item, _i, _len;
   addToData = function(item) {
-    var country, day, hour, workers;
+    var day, hour, workers;
     country = item["Country"];
     workers = parseFloat(item["Workers"]);
     day = item["Day"];
@@ -73,5 +110,6 @@ d3.csv("all_working_hours.csv", function(rawdata) {
     item = rawdata[_i];
     addToData(item);
   }
+  setUpCountries();
   return drawChart();
 });

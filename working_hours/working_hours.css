@@ -3,8 +3,6 @@ body {
 }
 
 #chart svg {
-  width: 960px;
-  height: 500px;
   border: solid 1px #ccc;
 }
 
@@ -21,7 +19,6 @@ circle, .line {
 circle {
   fill: #fff;
   fill-opacity: .2;
-  cursor: move;
 }
 
 circle.selected {
