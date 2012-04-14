@@ -58,5 +58,6 @@ d3.csv("all_working_hours.csv", (rawdata)->
   @odesk = data
 )
 
+#TODO: Signapore isn't in the world countries data yet.
 check = ()->
   l for l in _.keys(odesk) when names.indexOf(l) is -1
