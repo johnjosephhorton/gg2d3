@@ -1,4 +1,4 @@
-var countries, displayCountries, height, p, projection, setUpCountries, sum, vis, width;
+var check, height, p, path, projection, sum, vis, width;
 
 width = 482;
 
@@ -6,9 +6,9 @@ height = 482;
 
 p = 40;
 
-countries = new Object;
+projection = d3.geo.mercator().scale(height).translate([height / 2, height / 2]);
 
-projection = d3.geo.mercator().scale(250).translate([width / 2, height / 2]);
+path = d3.geo.path().projection(projection);
 
 sum = function(numbers) {
   return _.reduce(numbers, function(a, b) {
@@ -16,79 +16,35 @@ sum = function(numbers) {
   });
 };
 
-vis = d3.select("#countries").append("svg").attr("width", w).attr("height", h).append('g').attr("transform", "translate(" + (w / 2) + "," + (h / 2) + ")");
+vis = d3.select("#countries").append("svg").attr("width", width).attr("height", height).append('g');
 
-displayCountries = function() {
-  var clock, i, instance, line, max, number, percents, radialPercents, ref, rim, row, summed, total, transposed, x, y;
-  instance = data[country];
-  transposed = _.zip.apply(this, instance);
-  summed = (function() {
-    var _i, _len, _results;
-    _results = [];
-    for (_i = 0, _len = transposed.length; _i < _len; _i++) {
-      row = transposed[_i];
-      _results.push(sum(row));
-    }
-    return _results;
-  })();
-  total = sum(summed);
-  percents = (function() {
-    var _i, _len, _results;
-    _results = [];
-    for (_i = 0, _len = summed.length; _i < _len; _i++) {
-      number = summed[_i];
-      _results.push(number / total);
-    }
-    return _results;
-  })();
-  radialPercents = (function() {
+d3.json("world-countries.json", function(collection) {
+  var l;
+  this.names = (function() {
     var _i, _len, _ref, _results;
-    _ref = _.range(24);
+    _ref = collection.features;
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      i = _ref[_i];
-      _results.push([percents[i] * Math.cos(2 * Math.PI * i / 24 - Math.PI / 2), percents[i] * Math.sin(2 * Math.PI * i / 24 - Math.PI / 2)]);
+      l = _ref[_i];
+      _results.push(l.properties.name);
     }
     return _results;
   })();
-  line = d3.svg.line();
-  max = _.max(percents);
-  $("#total").text("Average total number of workers is " + total);
-  x = d3.scale.linear().domain([0, max]).range([0, w / 2]);
-  y = d3.scale.linear().domain([0, max]).range([0, h / 2]);
-  if (clock) vis.select("g.time").remove();
-  clock = vis.selectAll("g.time").data([radialPercents]).enter().append("g").attr("class", "time");
-  clock.append("path").attr("class", "line").attr("d", d3.svg.line().interpolate("cardinal-closed").x(function(d) {
-    return x(d[0]);
-  }).y(function(d) {
-    return y(d[1]);
-  }));
-  rim = max * 0.9;
-  ref = vis.selectAll("g.ref").data([[0, 0], [0, -rim, "0"], [rim, 0, "6"], [0, rim, "12"], [-rim, 0, "18"]]).enter().append("g").attr("class", "ref");
-  ref.append("circle").attr("cx", function(d) {
-    return x(d[0]);
-  }).attr("cy", function(d) {
-    return y(d[1]);
-  }).attr("r", 10);
-  return ref.append("text").attr("x", function(d) {
-    return x(d[0]);
-  }).attr("y", function(d) {
-    return y(d[1]);
-  }).attr("dy", ".5em").attr("text-anchor", "middle").text(function(d) {
-    return d[2];
+  return vis.selectAll(".feature").data(collection.features).enter().append("path").attr("class", "feature").attr("d", function(d) {
+    return path(d);
+  }).on('click', function(d, i) {
+    var classString, dom;
+    console.log(d.properties.name);
+    dom = d3.select(this);
+    classString = dom.attr("class");
+    classString = classString === "feature" ? "selected" : "feature";
+    return dom.attr("class", classString);
   });
-};
-
-setUpCountries = function() {
-  return d3.select("#country").on("change", function() {
-    var country;
-    country = this.value;
-    return drawChart();
-  }).selectAll("option").data(_.keys(data)).enter().append("option").attr("value", String).text(String);
-};
+});
 
 d3.csv("all_working_hours.csv", function(rawdata) {
-  var addToData, item, _i, _len;
+  var addToData, data, item, _i, _len;
+  data = new Object;
   addToData = function(item) {
     var country, day, hour, workers;
     country = item["Country"];
@@ -109,6 +65,16 @@ d3.csv("all_working_hours.csv", function(rawdata) {
     item = rawdata[_i];
     addToData(item);
   }
-  setUpCountries();
-  return drawChart();
+  return this.odesk = data;
 });
+
+check = function() {
+  var l, _i, _len, _ref, _results;
+  _ref = _.keys(odesk);
+  _results = [];
+  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+    l = _ref[_i];
+    if (names.indexOf(l) === -1) _results.push(l);
+  }
+  return _results;
+};

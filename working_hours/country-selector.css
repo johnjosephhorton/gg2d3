@@ -1,0 +1,31 @@
+.frame {
+  stroke: #000;
+  fill: none;
+  pointer-events: all;
+}      
+
+
+.feature {
+  fill: #eee;
+  stroke: #ccc;
+}
+
+.selected{
+  fill: #000;
+  stroke: #ccc;
+}
+
+#controls{
+  width: 500px;
+}
+button{
+  font-size: 20px;
+}
+#explain{
+  width:700px;
+  position:absolute;
+  right: 0px;
+  margin-right:10px;
+  font-size:20px;
+}
+
