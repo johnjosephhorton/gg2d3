@@ -4,14 +4,17 @@
   pointer-events: all;
 }      
 
-
 .feature {
   fill: #eee;
   stroke: #ccc;
 }
 
 .selected{
-  fill: #000;
+  fill: blue;
+  stroke: #ccc;
+}
+.unselected{
+  fill: red;
   stroke: #ccc;
 }
 
@@ -29,3 +32,34 @@ button{
   font-size:20px;
 }
 
+body {
+  font: 13px sans-serif;
+}
+
+#chart svg {
+  border: solid 1px #ccc;
+}
+#clock {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+}
+rect {
+  fill: #fff;
+}
+
+circle, .line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+circle {
+  fill: #fff;
+  fill-opacity: .2;
+}
+
+circle.selected {
+  fill: #ff7f0e;
+  stroke: #ff7f0e;
+}

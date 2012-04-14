@@ -1,4 +1,4 @@
-var check, height, p, path, projection, sum, vis, width;
+var check, clock, countries, height, onCountryClick, p, parseWorkerData, path, projection, resetClock, selectedCountry, sum, width;
 
 width = 482;
 
@@ -6,7 +6,9 @@ height = 482;
 
 p = 40;
 
-projection = d3.geo.mercator().scale(height).translate([height / 2, height / 2]);
+selectedCountry = "Canada";
+
+projection = d3.geo.mercator().scale(height * 1).translate([height / 2, height / 2]);
 
 path = d3.geo.path().projection(projection);
 
@@ -16,34 +18,83 @@ sum = function(numbers) {
   });
 };
 
-vis = d3.select("#countries").append("svg").attr("width", width).attr("height", height).append('g');
+countries = d3.select("#countries").append("svg").attr("width", width).attr("height", height).append('g');
 
-d3.json("world-countries.json", function(collection) {
-  var l;
-  this.names = (function() {
-    var _i, _len, _ref, _results;
-    _ref = collection.features;
+clock = d3.select("#clock").append("svg").attr("width", width).attr("height", height).append('g').attr("transform", "translate(" + (width / 2) + "," + (height / 2) + ")");
+
+resetClock = function() {
+  var i, instance, line, mainClock, max, number, percents, radialPercents, ref, rim, row, summed, total, transposed, x, y;
+  instance = workerData[selectedCountry];
+  transposed = _.zip.apply(this, instance);
+  summed = (function() {
+    var _i, _len, _results;
     _results = [];
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      l = _ref[_i];
-      _results.push(l.properties.name);
+    for (_i = 0, _len = transposed.length; _i < _len; _i++) {
+      row = transposed[_i];
+      _results.push(sum(row));
     }
     return _results;
   })();
-  return vis.selectAll(".feature").data(collection.features).enter().append("path").attr("class", "feature").attr("d", function(d) {
-    return path(d);
-  }).on('click', function(d, i) {
-    var classString, dom;
-    console.log(d.properties.name);
-    dom = d3.select(this);
-    classString = dom.attr("class");
-    classString = classString === "feature" ? "selected" : "feature";
-    return dom.attr("class", classString);
+  total = sum(summed);
+  percents = (function() {
+    var _i, _len, _results;
+    _results = [];
+    for (_i = 0, _len = summed.length; _i < _len; _i++) {
+      number = summed[_i];
+      _results.push(number / total);
+    }
+    return _results;
+  })();
+  radialPercents = (function() {
+    var _i, _len, _ref, _results;
+    _ref = _.range(24);
+    _results = [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      i = _ref[_i];
+      _results.push([percents[i] * Math.cos(2 * Math.PI * i / 24 - Math.PI / 2), percents[i] * Math.sin(2 * Math.PI * i / 24 - Math.PI / 2)]);
+    }
+    return _results;
+  })();
+  line = d3.svg.line();
+  max = _.max(percents);
+  $("#total").text("Average total number of workers is " + total);
+  x = d3.scale.linear().domain([0, max]).range([0, width / 2]);
+  y = d3.scale.linear().domain([0, max]).range([0, height / 2]);
+  if (clock) clock.select("g.time").remove();
+  mainClock = clock.selectAll("g.time").data([radialPercents]).enter().append("g").attr("class", "time");
+  mainClock.append("path").attr("class", "line").attr("d", d3.svg.line().interpolate("cardinal-closed").x(function(d) {
+    return x(d[0]);
+  }).y(function(d) {
+    return y(d[1]);
+  }));
+  rim = max * 0.9;
+  ref = clock.selectAll("g.ref").data([[0, 0], [0, -rim, "0"], [rim, 0, "6"], [0, rim, "12"], [-rim, 0, "18"]]).enter().append("g").attr("class", "ref");
+  ref.append("circle").attr("cx", function(d) {
+    return x(d[0]);
+  }).attr("cy", function(d) {
+    return y(d[1]);
+  }).attr("r", 10);
+  return ref.append("text").attr("x", function(d) {
+    return x(d[0]);
+  }).attr("y", function(d) {
+    return y(d[1]);
+  }).attr("dy", ".5em").attr("text-anchor", "middle").text(function(d) {
+    return d[2];
   });
-});
+};
 
-d3.csv("all_working_hours.csv", function(rawdata) {
-  var addToData, data, item, _i, _len;
+onCountryClick = function(d, i) {
+  var clicked, dom;
+  clicked = d.properties.name;
+  if (!_.contains(_.keys(workerData), clicked)) return;
+  selectedCountry = clicked;
+  d3.selectAll(".selected").attr("class", "unselected");
+  dom = d3.select(this).attr("class", "selected");
+  return resetClock();
+};
+
+parseWorkerData = function(rawdata) {
+  var addToData, data;
   data = new Object;
   addToData = function(item) {
     var country, day, hour, workers;
@@ -61,11 +112,39 @@ d3.csv("all_working_hours.csv", function(rawdata) {
       return data[country] = [[workers]];
     }
   };
-  for (_i = 0, _len = rawdata.length; _i < _len; _i++) {
-    item = rawdata[_i];
-    addToData(item);
-  }
-  return this.odesk = data;
+  _.map(rawdata, addToData);
+  return data;
+};
+
+d3.csv("all_working_hours.csv", function(rawdata) {
+  this.workerData = parseWorkerData(rawdata);
+  return resetClock();
+});
+
+d3.json("world-countries.json", function(collection) {
+  var l;
+  this.names = (function() {
+    var _i, _len, _ref, _results;
+    _ref = collection.features;
+    _results = [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      l = _ref[_i];
+      _results.push(l.properties.name);
+    }
+    return _results;
+  })();
+  return countries.selectAll(".feature").data(collection.features).enter().append("path").attr("class", function(d) {
+    var contained;
+    contained = _.contains(_.keys(workerData), d.properties.name);
+    if (d.properties.name === selectedCountry) return "selected";
+    if (contained) {
+      return "unselected";
+    } else {
+      return "feature";
+    }
+  }).attr("d", function(d) {
+    return path(d);
+  }).on('click', onCountryClick);
 });
 
 check = function() {
