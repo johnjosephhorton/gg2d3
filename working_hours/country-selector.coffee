@@ -1,6 +1,6 @@
-#TODO:
-# Add in fisheye so it is easier to click on certain countries
-# Find geo data for singpore. Is it under a different name perhaps?
+#TODO:Add in fisheye so it is easier to click on certain countries
+#TODO:Find geo data for singpore. Is it under a different name perhaps?
+#TODO:Make time be relative to timezones. Orientation of the clocks matter visually.
 
 #Width
 width = 482
