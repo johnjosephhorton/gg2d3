@@ -1,20 +1,10 @@
-var domain, drawLines, errors, funcs, graph, h, p, rate, seWidth, svgLine, vis, w, x, xRules, y, yRules;
+var domain, funcs, graph, h, p, rate, redrawLines, svgLine, vis, w, x, xRules, y, yRules;
 
 w = 482;
 
 h = 482;
 
 p = 20;
-
-seWidth = 2;
-
-vis = null;
-
-x = null;
-
-y = null;
-
-errors = null;
 
 rate = 1;
 
@@ -38,23 +28,23 @@ y = d3.scale.linear().domain([-0.1, 1.1]).range([h, 0]);
 
 vis = d3.select('body').append('svg').attr("width", w + p * 2).attr("height", h + p * 2).append('g').attr("transform", "translate(" + p + "," + p + ")");
 
-xRules = vis.selectAll("g.xRule").data([0]).enter().append("g").attr("class", "axis").append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", y(0)).attr("y2", y(1));
+xRules = vis.append("g").attr("class", "axis").append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", y(0)).attr("y2", y(1));
 
-yRules = vis.selectAll("g.yRule").data([0]).enter().append("g").attr("class", "axis").append("line").attr("x1", x(0)).attr("x2", x(_.max(domain))).attr("y1", y(0)).attr("y2", y(0));
+yRules = vis.append("g").attr("class", "axis").append("line").attr("x1", x(0)).attr("x2", x(_.max(domain))).attr("y1", y(0)).attr("y2", y(0));
 
-vis.append("foreignObject").attr("transform", "translate(" + (x(-6)) + "," + (y(0.45)) + "),rotate(-90)").attr("height", 100).attr("width", 100).append("xhtml:body").html("\\( {\\Large p_m(i)y} \\)");
+vis.append("foreignObject").attr("transform", "translate(" + (x(-7)) + "," + (y(0.45)) + "),rotate(-90)").attr("height", 100).attr("width", 100).append("xhtml:body").html("\\( {\\Large p_m(i)y} \\)");
 
 vis.append("foreignObject").attr("transform", "translate(" + (x(0.5)) + "," + (y(0.55)) + "),rotate(0)").attr("height", 100).attr("width", 100).append("xhtml:body").html("\\( {\\Large \\theta y} \\)");
 
 vis.append("foreignObject").attr("transform", "translate(" + (x(50)) + "," + (y(-0.01)) + "),rotate(0)").attr("height", 100).attr("width", 100).append("xhtml:body").html("\\( {\\Large i} \\)");
 
-vis.append("foreignObject").attr("transform", "translate(" + (x(-4)) + "," + (y(1)) + "),rotate(0)").attr("height", 100).attr("width", 100).append("xhtml:body").html("\\(1\\)");
+vis.append("foreignObject").attr("transform", "translate(" + (x(-4)) + "," + (y(1.03)) + "),rotate(0)").attr("height", 100).attr("width", 100).append("xhtml:body").html("\\(1\\)");
 
-vis.append("foreignObject").attr("transform", "translate(" + (x(-4)) + "," + (y(0)) + "),rotate(0)").attr("height", 100).attr("width", 100).append("xhtml:body").html("\\(0\\)");
+vis.append("foreignObject").attr("transform", "translate(" + (x(-4)) + "," + (y(0.04)) + "),rotate(0)").attr("height", 100).attr("width", 100).append("xhtml:body").html("\\(0\\)");
 
-vis.append("foreignObject").attr("transform", "translate(" + (x(100)) + "," + (y(0.1)) + "),rotate(0)").attr("height", 100).attr("width", 100).append("xhtml:body").html("\\(U\\)");
+vis.append("foreignObject").attr("transform", "translate(" + (x(100)) + "," + (y(0.34)) + "),rotate(0)").attr("height", 100).attr("width", 100).append("xhtml:body").html("\\( {\\Large U } \\)");
 
-vis.append("foreignObject").attr("transform", "translate(" + (x(80)) + "," + (y(0.9)) + "),rotate(0)").attr("height", 100).attr("width", 100).append("xhtml:body").html("\\(C(i)\\)");
+vis.append("foreignObject").attr("transform", "translate(" + (x(80)) + "," + (y(1.05)) + "),rotate(0)").attr("height", 100).attr("width", 100).append("xhtml:body").html("\\(C(i)\\)");
 
 graph = function(f) {
   var all;
@@ -98,7 +88,7 @@ vis.append("g").data([graph(funcs.constant)]).append("path").attr("class", "cons
 
 vis.append("g").data([graph(funcs.curve)]).append("path").attr("class", "curve line").attr("d", svgLine);
 
-drawLines = function() {
+redrawLines = function() {
   vis.selectAll(".top").data([graph(funcs.top)]).transition().duration(20).attr("d", svgLine);
   return vis.selectAll(".bottom").data([graph(funcs.bottom)]).transition().duration(20).attr("d", svgLine);
 };
