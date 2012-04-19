@@ -14,43 +14,31 @@ body {
   font: 10px sans-serif;
 }
 
-.rule line {
-  stroke: #eee;
-  shape-rendering: crispEdges;
-}
-
-.errors line {
+.axis {
   stroke: #000;
+  stroke-width: 2px;
   shape-rendering: crispEdges;
-  stroke-width: 1px;
-}
-
-.rule line.axis {
-  stroke: #000;
 }
 
 .line {
   fill: none;
   stroke: #000;
-  stroke-width: 1px;
+  stroke-width: 2px;
 }
 
-circle.line {
-  fill: #ff;
+#rate-slider{
+width: 400px;
 }
 
-.label{
-position: relative;
-}
-
-#se-slider{
-width: 482px;
+path.constant{
+stroke-dasharray: 9, 5;
 }
     </style>
   </head>
   <body>
-    <div id="se-slider"></div>
-    <div id="se-value">SE Width: 2</div>
+    <div id="rate-slider"></div>
+    <div id="rate-value">Rate Value: 1</div>
     <script type="text/javascript" src="econ_template.js"></script>
+    <script type="text/javascript" src="mathjax-MathJax-07669ac/MathJax.js?config=TeX-AMS-MML_SVG-full"></script>
   </body>
 </html>
