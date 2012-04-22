@@ -4,17 +4,20 @@
   pointer-events: all;
 }      
 
+svg {
+  background-color: #AAA;
+}
 .feature {
   fill: #eee;
   stroke: #ccc;
 }
 
 .selected{
-  fill: blue;
+  fill: #006491;
   stroke: #ccc;
 }
 .unselected{
-  fill: red;
+  fill: #C8EEFF;
   stroke: #ccc;
 }
 
