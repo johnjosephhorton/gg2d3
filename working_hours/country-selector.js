@@ -1,4 +1,4 @@
-var check, clock, countries, height, onCountryClick, p, parseWorkerData, path, projection, resetClock, selectedCountry, sum, width;
+var check, clock, countries, fishPolygon, fisheye, height, onCountryClick, p, parseWorkerData, path, projection, resetClock, selectedCountry, sum, width;
 
 width = 482;
 
@@ -6,11 +6,13 @@ height = 482;
 
 p = 40;
 
-selectedCountry = "Canada";
+selectedCountry = "Germany";
 
 projection = d3.geo.mercator().scale(height * 1).translate([height / 2, height / 2]);
 
 path = d3.geo.path().projection(projection);
+
+fisheye = d3.fisheye().radius(50).power(10);
 
 sum = function(numbers) {
   return _.reduce(numbers, function(a, b) {
@@ -88,8 +90,8 @@ onCountryClick = function(d, i) {
   clicked = d.properties.name;
   if (!_.contains(_.keys(workerData), clicked)) return;
   selectedCountry = clicked;
-  d3.selectAll(".selected").attr("class", "unselected");
-  dom = d3.select(this).attr("class", "selected");
+  d3.selectAll(".selected").attr("class", "feature unselected");
+  dom = d3.select(this).attr("class", "feature selected");
   return resetClock();
 };
 
@@ -121,6 +123,20 @@ d3.csv("all_working_hours.csv", function(rawdata) {
   return resetClock();
 });
 
+fishPolygon = function(polygon) {
+  return _.map(polygon, function(list) {
+    return _.map(list, function(tuple) {
+      var c;
+      p = projection(tuple);
+      c = fisheye({
+        x: p[0],
+        y: p[1]
+      });
+      return projection.invert([c.x, c.y]);
+    });
+  });
+};
+
 d3.json("world-countries.json", function(collection) {
   var l;
   this.names = (function() {
@@ -133,18 +149,28 @@ d3.json("world-countries.json", function(collection) {
     }
     return _results;
   })();
-  return countries.selectAll(".feature").data(collection.features).enter().append("path").attr("class", function(d) {
-    var contained;
+  countries.selectAll(".feature").data(collection.features).enter().append("path").attr("class", function(d) {
+    var classStr, contained, name;
     contained = _.contains(_.keys(workerData), d.properties.name);
-    if (d.properties.name === selectedCountry) return "selected";
-    if (contained) {
-      return "unselected";
-    } else {
-      return "feature";
-    }
-  }).attr("d", function(d) {
-    return path(d);
+    classStr = "feature ";
+    name = d.properties.name;
+    if (name === selectedCountry) return classStr + "selected";
+    if (contained) return classStr + "unselected";
+    return classStr;
+  }).attr("d", path).each(function(d) {
+    return d.org = d.geometry.coordinates;
   }).on('click', onCountryClick);
+  return d3.select("svg").on("mousemove", function() {
+    fisheye.center(d3.mouse(this));
+    return countries.selectAll(".feature").attr("d", function(d) {
+      var clone, processed, type;
+      clone = $.extend({}, d);
+      type = clone.geometry.type;
+      processed = type === "Polygon" ? fishPolygon(d.org) : _.map(d.org, fishPolygon);
+      clone.geometry.coordinates = processed;
+      return path(clone);
+    });
+  });
 });
 
 check = function() {

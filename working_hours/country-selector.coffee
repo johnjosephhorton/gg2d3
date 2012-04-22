@@ -10,7 +10,7 @@ height = 482
 p=40
 
 #Inital starting country
-selectedCountry ="Canada"
+selectedCountry ="Germany"
 
 # Mercator projection
 # TODO:
@@ -20,6 +20,11 @@ projection = d3.geo.mercator()
 
 #Function used for mapping countries to the mercator projection
 path = d3.geo.path().projection(projection);
+
+#Fisheye
+fisheye = d3.fisheye()
+    .radius(50)
+    .power(10)
 
 #Useful summation function
 sum = (numbers) -> _.reduce(numbers, (a,b)-> a+b)
@@ -108,8 +113,8 @@ onCountryClick = (d,i)->
   selectedCountry = clicked
   #Hacky way to add a class to a node element.
   #There should be a better way to do this.
-  d3.selectAll(".selected").attr("class","unselected")
-  dom = d3.select(this).attr("class","selected")
+  d3.selectAll(".selected").attr("class","feature unselected")
+  dom = d3.select(this).attr("class","feature selected")
   # str = dom.attr("class")
   # str = if str is "selected" then "unselected" else "selected"
   # dom.attr("class",str)
@@ -145,20 +150,43 @@ d3.csv "all_working_hours.csv", (rawdata)->
   @workerData = parseWorkerData(rawdata)
   resetClock()
 
+
+fishPolygon = (polygon)->
+  _.map(polygon, (list)->
+    _.map(list,(tuple)->
+      p = projection(tuple)
+      c = fisheye({x : p[0], y : p[1]})
+      projection.invert([c.x, c.y])
+    )
+  )
+
 d3.json "world-countries.json", (collection)->
     @names = (l.properties.name for l in collection.features)
+
     countries.selectAll(".feature").data(collection.features)
-      .enter().append("path")
-      .attr("class", (d)->
-        contained =  _.contains(_.keys(workerData),d.properties.name)
-        if d.properties.name is selectedCountry then return "selected"
-        if contained then "unselected" else "feature")
-      .attr("d",(d)-> path(d))
-      .on('click', onCountryClick)
+    .enter().append("path")
+    .attr "class", (d)->
+      #Class hackery. I don't like it.'
+      contained =  _.contains(_.keys(workerData),d.properties.name)
+      classStr = "feature "
+      name = d.properties.name
+      if name is selectedCountry then return (classStr+"selected")
+      if contained then return (classStr+"unselected")
+      classStr
+    .attr("d",path)
+    .each((d)-> d.org = d.geometry.coordinates)
+    .on('click', onCountryClick)
 
 
-
-
+    d3.select("svg").on "mousemove",()->
+      fisheye.center(d3.mouse(this))
+      countries.selectAll(".feature")
+      .attr "d",(d)->
+        clone = $.extend({},d)
+        type = clone.geometry.type
+        processed = if type is "Polygon" then fishPolygon(d.org) else _.map(d.org,fishPolygon)
+        clone.geometry.coordinates = processed
+        path(clone)
 
 
 
