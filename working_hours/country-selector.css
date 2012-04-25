@@ -1,46 +1,47 @@
-.frame {
-  stroke: #000;
-  fill: none;
-  pointer-events: all;
-}      
-
-svg {
-  background-color: #AAA;
+.area {
+  fill: lightsteelblue;
 }
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
 .feature {
   fill: #eee;
   stroke: #ccc;
 }
 
 .selected{
-  fill: #006491;
+  fill: steelblue;
   stroke: #ccc;
 }
+
 .unselected{
-  fill: #C8EEFF;
+  fill: lightsteelblue;
   stroke: #ccc;
 }
 
-#controls{
-  width: 500px;
-}
-button{
-  font-size: 20px;
-}
-#explain{
-  width:700px;
-  position:absolute;
-  right: 0px;
-  margin-right:10px;
-  font-size:20px;
-}
-
-body {
-  font: 13px sans-serif;
-}
-
-#chart svg {
+#container {
   border: solid 1px #ccc;
+}
+
+#countries {
+  width: 220px; 
+  height: 482px;
+  overflow-x:hidden;
+  overflow-y:scroll;
+  width: 12em;
+  padding: 0 0 1em 0;
+  margin-bottom: 1em;
+  font-family: 'Trebuchet MS', 'Lucida Grande',
+  Verdana, Lucida, Geneva, Helvetica, 
+  Arial, sans-serif;
+}
+
+ul#countries-list{
+  list-style: none;
 }
 #clock {
   position: absolute;
@@ -51,18 +52,3 @@ rect {
   fill: #fff;
 }
 
-circle, .line {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 1.5px;
-}
-
-circle {
-  fill: #fff;
-  fill-opacity: .2;
-}
-
-circle.selected {
-  fill: #ff7f0e;
-  stroke: #ff7f0e;
-}
