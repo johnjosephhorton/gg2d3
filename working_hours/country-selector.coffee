@@ -1,6 +1,13 @@
-#TODO:Find geo data for singpore. Is it under a different name perhaps?
-#TODO:Make time be relative to timezones. Orientation of the clocks matter visually.
+###########
+#
+#
+# Notes and TODOS
+#
+#
+###########
 
+#TODO:Make time be relative to timezones. Orientation of the clocks matter visually.
+#NB: Signapore isn't in the map persay. It's too small!
 
 ###########
 #
@@ -16,6 +23,9 @@ width = 482
 height = 482
 #Padding
 p=40
+
+#Max radius for clocks
+r= width/2
 
 ###########
 #
@@ -63,6 +73,36 @@ clock = d3.select("#clock")
     .attr("height", height)
   .append('g')
     .attr("transform","translate(#{width/2},#{height/2})")
+
+
+gradient = clock.append("svg:defs")
+  .append("svg:linearGradient")
+    .attr("id", "gradient")
+    .attr("x1", "0%")
+    .attr("y1", "0%")
+    .attr("x2", "100%")
+    .attr("y2", "100%")
+    .attr("spreadMethod", "pad");
+
+gradient.append("svg:stop")
+    .attr("offset", "0%")
+    .attr("stop-color", "rgb(64,200,255)")
+    .attr("stop-opacity", 1);
+
+gradient.append("svg:stop")
+    .attr("offset", "100%")
+    .attr("stop-color", "black")
+    .attr("stop-opacity", 1);
+
+#Outer clock, used for displaying max time and reference
+outerClock = clock.append("g")
+  .data([_.range(361)])
+  .append("path").attr("class","outer")
+  .style("fill", "url(#gradient)")
+  .attr("d", d3.svg.area.radial()
+    .innerRadius(r-10)
+    .outerRadius(r)
+    .angle((d,i) -> i/180 * Math.PI))
 
 ###########
 #
@@ -138,9 +178,19 @@ initList = ()->
 #Change the country. This calls the relevant functions
 changeCountry = (name)->
   selectedCountry = name
-  resetClock()
-  resetMap()
-  resetList()
+  updateClock()
+  updateMap()
+#  updateList()
+
+
+updateMap = ()->
+  map.selectAll(".feature").each((d,i)->
+    name = d.properties.name
+    if not _.contains(_.keys(workerData),name) then return
+    classStr = "feature "
+    classStr += (if name is selectedCountry then "selected" else "unselected")
+    d3.select(this).attr("class",classStr)
+  )
 
 #Updates the clock to reflect the current country
 updateClock = ()->
@@ -159,7 +209,7 @@ updateClock = ()->
    .data([summed]).enter()
      .append("g").attr("class","time")
 
-  r = height/2
+  smallR = r-11
 
   angle = (d,i) -> i/12 * Math.PI
 
@@ -167,21 +217,21 @@ updateClock = ()->
     .attr("class", "area")
     .attr("d", d3.svg.area.radial()
       .innerRadius(0)
-      .outerRadius((d)-> r * d/max)
+      .outerRadius((d)-> smallR * d/max)
+      .interpolate("cardinal")
       .angle(angle))
 
   mainClock.append("path")
     .attr("class", "line")
     .attr("d", d3.svg.line.radial()
-      .radius((d)-> r * d/max)
+      .radius((d)-> smallR * d/max)
+      .interpolate("cardinal")
       .angle(angle))
 
 #Update css based on whether or not a country should be highlighted
 onCountryClick = (d,i)->
   clicked = d.properties.name
   if not _.contains(_.keys(workerData),clicked) then return
-  d3.selectAll(".selected").attr("class","feature unselected")
-  dom = d3.select(this).attr("class","feature selected")
   changeCountry(clicked)
 
 
@@ -209,7 +259,7 @@ getCountries = () ->
       classStr
     .attr("d",path)
     .each((d)-> d.org = d.geometry.coordinates)
-    .on('click', onCountryClick)
+    .on('mouseover', onCountryClick)
 
     #Set up mouse events
     d3.select("svg").on "mousemove", refish
@@ -225,6 +275,7 @@ d3.csv "all_working_hours.csv", (rawdata)->
   updateClock()
 
 
+#TODO Fix the off cursor bug.
 refish = ()->
   fisheye.center(d3.mouse(this))
   map.selectAll(".feature")
@@ -237,7 +288,7 @@ refish = ()->
 
 
 
-#TODO: Signapore isn't in the world countries data yet.
-#Grab the data out of Mathematica.
+
+
 check = ()->
   l for l in _.keys(odesk) when names.indexOf(l) is -1

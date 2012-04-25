@@ -1,3 +1,35 @@
+#countries {
+  overflow-x:hidden;
+  overflow-y:scroll;
+  float: left;
+  width: 200px;
+  height: 500px;
+  font-family: 'Trebuchet MS', 'Lucida Grande';
+  margin-right: 10px;
+}
+
+ul#countries-list{
+  list-style: none;
+}
+
+#clock {
+  float: left;  
+  width: 482px;
+  margin-left:10px;
+}
+
+#map {
+  float: left;  
+  width: 482px;
+}
+
+/* 
+   d3 Styling
+*/
+rect {
+  fill: #fff;
+}
+
 .area {
   fill: lightsteelblue;
 }
@@ -21,34 +53,5 @@
 .unselected{
   fill: lightsteelblue;
   stroke: #ccc;
-}
-
-#container {
-  border: solid 1px #ccc;
-}
-
-#countries {
-  width: 220px; 
-  height: 482px;
-  overflow-x:hidden;
-  overflow-y:scroll;
-  width: 12em;
-  padding: 0 0 1em 0;
-  margin-bottom: 1em;
-  font-family: 'Trebuchet MS', 'Lucida Grande',
-  Verdana, Lucida, Geneva, Helvetica, 
-  Arial, sans-serif;
-}
-
-ul#countries-list{
-  list-style: none;
-}
-#clock {
-  position: absolute;
-  right: 0px;
-  top: 0px;
-}
-rect {
-  fill: #fff;
 }
 
