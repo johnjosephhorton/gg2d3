@@ -27,6 +27,7 @@ p=40
 #Max radius for clocks
 r= width/2
 
+arcWidth = 20
 ###########
 #
 #
@@ -74,35 +75,26 @@ clock = d3.select("#clock")
   .append('g')
     .attr("transform","translate(#{width/2},#{height/2})")
 
-
-gradient = clock.append("svg:defs")
-  .append("svg:linearGradient")
-    .attr("id", "gradient")
-    .attr("x1", "0%")
-    .attr("y1", "0%")
-    .attr("x2", "100%")
-    .attr("y2", "100%")
-    .attr("spreadMethod", "pad");
-
-gradient.append("svg:stop")
-    .attr("offset", "0%")
-    .attr("stop-color", "rgb(64,200,255)")
-    .attr("stop-opacity", 1);
-
-gradient.append("svg:stop")
-    .attr("offset", "100%")
-    .attr("stop-color", "black")
-    .attr("stop-opacity", 1);
-
 #Outer clock, used for displaying max time and reference
-outerClock = clock.append("g")
+outerCircle = clock.append("g")
   .data([_.range(361)])
   .append("path").attr("class","outer")
-  .style("fill", "url(#gradient)")
+  .style("fill", "steelblue")
   .attr("d", d3.svg.area.radial()
-    .innerRadius(r-10)
+    .innerRadius(r-arcWidth)
     .outerRadius(r)
     .angle((d,i) -> i/180 * Math.PI))
+
+outerArc = clock.append("g")
+  .append("path").attr("class","outer")
+  .style("fill", "lightsteelblue")
+  .attr("d", d3.svg.arc()
+    .startAngle(0)
+    .endAngle(2*Math.PI/3)
+    .innerRadius(r-arcWidth)
+    .outerRadius(r))
+
+
 
 ###########
 #
@@ -209,7 +201,7 @@ updateClock = ()->
    .data([summed]).enter()
      .append("g").attr("class","time")
 
-  smallR = r-11
+  smallR = r-arcWidth-1
 
   angle = (d,i) -> i/12 * Math.PI
 
