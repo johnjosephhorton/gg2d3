@@ -150,7 +150,7 @@ d3.csv "all_working_hours.csv", (rawdata)->
   @workerData = parseWorkerData(rawdata)
   resetClock()
 
-
+#TODO:Abstract out as part of d3.geo.projection
 fishPolygon = (polygon)->
   _.map(polygon, (list)->
     _.map(list,(tuple)->
@@ -177,7 +177,7 @@ d3.json "world-countries.json", (collection)->
     .each((d)-> d.org = d.geometry.coordinates)
     .on('click', onCountryClick)
 
-
+    #Abstrcat this out so that it works with mousein/out
     d3.select("svg").on "mousemove",()->
       fisheye.center(d3.mouse(this))
       countries.selectAll(".feature")
