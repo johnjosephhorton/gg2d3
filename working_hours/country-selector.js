@@ -1,8 +1,8 @@
-var arcWidth, changeCountry, check, clock, fishPolygon, fisheye, getCountries, height, initList, map, onCountryClick, outerArc, outerCircle, p, parseWorkerData, path, projection, r, refish, selectedCountry, sum, updateClock, updateMap, width;
+var arcWidth, changeCountry, check, clock, fishPolygon, fisheye, getCountries, height, initList, map, onCountryClick, outerArc, outerCircle, p, parseWorkerData, path, projection, r, refish, selectedCountry, sum, updateChart, updateClock, updateMap, weekChart, width;
 
-width = 482;
+width = 300;
 
-height = 482;
+height = 300;
 
 p = 40;
 
@@ -19,6 +19,8 @@ path = d3.geo.path().projection(projection);
 fisheye = d3.fisheye().radius(50).power(10);
 
 map = d3.select("#map").append("svg").attr("width", width).attr("height", height).append('g');
+
+weekChart = d3.select("#week").append("svg").attr("width", width * 2).attr("height", height / 2).append('g');
 
 clock = d3.select("#clock").append("svg").attr("width", width).attr("height", height).append('g').attr("transform", "translate(" + (width / 2) + "," + (height / 2) + ")");
 
@@ -88,7 +90,28 @@ initList = function() {
 changeCountry = function(name) {
   selectedCountry = name;
   updateClock();
-  return updateMap();
+  updateMap();
+  return updateChart();
+};
+
+updateChart = function() {
+  var chartArea, chartLine, flat, instance, x, y;
+  instance = workerData[selectedCountry];
+  flat = _.flatten(instance);
+  x = d3.scale.linear().domain([0, flat.length]).range([0, width * 2]);
+  y = d3.scale.linear().domain([0, _.max(flat)]).range([height / 2, 10]);
+  weekChart.select("path.area").remove();
+  weekChart.select("path.line").remove();
+  chartArea = weekChart.selectAll("path.area").data([flat]).enter().append("path").attr("class", "area").attr("d", d3.svg.area().x(function(d, i) {
+    return x(i);
+  }).y0(y(0)).y1(function(d, i) {
+    return y(d);
+  }).interpolate("cardinal"));
+  return chartLine = weekChart.selectAll("g.line").data([flat]).enter().append("path").attr("class", "line").attr("d", d3.svg.line().x(function(d, i) {
+    return x(i);
+  }).y(function(d, i) {
+    return y(d);
+  }).interpolate("cardinal"));
 };
 
 updateMap = function() {
@@ -175,7 +198,7 @@ d3.csv("all_working_hours.csv", function(rawdata) {
   this.workerData = parseWorkerData(rawdata);
   getCountries();
   initList();
-  return updateClock();
+  return changeCountry(selectedCountry);
 });
 
 refish = function() {

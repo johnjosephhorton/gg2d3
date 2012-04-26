@@ -18,9 +18,9 @@
 ###########
 
 #Width
-width = 482
+width = 300
 #Height
-height = 482
+height = 300
 #Padding
 p=40
 
@@ -65,6 +65,13 @@ map = d3.select("#map")
   .append("svg")
     .attr("width", width)
     .attr("height", height)
+  .append('g')
+
+#Set up html for the clock
+weekChart = d3.select("#week")
+  .append("svg")
+    .attr("width", width*2)
+    .attr("height", height/2)
   .append('g')
 
 #Set up html for the clock
@@ -172,7 +179,38 @@ changeCountry = (name)->
   selectedCountry = name
   updateClock()
   updateMap()
+  updateChart()
 #  updateList()
+
+updateChart = ()->
+  instance = workerData[selectedCountry]
+  flat  = _.flatten(instance)
+
+  x = d3.scale.linear().domain([0, flat.length]).range([0, width*2])
+  y = d3.scale.linear().domain([0, _.max(flat)]).range([height/2, 10])
+
+  weekChart.select("path.area").remove()
+  weekChart.select("path.line").remove()
+
+  chartArea = weekChart.selectAll("path.area")
+    .data([flat]).enter()
+    .append("path")
+    .attr("class","area")
+    .attr("d",d3.svg.area()
+    .x((d,i)-> x(i))
+    .y0(y(0))
+    .y1((d,i)-> y(d))
+    .interpolate("cardinal"))
+
+  chartLine = weekChart.selectAll("g.line")
+    .data([flat]).enter()
+    .append("path")
+    .attr("class","line")
+    .attr("d",d3.svg.line()
+    .x((d,i)-> x(i))
+    .y((d,i)-> y(d))
+    .interpolate("cardinal"))
+
 
 
 updateMap = ()->
@@ -264,7 +302,7 @@ d3.csv "all_working_hours.csv", (rawdata)->
   @workerData = parseWorkerData(rawdata)
   getCountries()
   initList()
-  updateClock()
+  changeCountry(selectedCountry)
 
 
 #TODO Fix the off cursor bug.
