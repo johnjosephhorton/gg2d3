@@ -1,4 +1,4 @@
-var arcWidth, changeCountry, check, clock, fishPolygon, fisheye, getCountries, height, initList, map, onCountryClick, outerArc, outerCircle, p, parseWorkerData, path, projection, r, refish, selectedCountry, sum, updateChart, updateClock, updateMap, weekChart, width;
+var arcWidth, changeCountry, check, clock, fishPolygon, fisheye, getCountries, getTimezones, height, initList, map, onCountryClick, outerArc, outerCircle, p, parseWorkerData, path, projection, r, refish, selectedCountry, sum, timezones, updateChart, updateClock, updateMap, weekChart, width;
 
 width = 300;
 
@@ -6,11 +6,13 @@ height = 300;
 
 p = 40;
 
-r = width / 2;
+r = width / 2 - 5;
 
 arcWidth = 20;
 
-selectedCountry = "Germany";
+selectedCountry = "United States";
+
+timezones = null;
 
 projection = d3.geo.mercator().scale(height).translate([height / 2, height * 2 / 3]);
 
@@ -28,7 +30,7 @@ outerCircle = clock.append("g").data([_.range(361)]).append("path").attr("class"
   return i / 180 * Math.PI;
 }));
 
-outerArc = clock.append("g").append("path").attr("class", "outer").style("fill", "lightsteelblue").attr("d", d3.svg.arc().startAngle(0).endAngle(2 * Math.PI / 3).innerRadius(r - arcWidth).outerRadius(r));
+outerArc = clock.append("g").append("path").attr("class", "outer").style("fill", "lightsteelblue").attr("d", d3.svg.arc().startAngle(0).endAngle(0).innerRadius(r - arcWidth).outerRadius(r));
 
 sum = function(numbers) {
   return _.reduce(numbers, function(a, b) {
@@ -126,7 +128,7 @@ updateMap = function() {
 };
 
 updateClock = function() {
-  var angle, instance, mainClock, max, row, smallR, summed, total, transposed;
+  var angle, average, instance, mainClock, max, row, smallR, summed, total, transposed, zone;
   instance = workerData[selectedCountry];
   transposed = _.zip.apply(this, instance);
   summed = (function() {
@@ -150,9 +152,13 @@ updateClock = function() {
   mainClock.append("path").attr("class", "area").attr("d", d3.svg.area.radial().innerRadius(0).outerRadius(function(d) {
     return smallR * d / max;
   }).interpolate("cardinal").angle(angle));
-  return mainClock.append("path").attr("class", "line").attr("d", d3.svg.line.radial().radius(function(d) {
+  mainClock.append("path").attr("class", "line").attr("d", d3.svg.line.radial().radius(function(d) {
     return smallR * d / max;
   }).interpolate("cardinal").angle(angle));
+  zone = timezones ? timezones[selectedCountry] : [-7.5];
+  average = sum(zone) / zone.length + 7.5 + 9;
+  angle = Math.PI * 2 * (average / 24);
+  return outerArc.attr("d", d3.svg.arc().startAngle(angle).endAngle(2 * Math.PI / 3 + angle).innerRadius(r - arcWidth).outerRadius(r));
 };
 
 onCountryClick = function(d, i) {
@@ -194,8 +200,15 @@ getCountries = function() {
   });
 };
 
+getTimezones = function() {
+  return d3.json("timezones.json", function(zones) {
+    return window.timezones = zones;
+  });
+};
+
 d3.csv("all_working_hours.csv", function(rawdata) {
   this.workerData = parseWorkerData(rawdata);
+  getTimezones();
   getCountries();
   initList();
   return changeCountry(selectedCountry);
@@ -214,12 +227,13 @@ refish = function() {
 };
 
 check = function() {
-  var l, _i, _len, _ref, _results;
-  _ref = _.keys(odesk);
+  var l, zones, _i, _len, _ref, _results;
+  zones = _.keys(timezones);
+  _ref = _.keys(workerData);
   _results = [];
   for (_i = 0, _len = _ref.length; _i < _len; _i++) {
     l = _ref[_i];
-    if (names.indexOf(l) === -1) _results.push(l);
+    if (zones.indexOf(l) === -1) _results.push(l);
   }
   return _results;
 };

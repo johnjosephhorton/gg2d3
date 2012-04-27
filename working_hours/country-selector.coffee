@@ -8,7 +8,7 @@
 
 #TODO:Make time be relative to timezones. Orientation of the clocks matter visually.
 #NB: Signapore isn't in the map persay. It's too small!
-
+#Figure out timezone race condition
 ###########
 #
 #
@@ -25,7 +25,7 @@ height = 300
 p=40
 
 #Max radius for clocks
-r= width/2
+r= width/2-5
 
 arcWidth = 20
 ###########
@@ -37,8 +37,9 @@ arcWidth = 20
 ###########
 
 #Inital starting country
-selectedCountry ="Germany"
+selectedCountry ="United States"
 
+timezones = null
 ###########
 #
 #
@@ -88,7 +89,7 @@ outerCircle = clock.append("g")
   .append("path").attr("class","outer")
   .style("fill", "steelblue")
   .attr("d", d3.svg.area.radial()
-    .innerRadius(r-arcWidth)
+      .innerRadius(r-arcWidth)
     .outerRadius(r)
     .angle((d,i) -> i/180 * Math.PI))
 
@@ -97,9 +98,24 @@ outerArc = clock.append("g")
   .style("fill", "lightsteelblue")
   .attr("d", d3.svg.arc()
     .startAngle(0)
-    .endAngle(2*Math.PI/3)
+    .endAngle(0)
     .innerRadius(r-arcWidth)
     .outerRadius(r))
+
+# numbers = clock.append("g")
+#   .data(_.range(8))
+#   .enter().append("g")
+#   .append("text")
+#   .attr("class","numbers")
+#   .attr("x",(d,i)-> Math.cos(i-Math.PI/2)*r)
+#   .attr("y",(d,i)-> Math.sin(i-Math.PI/2)*r)
+#   .attr("text-anchor","middle")
+#   .text((d)-> d)
+
+
+
+
+
 
 
 
@@ -258,6 +274,18 @@ updateClock = ()->
       .interpolate("cardinal")
       .angle(angle))
 
+  zone = if timezones then timezones[selectedCountry] else [-7.5]
+
+  #Lots of hand wavy math to get everything to line up the correct way.
+  average=sum(zone)/zone.length+7.5+9
+  angle = Math.PI*2*(average/24)
+  outerArc.attr("d", d3.svg.arc()
+    .startAngle(angle)
+    .endAngle(2*Math.PI/3+angle)
+    .innerRadius(r-arcWidth)
+    .outerRadius(r))
+
+
 #Update css based on whether or not a country should be highlighted
 onCountryClick = (d,i)->
   clicked = d.properties.name
@@ -298,11 +326,17 @@ getCountries = () ->
     d3.select("svg").on "touch", refish
     d3.select("svg").on "touchmove", refish
 
+getTimezones = () ->
+  d3.json "timezones.json", (zones)->
+    window.timezones = zones
+
 d3.csv "all_working_hours.csv", (rawdata)->
   @workerData = parseWorkerData(rawdata)
+  getTimezones()
   getCountries()
   initList()
   changeCountry(selectedCountry)
+
 
 
 #TODO Fix the off cursor bug.
@@ -317,8 +351,6 @@ refish = ()->
     path(clone)
 
 
-
-
-
 check = ()->
-  l for l in _.keys(odesk) when names.indexOf(l) is -1
+  zones = _.keys(timezones)
+  l for l in _.keys(workerData) when zones.indexOf(l) is -1
