@@ -83,19 +83,27 @@ clock = d3.select("#clock")
   .append('g')
     .attr("transform","translate(#{width/2},#{height/2})")
 
+clock.selectAll("g.rule")
+  .data(d3.range(3)).enter()
+  .append("g")
+  .attr("class","rule")
+  .append("line")
+  .attr("x1",0)
+  .attr("y1",0)
+  .attr("x2",(d)-> Math.cos(2*Math.PI*d/3-Math.PI)*r)
+  .attr("y2",(d)-> Math.sin(2*Math.PI*d/3)*r)
+
 #Outer clock, used for displaying max time and reference
 outerCircle = clock.append("g")
   .data([_.range(361)])
-  .append("path").attr("class","outer")
-  .style("fill", "steelblue")
+  .append("path").attr("class","outerCircle")
   .attr("d", d3.svg.area.radial()
       .innerRadius(r-arcWidth)
     .outerRadius(r)
     .angle((d,i) -> i/180 * Math.PI))
 
 outerArc = clock.append("g")
-  .append("path").attr("class","outer")
-  .style("fill", "lightsteelblue")
+  .append("path").attr("class","outerArc")
   .attr("d", d3.svg.arc()
     .startAngle(0)
     .endAngle(0)
@@ -203,29 +211,42 @@ updateChart = ()->
   flat  = _.flatten(instance)
 
   x = d3.scale.linear().domain([0, flat.length]).range([0, width*2])
-  y = d3.scale.linear().domain([0, _.max(flat)]).range([height/2, 10])
-
-  weekChart.select("path.area").remove()
+  y = d3.scale.linear().domain([0, _.max(flat)]).range([height/2-15, 10])
   weekChart.select("path.line").remove()
+  weekChart.select("path").remove()
 
-  chartArea = weekChart.selectAll("path.area")
+  extended = ( instance[i].concat(instance[i][23])for i in d3.range(7))
+
+  _.map _.range(7),(n)->
+      weekChart.selectAll("path.area")
+        .append("g")
+        .data([extended[n]]).enter()
+        .append("path")
+        .attr("fill", (if n%2 is 0 then "steelblue" else "lightsteelblue"))
+        .attr("d",d3.svg.area()
+          .x((d,i)-> x(i+24*n))
+          .y0(y(0))
+          .y1((d,i)-> y(d))
+          .interpolate("cardinal"))
+
+  chartLine = weekChart.selectAll("g.thickline")
     .data([flat]).enter()
     .append("path")
-    .attr("class","area")
-    .attr("d",d3.svg.area()
-    .x((d,i)-> x(i))
-    .y0(y(0))
-    .y1((d,i)-> y(d))
-    .interpolate("cardinal"))
-
-  chartLine = weekChart.selectAll("g.line")
-    .data([flat]).enter()
-    .append("path")
-    .attr("class","line")
+    .attr("class","thickline")
     .attr("d",d3.svg.line()
     .x((d,i)-> x(i))
     .y((d,i)-> y(d))
     .interpolate("cardinal"))
+
+
+  weekChart.selectAll("g.day")
+  #Did I spell Wednesday right
+    .data(["Sunday","Monday", "Tuesday",
+         "Wednesday", "Thursday", "Friday", "Saturday"])
+    .enter().append("text")
+    .attr("x",(d,i)->width*2/7*(i))
+    .attr("dy",height/2-5)
+    .text((d)->d)
 
 
 

@@ -1,7 +1,7 @@
 #countries {
   overflow-x:hidden;
   overflow-y:scroll;
-  float: left;
+  /* float: left; */
   width: 200px;
   height: 500px;
   font-family: 'Trebuchet MS', 'Lucida Grande';
@@ -13,13 +13,13 @@ ul#countries-list{
 }
 
 #clock {
-  float: left;  
+  /* float: left;   */
   width: 482px;
   margin-left:10px;
 }
 
 #map {
-  float: left;  
+  /* float: left;   */
   width: 482px;
 }
 
@@ -39,6 +39,17 @@ rect {
   stroke: steelblue;
   stroke-width: 1.5px;
 }
+.thickline {
+  fill: none;
+  stroke: black;
+  stroke-width: 2px;
+}
+
+.rule {
+  fill: none;
+  stroke: black;
+  stroke-width: 1.5px;
+}
 
 .feature {
   fill: #eee;
@@ -55,3 +66,16 @@ rect {
   stroke: #ccc;
 }
 
+.outerArc{
+  fill: lightsteelblue;
+  stroke: #ccc;
+}
+
+.outerCircle{
+  fill: steelblue;
+  stroke: #ccc;
+}
+
+.text{
+  font: 10px sans-serif;
+}
