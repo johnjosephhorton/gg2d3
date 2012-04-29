@@ -11,16 +11,16 @@ Chart = (function() {
       padding: 20
     },
     chart: {
-      width: $(document).width() - $(document).height(),
+      width: $(document).width() - $(document).width() / 3 - 50,
       height: $(document).height() / 3,
       padding: 20
     },
     clock: {
-      width: $(document).height() / 3,
-      height: $(document).height() / 3,
-      r: $(document).height() / 6 - 5,
+      width: $(document).height() / 2,
+      height: $(document).height() / 2,
+      r: $(document).height() / 4 - 5,
       padding: 20,
-      arcWidth: 20
+      arcWidth: 30
     }
   };
 

@@ -2,6 +2,11 @@ body {
   font: 10px sans-serif;
 }
 
+path.area{
+  fill: lightsteelblue;
+  stroke: #ccc;
+}
+
 #week{
   right:20px;
   bottom: 20px;
@@ -12,6 +17,7 @@ body {
   top: 20px;
   position: absolute;
 }
+
 .line {
   fill: none;
   stroke: steelblue;
