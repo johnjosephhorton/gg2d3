@@ -135,6 +135,7 @@ class Chart
       .text((d)->d)
 
   createClock: (ob)->
+
     w=Chart.parameters.clock.width
     h=Chart.parameters.clock.height
     r= Chart.parameters.clock.r
@@ -158,7 +159,7 @@ class Chart
       .attr("x2",(d)-> Math.cos(2*Math.PI*d/3-Math.PI)*r)
       .attr("y2",(d)-> Math.sin(2*Math.PI*d/3)*r)
 
-    outerCircle = clock.append("g")
+    clock.append("g")
       .data([_.range(361)])
       .append("path").attr("class","outerCircle")
       .attr("d", d3.svg.area.radial()
@@ -166,14 +167,17 @@ class Chart
         .outerRadius(r)
         .angle((d,i) -> i/180 * Math.PI))
 
-    outerArc = clock.append("g")
+    clock.append("g")
       .append("path").attr("class","outerArc")
       .attr("id","outerArc")
       .attr("d", d3.svg.arc()
         .startAngle(0)
-        .endAngle(0)
+        .endAngle(2*Math.PI/3)
         .innerRadius(r-arcWidth)
         .outerRadius(r))
+
+    clock.append("path").attr("class","area")
+    clock.append("path").attr("class","line")
 
   createStats : ()=>
     stats = d3.select("#stats")
@@ -263,27 +267,18 @@ class Chart
     summed.push(summed[0])
     max = _.max(summed)
 
-    clock = d3.select("#clockG")
-    clock.select("g.time").remove()
-
-    mainClock = clock.selectAll("g.time")
-     .data([summed]).enter()
-       .append("g").attr("class","time")
-
     smallR = Chart.parameters.clock.r-Chart.parameters.clock.arcWidth-1
 
     angle = (d,i) -> i/12 * Math.PI
 
-    mainClock.append("path")
-      .attr("class", "area")
-      .attr("d", d3.svg.area.radial()
+    d3.select("path.area").data([summed]).transition().delay(10)
+        .attr("d", d3.svg.area.radial()
         .innerRadius(0)
         .outerRadius((d)-> smallR * d/max)
         .interpolate("cardinal")
         .angle(angle))
 
-    mainClock.append("path")
-      .attr("class", "line")
+    d3.select("path.line").data([summed]).transition().delay(10)
       .attr("d", d3.svg.line.radial()
         .radius((d)-> smallR * d/max)
         .interpolate("cardinal")
@@ -294,23 +289,18 @@ class Chart
     #Lots of hand wavy math to get everything to line up the correct way
     average=sum(zone)/zone.length+7.5+9
     angle = Math.PI*2*(average/24)
-    d3.select("#outerArc")
-      .attr("d", d3.svg.arc()
-        .startAngle(angle)
-        .endAngle(2*Math.PI/3+angle)
-        .innerRadius(Chart.parameters.clock.r-Chart.parameters.clock.arcWidth)
-        .outerRadius(Chart.parameters.clock.r))
-      .transition().delay(100)
-
+    degree = (angle)*180/(Math.PI)
+    d3.select("#outerArc").transition().delay(10)
+      .attr("transform","rotate(#{degree}),translate(0,0)")
 
   updateStats : ()->
     d3.select("#statsG text#country")
       .text(@selectedCountry)
 
   updateMap: (ob)->
-    d3.selectAll("#map svg path").each((d,i)->
-
-      classStr =
+    d3.selectAll("#map svg path")
+      .transition().delay(10)
+      .attr("class",(d) ->
         if d.properties.name of ob.data.workingData
           if d.properties.name is ob.selectedCountry
             "selected"
@@ -318,7 +308,6 @@ class Chart
             'unselected'
         else
           "feature"
-      d3.select(this).attr("class",classStr)
     )
 
   ########

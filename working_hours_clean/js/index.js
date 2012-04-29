@@ -126,7 +126,7 @@ Chart = (function() {
   };
 
   Chart.prototype.createClock = function(ob) {
-    var arcWidth, clock, h, outerArc, outerCircle, r, w;
+    var arcWidth, clock, h, r, w;
     w = Chart.parameters.clock.width;
     h = Chart.parameters.clock.height;
     r = Chart.parameters.clock.r;
@@ -137,10 +137,12 @@ Chart = (function() {
     }).attr("y2", function(d) {
       return Math.sin(2 * Math.PI * d / 3) * r;
     });
-    outerCircle = clock.append("g").data([_.range(361)]).append("path").attr("class", "outerCircle").attr("d", d3.svg.area.radial().innerRadius(r - arcWidth).outerRadius(r).angle(function(d, i) {
+    clock.append("g").data([_.range(361)]).append("path").attr("class", "outerCircle").attr("d", d3.svg.area.radial().innerRadius(r - arcWidth).outerRadius(r).angle(function(d, i) {
       return i / 180 * Math.PI;
     }));
-    return outerArc = clock.append("g").append("path").attr("class", "outerArc").attr("id", "outerArc").attr("d", d3.svg.arc().startAngle(0).endAngle(0).innerRadius(r - arcWidth).outerRadius(r));
+    clock.append("g").append("path").attr("class", "outerArc").attr("id", "outerArc").attr("d", d3.svg.arc().startAngle(0).endAngle(2 * Math.PI / 3).innerRadius(r - arcWidth).outerRadius(r));
+    clock.append("path").attr("class", "area");
+    return clock.append("path").attr("class", "line");
   };
 
   Chart.prototype.createStats = function() {
@@ -201,7 +203,7 @@ Chart = (function() {
   };
 
   Chart.prototype.updateClock = function(ob) {
-    var angle, average, clock, instance, mainClock, max, row, smallR, sum, summed, total, transposed, zone;
+    var angle, average, degree, instance, max, row, smallR, sum, summed, total, transposed, zone;
     instance = this.data.workingData[this.selectedCountry]["hours"];
     transposed = _.zip.apply(this, instance);
     sum = function(row) {
@@ -221,23 +223,21 @@ Chart = (function() {
     total = sum(summed);
     summed.push(summed[0]);
     max = _.max(summed);
-    clock = d3.select("#clockG");
-    clock.select("g.time").remove();
-    mainClock = clock.selectAll("g.time").data([summed]).enter().append("g").attr("class", "time");
     smallR = Chart.parameters.clock.r - Chart.parameters.clock.arcWidth - 1;
     angle = function(d, i) {
       return i / 12 * Math.PI;
     };
-    mainClock.append("path").attr("class", "area").attr("d", d3.svg.area.radial().innerRadius(0).outerRadius(function(d) {
+    d3.select("path.area").data([summed]).transition().delay(10).attr("d", d3.svg.area.radial().innerRadius(0).outerRadius(function(d) {
       return smallR * d / max;
     }).interpolate("cardinal").angle(angle));
-    mainClock.append("path").attr("class", "line").attr("d", d3.svg.line.radial().radius(function(d) {
+    d3.select("path.line").data([summed]).transition().delay(10).attr("d", d3.svg.line.radial().radius(function(d) {
       return smallR * d / max;
     }).interpolate("cardinal").angle(angle));
     zone = this.data.workingData[this.selectedCountry]["zones"];
     average = sum(zone) / zone.length + 7.5 + 9;
     angle = Math.PI * 2 * (average / 24);
-    return d3.select("#outerArc").attr("d", d3.svg.arc().startAngle(angle).endAngle(2 * Math.PI / 3 + angle).innerRadius(Chart.parameters.clock.r - Chart.parameters.clock.arcWidth).outerRadius(Chart.parameters.clock.r)).transition().delay(100);
+    degree = angle * 180 / Math.PI;
+    return d3.select("#outerArc").transition().delay(10).attr("transform", "rotate(" + degree + "),translate(0,0)");
   };
 
   Chart.prototype.updateStats = function() {
@@ -245,10 +245,16 @@ Chart = (function() {
   };
 
   Chart.prototype.updateMap = function(ob) {
-    return d3.selectAll("#map svg path").each(function(d, i) {
-      var classStr;
-      classStr = d.properties.name in ob.data.workingData ? d.properties.name === ob.selectedCountry ? "selected" : 'unselected' : "feature";
-      return d3.select(this).attr("class", classStr);
+    return d3.selectAll("#map svg path").transition().delay(10).attr("class", function(d) {
+      if (d.properties.name in ob.data.workingData) {
+        if (d.properties.name === ob.selectedCountry) {
+          return "selected";
+        } else {
+          return 'unselected';
+        }
+      } else {
+        return "feature";
+      }
     });
   };
 
