@@ -18,6 +18,7 @@ path.area{
   bottom: 20px;
   position: absolute;
 }
+
 #clock{
   right:20px;
   top: 20px;
@@ -26,7 +27,7 @@ path.area{
 
 #map{
   left:20px;
-  top: 20px;
+  bottom: 35px;
   position: absolute;
 }
 
@@ -70,9 +71,9 @@ path.area{
 
 .outerCircle{
   fill: steelblue;
-  stroke: #ccc;
+  stroke: steelblue;
 }
-
-.text{
-  font: 10px sans-serif;
+#stats {
+  padding-left:20px;
+  font: 40px sans-serif;
 }

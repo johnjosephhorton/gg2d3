@@ -8,6 +8,7 @@ Chart = (function() {
     this.updateChart = __bind(this.updateChart, this);
     this.changeCountry = __bind(this.changeCountry, this);
     this.onCountryClick = __bind(this.onCountryClick, this);
+    this.createStats = __bind(this.createStats, this);
   }
 
   Chart.parameters = (function() {
@@ -31,6 +32,11 @@ Chart = (function() {
       padding: 20,
       arcWidth: 30
     };
+    ob.title = {
+      width: $(document).width() - ob.clock.width,
+      height: $(document).height() - ob.chart.height,
+      padding: 20
+    };
     return ob;
   })();
 
@@ -49,7 +55,7 @@ Chart = (function() {
   })(Chart);
 
   Chart.prototype.createMap = function(ob) {
-    var feature, fishPolygon, refish, svg;
+    var feature, fishPolygon, i, refish, svg, _i, _len, _ref, _results;
     svg = d3.select("#map").append("svg").attr("width", Chart.parameters.map.width).attr("height", Chart.parameters.map.height);
     feature = svg.selectAll("path").data(this.data.worldCountries.features).enter().append("path").attr("class", function(d) {
       if (d.properties.name in ob.data.workingData) {
@@ -82,8 +88,8 @@ Chart = (function() {
         });
       });
     };
-    refish = function() {
-      ob.map.fisheye.center([d3.event.x - 20, d3.event.y - 20]);
+    refish = function(e) {
+      ob.map.fisheye.center([e.offsetX, e.offsetY]);
       return svg.selectAll("path").attr("d", function(d) {
         var clone, processed, type;
         clone = $.extend({}, d);
@@ -93,16 +99,25 @@ Chart = (function() {
         return ob.map.path(clone);
       });
     };
-    d3.select("svg").on("mousemove", refish);
-    d3.select("svg").on("mousein", refish);
-    d3.select("svg").on("mouseout", refish);
-    d3.select("svg").on("touch", refish);
-    return d3.select("svg").on("touchmove", refish);
+    _ref = ["mousemove", "mousein", "mouseout", "touch", "touchmove"];
+    _results = [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      i = _ref[_i];
+      _results.push($("#map").on(i, refish));
+    }
+    return _results;
   };
 
   Chart.prototype.createChart = function(ob) {
     var weekChart;
     weekChart = d3.select("#week").append("svg").attr("width", Chart.parameters.chart.width).attr("height", Chart.parameters.chart.height).append('g').attr("id", "weekChart");
+    _.map(_.range(7), function(n) {
+      var str;
+      str = "abcdefghi";
+      weekChart.append("path").attr("class", "area" + str[n] + "l");
+      return weekChart.append("path").attr("class", "area" + str[n] + "r");
+    });
+    weekChart.append("path").attr("class", "thickline");
     return weekChart.selectAll("g.day").data(["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]).enter().append("text").attr("x", function(d, i) {
       return Chart.parameters.chart.width / 7 * (i + 0.5);
     }).attr("dy", Chart.parameters.chart.height - 3).attr("text-anchor", "middle").text(function(d) {
@@ -128,17 +143,25 @@ Chart = (function() {
     return outerArc = clock.append("g").append("path").attr("class", "outerArc").attr("id", "outerArc").attr("d", d3.svg.arc().startAngle(0).endAngle(0).innerRadius(r - arcWidth).outerRadius(r));
   };
 
+  Chart.prototype.createStats = function() {
+    var stats;
+    stats = d3.select("#stats").append("svg").attr("width", Chart.parameters.title.width).attr("height", Chart.parameters.title.height).append('g').attr("id", "statsG");
+    return stats.append("text").attr("x", 100).attr("y", 100).attr("id", "country");
+  };
+
   Chart.prototype.onCountryClick = function(d, i) {
     var clicked;
     clicked = d.properties.name;
     if (!(clicked in this.data.workingData)) return;
-    return this.changeCountry(clicked);
+    return this.changeCountry(clicked, this);
   };
 
   Chart.prototype.changeCountry = function(name, ob) {
     this.selectedCountry = name;
+    this.updateMap(ob);
     this.updateChart();
-    return this.updateClock(ob);
+    this.updateClock(ob);
+    return this.updateStats();
   };
 
   Chart.prototype.updateChart = function() {
@@ -157,18 +180,20 @@ Chart = (function() {
       return _results;
     })();
     _.map(_.range(7), function(n) {
-      weekChart.selectAll("path.area").data([instance[n]]).enter().append("path").attr("fill", n % 2 === 0 ? "steelblue" : "lightsteelblue").attr("d", d3.svg.area().x(function(d, i) {
+      var str;
+      str = "abcdefghi";
+      weekChart.selectAll("path.area" + str[n] + "l").data([instance[n]]).transition().delay(10).attr("fill", n % 2 === 0 ? "steelblue" : "lightsteelblue").attr("d", d3.svg.area().x(function(d, i) {
         return x(i + 24 * n);
       }).y0(y(0)).y1(function(d, i) {
         return y(d);
       }).interpolate("cardinal"));
-      return weekChart.selectAll("path.area").data([extended[n]]).enter().append("path").attr("fill", n % 2 === 0 ? "steelblue" : "lightsteelblue").attr("d", d3.svg.area().x(function(d, i) {
+      return weekChart.selectAll("path.area" + str[n] + "r").data([extended[n]]).transition().delay(10).attr("fill", n % 2 === 0 ? "steelblue" : "lightsteelblue").attr("d", d3.svg.area().x(function(d, i) {
         return x(i + 1 + 24 * n);
       }).y0(y(0)).y1(function(d, i) {
         return y(d);
       }).interpolate("cardinal"));
     });
-    return chartLine = weekChart.selectAll("g.thickline").data([flat]).enter().append("path").attr("class", "thickline").attr("d", d3.svg.line().x(function(d, i) {
+    return chartLine = weekChart.selectAll("path.thickline").data([flat]).transition().delay(10).attr("d", d3.svg.line().x(function(d, i) {
       return x(i);
     }).y(function(d, i) {
       return y(d);
@@ -212,15 +237,29 @@ Chart = (function() {
     zone = this.data.workingData[this.selectedCountry]["zones"];
     average = sum(zone) / zone.length + 7.5 + 9;
     angle = Math.PI * 2 * (average / 24);
-    return d3.select("#outerArc").attr("d", d3.svg.arc().startAngle(angle).endAngle(2 * Math.PI / 3 + angle).innerRadius(Chart.parameters.clock.r - Chart.parameters.clock.arcWidth).outerRadius(Chart.parameters.clock.r));
+    return d3.select("#outerArc").attr("d", d3.svg.arc().startAngle(angle).endAngle(2 * Math.PI / 3 + angle).innerRadius(Chart.parameters.clock.r - Chart.parameters.clock.arcWidth).outerRadius(Chart.parameters.clock.r)).transition().delay(100);
+  };
+
+  Chart.prototype.updateStats = function() {
+    return d3.select("#statsG text#country").text(this.selectedCountry);
+  };
+
+  Chart.prototype.updateMap = function(ob) {
+    return d3.selectAll("#map svg path").each(function(d, i) {
+      var classStr;
+      classStr = d.properties.name in ob.data.workingData ? d.properties.name === ob.selectedCountry ? "selected" : 'unselected' : "feature";
+      return d3.select(this).attr("class", classStr);
+    });
   };
 
   Chart.prototype.begin = function(c) {
     this.createMap(c);
     this.createChart(c);
     this.createClock(c);
+    this.createStats(c);
     this.updateChart(c);
-    return this.updateClock(c);
+    this.updateClock(c);
+    return this.updateStats(c);
   };
 
   return Chart;

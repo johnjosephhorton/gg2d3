@@ -1,6 +1,5 @@
 class Chart
   constructor: ()->
-
   ########
   #
   # Constant parameters
@@ -25,6 +24,10 @@ class Chart
       r: $(document).height()/4-5
       padding: 20
       arcWidth: 30
+    ob.title=
+      width: $(document).width()-ob.clock.width
+      height: $(document).height()-ob.chart.height
+      padding: 20
     ob
   )()
   data: {}
@@ -91,9 +94,11 @@ class Chart
           c =  ob.map.fisheye({x : p[0], y : p[1]})
           ob.map.projection.invert([c.x, c.y])))
 
-    refish = ()->
+    refish = (e)->
       #Not sure why you have to get rid of 20
-      ob.map.fisheye.center([d3.event.x-20,d3.event.y-20])
+      #Padding maybe?
+
+      ob.map.fisheye.center([e.offsetX,e.offsetY])
       svg.selectAll("path")
       .attr "d",(d)->
         clone = $.extend({},d)
@@ -102,11 +107,7 @@ class Chart
         clone.geometry.coordinates = processed
         ob.map.path(clone)
 
-    d3.select("svg").on "mousemove", refish
-    d3.select("svg").on "mousein", refish
-    d3.select("svg").on "mouseout", refish
-    d3.select("svg").on "touch", refish
-    d3.select("svg").on "touchmove", refish
+    $("#map").on(i,refish) for i in ["mousemove","mousein","mouseout","touch","touchmove"]
 
   createChart: (ob)->
     weekChart = d3.select("#week")
@@ -116,6 +117,14 @@ class Chart
       .append('g')
       .attr("id","weekChart")
 
+    _.map _.range(7), (n)->
+      str = "abcdefghi"
+      weekChart.append("path").attr("class","area#{str[n]}l")
+      weekChart.append("path").attr("class","area#{str[n]}r")
+
+
+    weekChart.append("path").attr("class","thickline")
+
     weekChart.selectAll("g.day")
       .data(["Sunday","Monday", "Tuesday",
          "Wednesday", "Thursday", "Friday", "Saturday"])
@@ -124,7 +133,6 @@ class Chart
       .attr("dy",Chart.parameters.chart.height-3)
       .attr("text-anchor","middle")
       .text((d)->d)
-
 
   createClock: (ob)->
     w=Chart.parameters.clock.width
@@ -167,6 +175,20 @@ class Chart
         .innerRadius(r-arcWidth)
         .outerRadius(r))
 
+  createStats : ()=>
+    stats = d3.select("#stats")
+      .append("svg")
+      .attr("width", Chart.parameters.title.width)
+      .attr("height", Chart.parameters.title.height)
+      .append('g')
+      .attr("id","statsG")
+
+    stats.append("text")
+      .attr("x",100)
+      .attr("y",100)
+#      .attr("text-anchor","left")
+      .attr("id","country")
+
   ########
   #
   # Mouse events
@@ -176,7 +198,7 @@ class Chart
   onCountryClick: (d,i)=>
     clicked= d.properties.name
     if not (clicked of @data.workingData) then return
-    @changeCountry(clicked)
+    @changeCountry(clicked,this)
   ########
   #
   # Change that which needs to be changed
@@ -185,9 +207,10 @@ class Chart
 
   changeCountry: (name,ob)=>
     @selectedCountry = name
-#    @updateMap()
+    @updateMap(ob)
     @updateChart()
     @updateClock(ob)
+    @updateStats()
 
   updateChart: ()=>
     instance = @data.workingData[@selectedCountry].hours
@@ -201,30 +224,28 @@ class Chart
     extended = (flat[i..i+24] for i in [1..flat.length] by 24)
 
     _.map _.range(7),(n)->
-      weekChart.selectAll("path.area")
-        .data([instance[n]]).enter()
-        .append("path")
-        .attr("fill", if n%2 is 0 then "steelblue" else "lightsteelblue")
-        .attr("d",d3.svg.area()
-          .x((d,i)-> x(i+24*n))
-          .y0(y(0))
-          .y1((d,i)-> y(d))
-          .interpolate("cardinal"))
+      str = "abcdefghi"
 
-      weekChart.selectAll("path.area")
-        .data([extended[n]]).enter()
-        .append("path")
-        .attr("fill", if n%2 is 0 then "steelblue" else "lightsteelblue")
-        .attr("d",d3.svg.area()
-          .x((d,i)-> x(i+1+24*n))
-          .y0(y(0))
-          .y1((d,i)-> y(d))
-          .interpolate("cardinal"))
+      weekChart.selectAll("path.area#{str[n]}l")
+      .data([instance[n]]).transition().delay(10)
+      .attr("fill", if n%2 is 0 then "steelblue" else "lightsteelblue")
+      .attr("d",d3.svg.area()
+        .x((d,i)-> x(i+24*n))
+        .y0(y(0))
+        .y1((d,i)-> y(d))
+        .interpolate("cardinal"))
 
-    chartLine = weekChart.selectAll("g.thickline")
-     .data([flat]).enter()
-     .append("path")
-     .attr("class","thickline")
+      weekChart.selectAll("path.area#{str[n]}r")
+      .data([extended[n]]).transition().delay(10)
+      .attr("fill", if n%2 is 0 then "steelblue" else "lightsteelblue")
+      .attr("d",d3.svg.area()
+        .x((d,i)-> x(i+1+24*n))
+        .y0(y(0))
+        .y1((d,i)-> y(d))
+        .interpolate("cardinal"))
+
+    chartLine = weekChart.selectAll("path.thickline")
+     .data([flat]).transition().delay(10)
      .attr("d",d3.svg.line()
        .x((d,i)-> x(i))
        .y((d,i)-> y(d))
@@ -270,14 +291,35 @@ class Chart
 
     zone = @data.workingData[@selectedCountry]["zones"]
 
-  #Lots of hand wavy math to get everything to line up the correct way.
+    #Lots of hand wavy math to get everything to line up the correct way
     average=sum(zone)/zone.length+7.5+9
     angle = Math.PI*2*(average/24)
-    d3.select("#outerArc").attr("d", d3.svg.arc()
-      .startAngle(angle)
-      .endAngle(2*Math.PI/3+angle)
-      .innerRadius(Chart.parameters.clock.r-Chart.parameters.clock.arcWidth)
-      .outerRadius(Chart.parameters.clock.r))
+    d3.select("#outerArc")
+      .attr("d", d3.svg.arc()
+        .startAngle(angle)
+        .endAngle(2*Math.PI/3+angle)
+        .innerRadius(Chart.parameters.clock.r-Chart.parameters.clock.arcWidth)
+        .outerRadius(Chart.parameters.clock.r))
+      .transition().delay(100)
+
+
+  updateStats : ()->
+    d3.select("#statsG text#country")
+      .text(@selectedCountry)
+
+  updateMap: (ob)->
+    d3.selectAll("#map svg path").each((d,i)->
+
+      classStr =
+        if d.properties.name of ob.data.workingData
+          if d.properties.name is ob.selectedCountry
+            "selected"
+          else
+            'unselected'
+        else
+          "feature"
+      d3.select(this).attr("class",classStr)
+    )
 
   ########
   #
@@ -289,9 +331,12 @@ class Chart
     @createMap(c)
     @createChart(c)
     @createClock(c)
+    @createStats(c)
 
     @updateChart(c)
     @updateClock(c)
+    @updateStats(c)
+
 
 c = new Chart()
 
