@@ -66,14 +66,18 @@ path.area{
 
 .outerArc{
   fill: lightsteelblue;
-  stroke: #ccc;
+  stroke: lightsteelblue;
 }
 
 .outerCircle{
   fill: steelblue;
+}
+.outerCircleFill{
+  fill: steelblue;
   stroke: steelblue;
 }
+
 #stats {
   padding-left:20px;
-  font: 40px sans-serif;
+  padding-top:40px;
 }

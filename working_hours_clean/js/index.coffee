@@ -5,9 +5,7 @@ class Chart
   # Constant parameters
   #
   ########
-  @parameters: (()->
-    #TODO: get the parameters to reset on resize
-
+  parameters: (()->
     #Map parameters
     ob =
       map:
@@ -21,10 +19,10 @@ class Chart
     ob.clock=
       width: $(document).height()/2
       height: $(document).height()/2
-      r: $(document).height()/4-5
+      r: $(document).height()/4-40
       padding: 20
       arcWidth: 30
-    ob.title=
+    ob.stats=
       width: $(document).width()-ob.clock.width
       height: $(document).height()-ob.chart.height
       padding: 20
@@ -48,10 +46,8 @@ class Chart
   map: ((main)->
     ob =
       projection: d3.geo.mercator()
-        .scale(main.parameters.map.width)
-        .translate([main.parameters.map.width/2,
-          main.parameters.map.height*2/3])
-
+        .scale($(document).width()/3)
+        .translate([$(document).width()/6,$(document).width()/4])
     ob.path = d3.geo.path().projection(ob.projection)
     ob.fisheye = d3.fisheye().radius(50).power(10)
     ob
@@ -66,8 +62,8 @@ class Chart
   createMap: (ob)->
 
     svg = d3.select("#map").append("svg")
-     .attr("width", Chart.parameters.map.width)
-     .attr("height",Chart.parameters.map.height)
+     .attr("width", ob.parameters.map.width)
+     .attr("height",ob.parameters.map.height)
 
     feature = svg.selectAll("path")
       .data(@data.worldCountries.features)
@@ -112,8 +108,8 @@ class Chart
   createChart: (ob)->
     weekChart = d3.select("#week")
       .append("svg")
-      .attr("width", Chart.parameters.chart.width)
-      .attr("height", Chart.parameters.chart.height)
+      .attr("width", ob.parameters.chart.width)
+      .attr("height", ob.parameters.chart.height)
       .append('g')
       .attr("id","weekChart")
 
@@ -125,21 +121,24 @@ class Chart
 
     weekChart.append("path").attr("class","thickline")
 
+    weekChart.append("text").attr("class","yaxislabels") for i in [0..5]
+    weekChart.append("text").attr("class","yaxistoplabel").text("# of workers")
+
     weekChart.selectAll("g.day")
       .data(["Sunday","Monday", "Tuesday",
          "Wednesday", "Thursday", "Friday", "Saturday"])
       .enter().append("text")
-      .attr("x",(d,i)->Chart.parameters.chart.width/7*(i+0.5))
-      .attr("dy",Chart.parameters.chart.height-3)
+      .attr("x",(d,i)->(ob.parameters.chart.width-35)/7*(i+0.5)+35)
+      .attr("dy",ob.parameters.chart.height-3)
       .attr("text-anchor","middle")
       .text((d)->d)
 
   createClock: (ob)->
 
-    w=Chart.parameters.clock.width
-    h=Chart.parameters.clock.height
-    r= Chart.parameters.clock.r
-    arcWidth= Chart.parameters.clock.arcWidth
+    w=ob.parameters.clock.width
+    h=ob.parameters.clock.height
+    r= ob.parameters.clock.r
+    arcWidth= ob.parameters.clock.arcWidth
 
     clock = d3.select("#clock")
       .append("svg")
@@ -149,21 +148,11 @@ class Chart
       .attr("id","clockG")
       .attr("transform","translate(#{h/2},#{w/2})")
 
-    clock.selectAll("g.rule")
-      .data(d3.range(3)).enter()
-      .append("g")
-      .attr("class","rule")
-      .append("line")
-      .attr("x1",0)
-      .attr("y1",0)
-      .attr("x2",(d)-> Math.cos(2*Math.PI*d/3-Math.PI)*r)
-      .attr("y2",(d)-> Math.sin(2*Math.PI*d/3)*r)
-
     clock.append("g")
-      .data([_.range(361)])
+      .data([_.range(370)])
       .append("path").attr("class","outerCircle")
       .attr("d", d3.svg.area.radial()
-          .innerRadius(r-arcWidth)
+        .innerRadius(r-arcWidth)
         .outerRadius(r)
         .angle((d,i) -> i/180 * Math.PI))
 
@@ -178,119 +167,152 @@ class Chart
 
     clock.append("path").attr("class","area")
     clock.append("path").attr("class","line")
+    clock.append("text").attr("class","rlabel") for i in [0..10]
 
-  createStats : ()=>
+    clock.append("text")
+      .attr("x", -(ob.parameters.clock.r+5))
+      .attr("y", -ob.parameters.clock.height/4-20)
+      .attr("text-anchor", "middle")
+      .text("# of workers")
+
+  createStats : (ob)=>
     stats = d3.select("#stats")
       .append("svg")
-      .attr("width", Chart.parameters.title.width)
-      .attr("height", Chart.parameters.title.height)
+      .attr("width", ob.parameters.stats.width)
+      .attr("height", ob.parameters.stats.height)
       .append('g')
       .attr("id","statsG")
 
+    len =  _.max(_.pluck(_.keys(@data.workingData),"length"))
+    t = Math.round(ob.parameters.stats.width/len*2)
     stats.append("text")
-      .attr("x",100)
-      .attr("y",100)
-#      .attr("text-anchor","left")
+      .attr("y",t)
+      .style("font-size","#{t}px")
       .attr("id","country")
 
-  ########
-  #
-  # Mouse events
-  #
-  ########
+   ########
+   #
+   # Mouse events
+   #
+   ########
 
-  onCountryClick: (d,i)=>
-    clicked= d.properties.name
-    if not (clicked of @data.workingData) then return
-    @changeCountry(clicked,this)
-  ########
-  #
-  # Change that which needs to be changed
-  #
-  ########
+   onCountryClick: (d,i)=>
+     clicked= d.properties.name
+     if not (clicked of @data.workingData) then return
+     @changeCountry(clicked,this)
+   ########
+   #
+   # Change that which needs to be changed
+   #
+   ########
 
-  changeCountry: (name,ob)=>
-    @selectedCountry = name
-    @updateMap(ob)
-    @updateChart()
-    @updateClock(ob)
-    @updateStats()
+   changeCountry: (name,ob)=>
+     @selectedCountry = name
+     @updateMap(ob)
+     @updateChart(ob)
+     @updateClock(ob)
+     @updateStats(ob)
 
-  updateChart: ()=>
-    instance = @data.workingData[@selectedCountry].hours
-    flat  = _.flatten(instance)
+   updateChart: (ob)=>
+     instance = @data.workingData[@selectedCountry].hours
+     flat  = _.flatten(instance)
 
-    x = d3.scale.linear().domain([0, flat.length]).range([0, Chart.parameters.chart.width])
-    y = d3.scale.linear().domain([0, _.max(flat)]).range([Chart.parameters.chart.height-15, 10])
+     x = d3.scale.linear().domain([0, flat.length]).range([35, ob.parameters.chart.width])
+     y = d3.scale.linear().domain([0, _.max(flat)]).range([ob.parameters.chart.height-15,5])
 
-    weekChart = d3.select("#weekChart")
+     weekChart = d3.select("#weekChart")
 
-    extended = (flat[i..i+24] for i in [1..flat.length] by 24)
+     #TODO: This looks wrong
+     tickers= y.ticks(10)
 
-    _.map _.range(7),(n)->
-      str = "abcdefghi"
+     labels= weekChart.selectAll(".yaxislabels").data(tickers)
+     labels.transition().delay(20)
+       .attr("x", 30)
+       .attr("y", y)
+       .attr("text-anchor", "end")
+       .text((d)-> d)
+     labels.exit().remove()
 
-      weekChart.selectAll("path.area#{str[n]}l")
-      .data([instance[n]]).transition().delay(10)
-      .attr("fill", if n%2 is 0 then "steelblue" else "lightsteelblue")
-      .attr("d",d3.svg.area()
-        .x((d,i)-> x(i+24*n))
-        .y0(y(0))
-        .y1((d,i)-> y(d))
+     weekChart.select(".yaxistoplabel").transition().delay(20)
+     .attr("y",30)
+
+     extended = (flat[i..i+24] for i in [1..flat.length] by 24)
+
+     _.map _.range(7),(n)->
+       str = "abcdefghi"
+
+       weekChart.selectAll("path.area#{str[n]}l")
+       .data([instance[n]]).transition().delay(20)
+       .attr("fill", if n%2 is 0 then "steelblue" else "lightsteelblue")
+       .attr("d",d3.svg.area()
+         .x((d,i)-> x(i+24*n))
+         .y0(y(0))
+         .y1((d,i)-> y(d))
+         .interpolate("cardinal"))
+
+       weekChart.selectAll("path.area#{str[n]}r")
+       .data([extended[n]]).transition().delay(20)
+       .attr("fill", if n%2 is 0 then "steelblue" else "lightsteelblue")
+       .attr("d",d3.svg.area()
+         .x((d,i)-> x(i+1+24*n))
+         .y0(y(0))
+         .y1((d,i)-> y(d))
+         .interpolate("cardinal"))
+
+     chartLine = weekChart.selectAll("path.thickline")
+      .data([flat]).transition().delay(20)
+      .attr("d",d3.svg.line()
+        .x((d,i)-> x(i))
+        .y((d,i)-> y(d))
         .interpolate("cardinal"))
 
-      weekChart.selectAll("path.area#{str[n]}r")
-      .data([extended[n]]).transition().delay(10)
-      .attr("fill", if n%2 is 0 then "steelblue" else "lightsteelblue")
-      .attr("d",d3.svg.area()
-        .x((d,i)-> x(i+1+24*n))
-        .y0(y(0))
-        .y1((d,i)-> y(d))
-        .interpolate("cardinal"))
+   updateClock: (ob)=>
+     instance = @data.workingData[@selectedCountry]["hours"]
 
-    chartLine = weekChart.selectAll("path.thickline")
-     .data([flat]).transition().delay(10)
-     .attr("d",d3.svg.line()
-       .x((d,i)-> x(i))
-       .y((d,i)-> y(d))
-       .interpolate("cardinal"))
+     transposed = _.zip.apply(this,instance)
 
-  updateClock: (ob)=>
-    instance = @data.workingData[@selectedCountry]["hours"]
+     sum = (row)-> _.reduce(row,(a,b)-> a+b)
 
-    transposed = _.zip.apply(this,instance)
+     summed = (sum(row) for row in transposed)
+     total=sum(summed)
+     summed.push(summed[0])
+     max = _.max(summed)
 
-    sum = (row)-> _.reduce(row,(a,b)-> a+b)
+     smallR = ob.parameters.clock.r-ob.parameters.clock.arcWidth-1
 
-    summed = (sum(row) for row in transposed)
-    total=sum(summed)
-    summed.push(summed[0])
-    max = _.max(summed)
+     scale = d3.scale.linear().domain([0,max]).range([0,-smallR])
 
-    smallR = Chart.parameters.clock.r-Chart.parameters.clock.arcWidth-1
+     labels = d3.selectAll("text.rlabel").data(scale.ticks(5))
 
-    angle = (d,i) -> i/12 * Math.PI
+     labels.transition().delay(20)
+       .attr("x", -(ob.parameters.clock.r+5))
+       .attr("y", scale)
+       .attr("text-anchor", "end")
+       .text((d)-> d)
+     labels.exit().remove()
 
-    d3.select("path.area").data([summed]).transition().delay(10)
-        .attr("d", d3.svg.area.radial()
-        .innerRadius(0)
-        .outerRadius((d)-> smallR * d/max)
-        .interpolate("cardinal")
-        .angle(angle))
+     angle = (d,i) -> i/12 * Math.PI
 
-    d3.select("path.line").data([summed]).transition().delay(10)
-      .attr("d", d3.svg.line.radial()
-        .radius((d)-> smallR * d/max)
-        .interpolate("cardinal")
-        .angle(angle))
+     d3.select("path.area").data([summed]).transition().delay(20)
+         .attr("d", d3.svg.area.radial()
+         .innerRadius(0)
+         .outerRadius((d)-> smallR * d/max)
+         .interpolate("cardinal")
+         .angle(angle))
 
-    zone = @data.workingData[@selectedCountry]["zones"]
+     d3.select("path.line").data([summed]).transition().delay(20)
+       .attr("d", d3.svg.line.radial()
+         .radius((d)-> smallR * d/max)
+         .interpolate("cardinal")
+         .angle(angle))
 
-    #Lots of hand wavy math to get everything to line up the correct way
-    average=sum(zone)/zone.length+7.5+9
-    angle = Math.PI*2*(average/24)
-    degree = (angle)*180/(Math.PI)
-    d3.select("#outerArc").transition().delay(10)
+     zone = @data.workingData[@selectedCountry]["zones"]
+
+     #Lots of hand wavy math to get everything to line up the correct way
+     average=sum(zone)/zone.length+7.5+9
+     angle = Math.PI*2*(average/24)
+     degree = (angle)*180/(Math.PI)
+     d3.select("#outerArc").transition().delay(40)
       .attr("transform","rotate(#{degree}),translate(0,0)")
 
   updateStats : ()->
@@ -345,10 +367,10 @@ d3.json("data/world-countries.json", (data)->
 )
 
 $(window).resize(()->
-  c = new Chart()
+  d = new Chart()
   $("#map").empty()
   $("#clock").empty()
   $("#week").empty()
   $("#stats").empty()
-  c.begin(c)
+  d.begin(d)
 )
