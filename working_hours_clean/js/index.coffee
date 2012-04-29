@@ -125,8 +125,8 @@ class Chart
     weekChart.append("text").attr("class","yaxistoplabel").text("# of workers")
 
     weekChart.selectAll("g.day")
-      .data(["Sunday","Monday", "Tuesday",
-         "Wednesday", "Thursday", "Friday", "Saturday"])
+      .data(["Monday", "Tuesday",
+         "Wednesday", "Thursday", "Friday", "Saturday","Sunday"])
       .enter().append("text")
       .attr("x",(d,i)->(ob.parameters.chart.width-35)/7*(i+0.5)+35)
       .attr("dy",ob.parameters.chart.height-3)
@@ -234,9 +234,11 @@ class Chart
      labels.exit().remove()
 
      weekChart.select(".yaxistoplabel").transition().delay(20)
-     .attr("y",30)
+     .attr("y",25)
 
      extended = (flat[i..i+24] for i in [1..flat.length] by 24)
+
+     mode = "basis"
 
      _.map _.range(7),(n)->
        str = "abcdefghi"
@@ -248,7 +250,7 @@ class Chart
          .x((d,i)-> x(i+24*n))
          .y0(y(0))
          .y1((d,i)-> y(d))
-         .interpolate("cardinal"))
+         .interpolate(mode,1000))
 
        weekChart.selectAll("path.area#{str[n]}r")
        .data([extended[n]]).transition().delay(20)
@@ -257,14 +259,14 @@ class Chart
          .x((d,i)-> x(i+1+24*n))
          .y0(y(0))
          .y1((d,i)-> y(d))
-         .interpolate("cardinal"))
+         .interpolate(mode))
 
      chartLine = weekChart.selectAll("path.thickline")
       .data([flat]).transition().delay(20)
       .attr("d",d3.svg.line()
         .x((d,i)-> x(i))
         .y((d,i)-> y(d))
-        .interpolate("cardinal"))
+        .interpolate(mode))
 
    updateClock: (ob)=>
      instance = @data.workingData[@selectedCountry]["hours"]
@@ -374,3 +376,6 @@ $(window).resize(()->
   $("#stats").empty()
   d.begin(d)
 )
+
+check = ()->
+  key for key, ob of c.data.workingData when not ob.zones?

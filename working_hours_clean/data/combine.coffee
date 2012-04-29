@@ -6,7 +6,7 @@ timezones = JSON.parse fs.readFileSync "timezones.json","utf-8"
 rawData = []
 
 csv()
-.fromPath(__dirname+'/all_working_hours.csv')
+.fromPath(__dirname+'/more_working_hours.csv')
 .toPath(__dirname+'/sample.out')
 .transform((data)->
     data.unshift(data.pop())
@@ -17,30 +17,27 @@ csv()
 )
 .on('end',(count)->
   data = new Object
-
   addToData = (item)->
-
-    country = item[1]
+    [num, d, hour, country, w,key, mouse] = item
+    workers = +w
+    day = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].indexOf(d)
     if country is "Country" then return
-    workers = parseFloat(item[0])
-    day = item[2]
-    hour = item[3]
+
+    #Init empty arrays to deal with sparse arrays
+    zeros = (0 for i in [0...24])
+    zerozeros = (zeros[0..] for i in [0..6])
+#    console.log(zeros,zerozeros)
 
     #Do we have an object
-    if data[country]
-      #Do we have a day in that object?
-      if data[country]["hours"][day]
-        #Add in the workers
-        data[country]["hours"][day][hour]=workers
-      else
-        #Make an array
-        data[country]["hours"][day]=[workers]
-    else
-      data[country] = new Object
-      data[country]["hours"] = [[workers]]
+    if not data[country]?
+      data[country] = new Object()
+      data[country]["hours"] = zerozeros[0..]
       data[country]["zones"]= timezones[country]
 
+    data[country]["hours"][day][hour]=workers
+
   _.map(rawData,addToData)
+  console.log data["Iraq"]
   fs.writeFileSync("working-data.json",JSON.stringify(data))
 )
 .on('error',(error)->

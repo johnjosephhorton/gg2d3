@@ -1,4 +1,4 @@
-var Chart, c, i, startQ,
+var Chart, c, check, i, startQ,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 Chart = (function() {
@@ -122,7 +122,7 @@ Chart = (function() {
       weekChart.append("text").attr("class", "yaxislabels");
     }
     weekChart.append("text").attr("class", "yaxistoplabel").text("# of workers");
-    return weekChart.selectAll("g.day").data(["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]).enter().append("text").attr("x", function(d, i) {
+    return weekChart.selectAll("g.day").data(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]).enter().append("text").attr("x", function(d, i) {
       return (ob.parameters.chart.width - 35) / 7 * (i + 0.5) + 35;
     }).attr("dy", ob.parameters.chart.height - 3).attr("text-anchor", "middle").text(function(d) {
       return d;
@@ -172,7 +172,7 @@ Chart = (function() {
   };
 
   Chart.prototype.updateChart = function(ob) {
-    var chartLine, extended, flat, i, instance, labels, tickers, weekChart, x, y;
+    var chartLine, extended, flat, i, instance, labels, mode, tickers, weekChart, x, y;
     instance = this.data.workingData[this.selectedCountry].hours;
     flat = _.flatten(instance);
     x = d3.scale.linear().domain([0, flat.length]).range([35, ob.parameters.chart.width]);
@@ -184,7 +184,7 @@ Chart = (function() {
       return d;
     });
     labels.exit().remove();
-    weekChart.select(".yaxistoplabel").transition().delay(20).attr("y", 30);
+    weekChart.select(".yaxistoplabel").transition().delay(20).attr("y", 25);
     extended = (function() {
       var _ref, _results;
       _results = [];
@@ -193,6 +193,7 @@ Chart = (function() {
       }
       return _results;
     })();
+    mode = "basis";
     _.map(_.range(7), function(n) {
       var str;
       str = "abcdefghi";
@@ -200,18 +201,18 @@ Chart = (function() {
         return x(i + 24 * n);
       }).y0(y(0)).y1(function(d, i) {
         return y(d);
-      }).interpolate("cardinal"));
+      }).interpolate(mode, 1000));
       return weekChart.selectAll("path.area" + str[n] + "r").data([extended[n]]).transition().delay(20).attr("fill", n % 2 === 0 ? "steelblue" : "lightsteelblue").attr("d", d3.svg.area().x(function(d, i) {
         return x(i + 1 + 24 * n);
       }).y0(y(0)).y1(function(d, i) {
         return y(d);
-      }).interpolate("cardinal"));
+      }).interpolate(mode));
     });
     return chartLine = weekChart.selectAll("path.thickline").data([flat]).transition().delay(20).attr("d", d3.svg.line().x(function(d, i) {
       return x(i);
     }).y(function(d, i) {
       return y(d);
-    }).interpolate("cardinal"));
+    }).interpolate(mode));
   };
 
   Chart.prototype.updateClock = function(ob) {
@@ -318,3 +319,14 @@ $(window).resize(function() {
   $("#stats").empty();
   return d.begin(d);
 });
+
+check = function() {
+  var key, ob, _ref, _results;
+  _ref = c.data.workingData;
+  _results = [];
+  for (key in _ref) {
+    ob = _ref[key];
+    if (!(ob.zones != null)) _results.push(key);
+  }
+  return _results;
+};
