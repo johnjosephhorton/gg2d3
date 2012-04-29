@@ -127,7 +127,7 @@ updateChart = function() {
       return y(d);
     }).interpolate("cardinal"));
   });
-  chartLine = weekChart.selectAll("g.thickline").data([flat]).enter().append("path").attr("class", "thickline").attr("d", d3.svg.line().x(function(d, i) {
+  chartLine = weekChart.selectAll("g.thickline").transition(100).data([flat]).enter().append("path").attr("class", "thickline").attr("d", d3.svg.line().x(function(d, i) {
     return x(i);
   }).y(function(d, i) {
     return y(d);

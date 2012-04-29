@@ -229,7 +229,7 @@ updateChart = ()->
           .y1((d,i)-> y(d))
           .interpolate("cardinal"))
 
-  chartLine = weekChart.selectAll("g.thickline")
+  chartLine = weekChart.selectAll("g.thickline").transition(100)
     .data([flat]).enter()
     .append("path")
     .attr("class","thickline")

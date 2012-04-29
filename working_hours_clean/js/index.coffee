@@ -80,11 +80,9 @@ class Chart
       )
       .attr("d",(d)-> ob.map.path(d))
       .each((d)-> d.org = d.geometry.coordinates)
-#      .on('mouseover', onCountryClick)
+      .on('mouseover', ob.onCountryClick)
 
     feature.append("title").text((d)-> d.properties.name)
-
-
 
     fishPolygon = (polygon)->
       _.map(polygon, (list)->
@@ -118,53 +116,6 @@ class Chart
       .append('g')
       .attr("id","weekChart")
 
-  updateChart: (ob)->
-    instance = ob.data.workingData[ob.selectedCountry].hours
-    flat  = _.flatten(instance)
-
-    x = d3.scale.linear().domain([0, flat.length]).range([0, Chart.parameters.chart.width])
-    y = d3.scale.linear().domain([0, _.max(flat)]).range([Chart.parameters.chart.height-15, 10])
-
-    weekChart = d3.select("#weekChart")
-
-    weekChart.select("path.line").remove()
-    weekChart.select("path").remove()
-
-    extended = (flat[i..i+24] for i in [1..flat.length] by 24)
-    #TODO: Fix the overlapping thing
-    _.map _.range(7),(n)->
-      weekChart.selectAll("path.area")
-      .append("g")
-      .data([instance[n]]).enter()
-      .append("path")
-      .attr("fill",(if n%2 is 0 then "steelblue" else "lightsteelblue"))
-      .attr("d",d3.svg.area()
-        .x((d,i)-> x(i+24*n))
-        .y0(y(0))
-        .y1((d,i)-> y(d))
-        .interpolate("cardinal"))
-
-    _.map _.range(7),(n)->
-      weekChart.selectAll("path.area")
-      .append("g")
-      .data([extended[n]]).enter()
-      .append("path")
-      .attr("fill",(if n%2 is 0 then "steelblue" else "lightsteelblue"))
-      .attr("d",d3.svg.area()
-        .x((d,i)-> x(i+1+24*n))
-        .y0(y(0))
-        .y1((d,i)-> y(d))
-        .interpolate("cardinal"))
-
-    chartLine = weekChart.selectAll("g.thickline")
-     .data([flat]).enter()
-     .append("path")
-     .attr("class","thickline")
-     .attr("d",d3.svg.line()
-       .x((d,i)-> x(i))
-       .y((d,i)-> y(d))
-       .interpolate("cardinal"))
-
     weekChart.selectAll("g.day")
       .data(["Sunday","Monday", "Tuesday",
          "Wednesday", "Thursday", "Friday", "Saturday"])
@@ -173,6 +124,7 @@ class Chart
       .attr("dy",Chart.parameters.chart.height-3)
       .attr("text-anchor","middle")
       .text((d)->d)
+
 
   createClock: (ob)->
     w=Chart.parameters.clock.width
@@ -215,14 +167,76 @@ class Chart
         .innerRadius(r-arcWidth)
         .outerRadius(r))
 
-  updateClock: (ob)->
-    r= Chart.parameters.clock.r
-    arcWidth= Chart.parameters.clock.arcWidth
+  ########
+  #
+  # Mouse events
+  #
+  ########
 
-    instance = ob.data.workingData[ob.selectedCountry]["hours"]
+  onCountryClick: (d,i)=>
+    clicked= d.properties.name
+    if not (clicked of @data.workingData) then return
+    @changeCountry(clicked)
+  ########
+  #
+  # Change that which needs to be changed
+  #
+  ########
+
+  changeCountry: (name,ob)=>
+    @selectedCountry = name
+#    @updateMap()
+    @updateChart()
+    @updateClock(ob)
+
+  updateChart: ()=>
+    instance = @data.workingData[@selectedCountry].hours
+    flat  = _.flatten(instance)
+
+    x = d3.scale.linear().domain([0, flat.length]).range([0, Chart.parameters.chart.width])
+    y = d3.scale.linear().domain([0, _.max(flat)]).range([Chart.parameters.chart.height-15, 10])
+
+    weekChart = d3.select("#weekChart")
+
+    extended = (flat[i..i+24] for i in [1..flat.length] by 24)
+
+    _.map _.range(7),(n)->
+      weekChart.selectAll("path.area")
+        .data([instance[n]]).enter()
+        .append("path")
+        .attr("fill", if n%2 is 0 then "steelblue" else "lightsteelblue")
+        .attr("d",d3.svg.area()
+          .x((d,i)-> x(i+24*n))
+          .y0(y(0))
+          .y1((d,i)-> y(d))
+          .interpolate("cardinal"))
+
+      weekChart.selectAll("path.area")
+        .data([extended[n]]).enter()
+        .append("path")
+        .attr("fill", if n%2 is 0 then "steelblue" else "lightsteelblue")
+        .attr("d",d3.svg.area()
+          .x((d,i)-> x(i+1+24*n))
+          .y0(y(0))
+          .y1((d,i)-> y(d))
+          .interpolate("cardinal"))
+
+    chartLine = weekChart.selectAll("g.thickline")
+     .data([flat]).enter()
+     .append("path")
+     .attr("class","thickline")
+     .attr("d",d3.svg.line()
+       .x((d,i)-> x(i))
+       .y((d,i)-> y(d))
+       .interpolate("cardinal"))
+
+  updateClock: (ob)=>
+    instance = @data.workingData[@selectedCountry]["hours"]
+
     transposed = _.zip.apply(this,instance)
 
     sum = (row)-> _.reduce(row,(a,b)-> a+b)
+
     summed = (sum(row) for row in transposed)
     total=sum(summed)
     summed.push(summed[0])
@@ -235,7 +249,7 @@ class Chart
      .data([summed]).enter()
        .append("g").attr("class","time")
 
-    smallR = r-arcWidth-1
+    smallR = Chart.parameters.clock.r-Chart.parameters.clock.arcWidth-1
 
     angle = (d,i) -> i/12 * Math.PI
 
@@ -254,7 +268,7 @@ class Chart
         .interpolate("cardinal")
         .angle(angle))
 
-    zone = ob.data.workingData[ob.selectedCountry]["zones"]
+    zone = @data.workingData[@selectedCountry]["zones"]
 
   #Lots of hand wavy math to get everything to line up the correct way.
     average=sum(zone)/zone.length+7.5+9
@@ -262,8 +276,14 @@ class Chart
     d3.select("#outerArc").attr("d", d3.svg.arc()
       .startAngle(angle)
       .endAngle(2*Math.PI/3+angle)
-      .innerRadius(r-arcWidth)
-      .outerRadius(r))
+      .innerRadius(Chart.parameters.clock.r-Chart.parameters.clock.arcWidth)
+      .outerRadius(Chart.parameters.clock.r))
+
+  ########
+  #
+  # Let there be light
+  #
+  ########
 
   begin: (c)->
     @createMap(c)
@@ -272,12 +292,6 @@ class Chart
 
     @updateChart(c)
     @updateClock(c)
-
-  ########
-  #
-  # Redraw that which needs to change
-  #
-  ########
 
 c = new Chart()
 
@@ -298,7 +312,6 @@ d3.json("data/world-countries.json", (data)->
 
 $(window).resize(()->
   c = new Chart()
-  console.log("yo")
   $("#map").empty()
   $("#clock").empty()
   $("#week").empty()
