@@ -6,23 +6,27 @@ class Chart
   # Constant parameters
   #
   ########
-  @parameters:
+  @parameters: (()->
     #TODO: get the parameters to reset on resize
+
     #Map parameters
-    map:
-      width: $(document).width()/3
-      height: $(document).height()
-      padding: 20
-    chart:
-      width: $(document).width()-$(document).width()/3-50
+    ob =
+      map:
+        width: $(document).width()/3
+        height: $(document).width()/3
+        padding: 20
+    ob.chart =
+      width: $(document).width()-ob.map.width-50
       height: $(document).height()/3
       padding: 20
-    clock:
+    ob.clock=
       width: $(document).height()/2
       height: $(document).height()/2
       r: $(document).height()/4-5
       padding: 20
       arcWidth: 30
+    ob
+  )()
   data: {}
   ########
   #
@@ -40,28 +44,13 @@ class Chart
 
   map: ((main)->
     ob =
-      projection: d3.geo.azimuthal()
-        .scale(main.parameters.map.width/2)
-        .origin([-71.03,42.37])
+      projection: d3.geo.mercator()
+        .scale(main.parameters.map.width)
         .translate([main.parameters.map.width/2,
-          main.parameters.map.height/2])
-        .mode("orthographic")
-      # scale:
-      #   orthographic: 380
-      #   stereographic: 380
-      #   gnomonic: 380
-      #   equidistant: 380 / Math.PI * 2
-      #   equalarea: 380 / Math.SQRT2
+          main.parameters.map.height*2/3])
 
-    ob.circle = d3.geo.greatCircle()
-    ob.circle.origin(ob.projection.origin)
     ob.path = d3.geo.path().projection(ob.projection)
-    #TODO: Get circle to clip again
-    ob.clip = (d)->
-      console.log(this,main)
-      @path(d)
-    ob.m0 = null
-    ob.o0 = null
+    ob.fisheye = d3.fisheye().radius(50).power(10)
     ob
   )(this)
 
@@ -73,15 +62,10 @@ class Chart
 
   createMap: (ob)->
 
-    mousedown = ->
-      ob.map.m0 = [d3.event.pageX, d3.event.pageY]
-      ob.map.o0 = ob.map.projection.origin()
-      d3.event.preventDefault()
-
     svg = d3.select("#map").append("svg")
      .attr("width", Chart.parameters.map.width)
      .attr("height",Chart.parameters.map.height)
-     .on("mousedown", mousedown)
+
     feature = svg.selectAll("path")
       .data(@data.worldCountries.features)
       .enter().append("path")
@@ -94,35 +78,38 @@ class Chart
         else
           "feature"
       )
-      .attr("d",(d)-> ob.map.clip(d))
+      .attr("d",(d)-> ob.map.path(d))
+      .each((d)-> d.org = d.geometry.coordinates)
+#      .on('mouseover', onCountryClick)
+
     feature.append("title").text((d)-> d.properties.name)
 
 
-    mousemove = ->
-      if (ob.map.m0)
-        m1 = [d3.event.pageX, d3.event.pageY]
-        o1 = [ob.map.o0[0] + (ob.map.m0[0] - m1[0]) / 8,
-            ob.map.o0[1] + (m1[1] - ob.map.m0[1]) / 8]
-        ob.map.projection.origin(o1)
-        ob.map.circle.origin(o1)
-        refresh()
 
-    mouseup = ->
-      if c.map.m0
-        mousemove()
-        c.map.m0 = null
+    fishPolygon = (polygon)->
+      _.map(polygon, (list)->
+        _.map(list,(tuple)->
+          p = ob.map.projection(tuple)
+          c =  ob.map.fisheye({x : p[0], y : p[1]})
+          ob.map.projection.invert([c.x, c.y])))
 
-    refresh = (duration) ->
-      if duration
-        feature.transition().duration(duration)
-      else feature.attr("d", (d)-> ob.map.clip(d))
+    refish = ()->
+      #Not sure why you have to get rid of 20
+      ob.map.fisheye.center([d3.event.x-20,d3.event.y-20])
+      svg.selectAll("path")
+      .attr "d",(d)->
+        clone = $.extend({},d)
+        type = clone.geometry.type
+        processed = if type is "Polygon" then fishPolygon(d.org) else _.map(d.org,fishPolygon)
+        clone.geometry.coordinates = processed
+        ob.map.path(clone)
 
-    d3.select(window).on("mousemove", mousemove).on("mouseup", mouseup)
+    d3.select("svg").on "mousemove", refish
+    d3.select("svg").on "mousein", refish
+    d3.select("svg").on "mouseout", refish
+    d3.select("svg").on "touch", refish
+    d3.select("svg").on "touchmove", refish
 
-    d3.select("select").on("change", ->
-      projection.mode(this.value).scale(scale[this.value])
-      refresh(750)
-    )
   createChart: (ob)->
     weekChart = d3.select("#week")
       .append("svg")
@@ -144,7 +131,6 @@ class Chart
     weekChart.select("path").remove()
 
     extended = (flat[i..i+24] for i in [1..flat.length] by 24)
-    console.log(extended)
     #TODO: Fix the overlapping thing
     _.map _.range(7),(n)->
       weekChart.selectAll("path.area")

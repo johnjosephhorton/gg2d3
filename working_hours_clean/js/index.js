@@ -4,25 +4,29 @@ Chart = (function() {
 
   function Chart() {}
 
-  Chart.parameters = {
-    map: {
-      width: $(document).width() / 3,
-      height: $(document).height(),
-      padding: 20
-    },
-    chart: {
-      width: $(document).width() - $(document).width() / 3 - 50,
+  Chart.parameters = (function() {
+    var ob;
+    ob = {
+      map: {
+        width: $(document).width() / 3,
+        height: $(document).width() / 3,
+        padding: 20
+      }
+    };
+    ob.chart = {
+      width: $(document).width() - ob.map.width - 50,
       height: $(document).height() / 3,
       padding: 20
-    },
-    clock: {
+    };
+    ob.clock = {
       width: $(document).height() / 2,
       height: $(document).height() / 2,
       r: $(document).height() / 4 - 5,
       padding: 20,
       arcWidth: 30
-    }
-  };
+    };
+    return ob;
+  })();
 
   Chart.prototype.data = {};
 
@@ -31,28 +35,16 @@ Chart = (function() {
   Chart.prototype.map = (function(main) {
     var ob;
     ob = {
-      projection: d3.geo.azimuthal().scale(main.parameters.map.width / 2).origin([-71.03, 42.37]).translate([main.parameters.map.width / 2, main.parameters.map.height / 2]).mode("orthographic")
+      projection: d3.geo.mercator().scale(main.parameters.map.width).translate([main.parameters.map.width / 2, main.parameters.map.height * 2 / 3])
     };
-    ob.circle = d3.geo.greatCircle();
-    ob.circle.origin(ob.projection.origin);
     ob.path = d3.geo.path().projection(ob.projection);
-    ob.clip = function(d) {
-      console.log(this, main);
-      return this.path(d);
-    };
-    ob.m0 = null;
-    ob.o0 = null;
+    ob.fisheye = d3.fisheye().radius(50).power(10);
     return ob;
   })(Chart);
 
   Chart.prototype.createMap = function(ob) {
-    var feature, mousedown, mousemove, mouseup, refresh, svg;
-    mousedown = function() {
-      ob.map.m0 = [d3.event.pageX, d3.event.pageY];
-      ob.map.o0 = ob.map.projection.origin();
-      return d3.event.preventDefault();
-    };
-    svg = d3.select("#map").append("svg").attr("width", Chart.parameters.map.width).attr("height", Chart.parameters.map.height).on("mousedown", mousedown);
+    var feature, fishPolygon, refish, svg;
+    svg = d3.select("#map").append("svg").attr("width", Chart.parameters.map.width).attr("height", Chart.parameters.map.height);
     feature = svg.selectAll("path").data(this.data.worldCountries.features).enter().append("path").attr("class", function(d) {
       if (d.properties.name in ob.data.workingData) {
         if (d.properties.name === ob.selectedCountry) {
@@ -64,41 +56,42 @@ Chart = (function() {
         return "feature";
       }
     }).attr("d", function(d) {
-      return ob.map.clip(d);
+      return ob.map.path(d);
+    }).each(function(d) {
+      return d.org = d.geometry.coordinates;
     });
     feature.append("title").text(function(d) {
       return d.properties.name;
     });
-    mousemove = function() {
-      var m1, o1;
-      if (ob.map.m0) {
-        m1 = [d3.event.pageX, d3.event.pageY];
-        o1 = [ob.map.o0[0] + (ob.map.m0[0] - m1[0]) / 8, ob.map.o0[1] + (m1[1] - ob.map.m0[1]) / 8];
-        ob.map.projection.origin(o1);
-        ob.map.circle.origin(o1);
-        return refresh();
-      }
-    };
-    mouseup = function() {
-      if (c.map.m0) {
-        mousemove();
-        return c.map.m0 = null;
-      }
-    };
-    refresh = function(duration) {
-      if (duration) {
-        return feature.transition().duration(duration);
-      } else {
-        return feature.attr("d", function(d) {
-          return ob.map.clip(d);
+    fishPolygon = function(polygon) {
+      return _.map(polygon, function(list) {
+        return _.map(list, function(tuple) {
+          var c, p;
+          p = ob.map.projection(tuple);
+          c = ob.map.fisheye({
+            x: p[0],
+            y: p[1]
+          });
+          return ob.map.projection.invert([c.x, c.y]);
         });
-      }
+      });
     };
-    d3.select(window).on("mousemove", mousemove).on("mouseup", mouseup);
-    return d3.select("select").on("change", function() {
-      projection.mode(this.value).scale(scale[this.value]);
-      return refresh(750);
-    });
+    refish = function() {
+      ob.map.fisheye.center([d3.event.x - 20, d3.event.y - 20]);
+      return svg.selectAll("path").attr("d", function(d) {
+        var clone, processed, type;
+        clone = $.extend({}, d);
+        type = clone.geometry.type;
+        processed = type === "Polygon" ? fishPolygon(d.org) : _.map(d.org, fishPolygon);
+        clone.geometry.coordinates = processed;
+        return ob.map.path(clone);
+      });
+    };
+    d3.select("svg").on("mousemove", refish);
+    d3.select("svg").on("mousein", refish);
+    d3.select("svg").on("mouseout", refish);
+    d3.select("svg").on("touch", refish);
+    return d3.select("svg").on("touchmove", refish);
   };
 
   Chart.prototype.createChart = function(ob) {
@@ -123,7 +116,6 @@ Chart = (function() {
       }
       return _results;
     })();
-    console.log(extended);
     _.map(_.range(7), function(n) {
       return weekChart.selectAll("path.area").append("g").data([instance[n]]).enter().append("path").attr("fill", (n % 2 === 0 ? "steelblue" : "lightsteelblue")).attr("d", d3.svg.area().x(function(d, i) {
         return x(i + 24 * n);

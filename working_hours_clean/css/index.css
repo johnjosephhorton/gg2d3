@@ -24,6 +24,12 @@ path.area{
   position: absolute;
 }
 
+#map{
+  left:20px;
+  top: 20px;
+  position: absolute;
+}
+
 .line {
   fill: none;
   stroke: steelblue;
