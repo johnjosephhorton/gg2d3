@@ -7,6 +7,12 @@ path.area{
   stroke: #ccc;
 }
 
+.feature {
+  fill: #eee;
+  stroke: #ccc;
+}
+
+
 #week{
   right:20px;
   bottom: 20px;
@@ -27,7 +33,7 @@ path.area{
 .thickline {
   fill: none;
   stroke: black;
-  stroke-width: 2px;
+  stroke-width: 1.5px;
 }
 
 .rule {

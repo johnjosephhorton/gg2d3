@@ -37,6 +37,7 @@ Chart = (function() {
     ob.circle.origin(ob.projection.origin);
     ob.path = d3.geo.path().projection(ob.projection);
     ob.clip = function(d) {
+      console.log(this, main);
       return this.path(d);
     };
     ob.m0 = null;
@@ -52,7 +53,17 @@ Chart = (function() {
       return d3.event.preventDefault();
     };
     svg = d3.select("#map").append("svg").attr("width", Chart.parameters.map.width).attr("height", Chart.parameters.map.height).on("mousedown", mousedown);
-    feature = svg.selectAll("path").data(this.data.worldCountries.features).enter().append("svg:path").attr("d", function(d) {
+    feature = svg.selectAll("path").data(this.data.worldCountries.features).enter().append("path").attr("class", function(d) {
+      if (d.properties.name in ob.data.workingData) {
+        if (d.properties.name === ob.selectedCountry) {
+          return 'selected';
+        } else {
+          return 'unselected';
+        }
+      } else {
+        return "feature";
+      }
+    }).attr("d", function(d) {
       return ob.map.clip(d);
     });
     feature.append("title").text(function(d) {
@@ -105,18 +116,24 @@ Chart = (function() {
     weekChart.select("path.line").remove();
     weekChart.select("path").remove();
     extended = (function() {
-      var _i, _len, _ref, _results;
-      _ref = d3.range(7);
+      var _ref, _results;
       _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        i = _ref[_i];
-        _results.push(instance[i].concat(instance[i][23]));
+      for (i = 1, _ref = flat.length; i <= _ref; i += 24) {
+        _results.push(flat.slice(i, (i + 24) + 1 || 9e9));
       }
       return _results;
     })();
+    console.log(extended);
+    _.map(_.range(7), function(n) {
+      return weekChart.selectAll("path.area").append("g").data([instance[n]]).enter().append("path").attr("fill", (n % 2 === 0 ? "steelblue" : "lightsteelblue")).attr("d", d3.svg.area().x(function(d, i) {
+        return x(i + 24 * n);
+      }).y0(y(0)).y1(function(d, i) {
+        return y(d);
+      }).interpolate("cardinal"));
+    });
     _.map(_.range(7), function(n) {
       return weekChart.selectAll("path.area").append("g").data([extended[n]]).enter().append("path").attr("fill", (n % 2 === 0 ? "steelblue" : "lightsteelblue")).attr("d", d3.svg.area().x(function(d, i) {
-        return x(i + 24 * n);
+        return x(i + 1 + 24 * n);
       }).y0(y(0)).y1(function(d, i) {
         return y(d);
       }).interpolate("cardinal"));
@@ -128,7 +145,7 @@ Chart = (function() {
     }).interpolate("cardinal"));
     return weekChart.selectAll("g.day").data(["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]).enter().append("text").attr("x", function(d, i) {
       return Chart.parameters.chart.width / 7 * (i + 0.5);
-    }).attr("dy", Chart.parameters.chart.height).attr("text-anchor", "middle").text(function(d) {
+    }).attr("dy", Chart.parameters.chart.height - 3).attr("text-anchor", "middle").text(function(d) {
       return d;
     });
   };

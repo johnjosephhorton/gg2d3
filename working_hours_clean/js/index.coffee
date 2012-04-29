@@ -57,7 +57,9 @@ class Chart
     ob.circle.origin(ob.projection.origin)
     ob.path = d3.geo.path().projection(ob.projection)
     #TODO: Get circle to clip again
-    ob.clip = (d)-> @path(d)
+    ob.clip = (d)->
+      console.log(this,main)
+      @path(d)
     ob.m0 = null
     ob.o0 = null
     ob
@@ -82,7 +84,16 @@ class Chart
      .on("mousedown", mousedown)
     feature = svg.selectAll("path")
       .data(@data.worldCountries.features)
-      .enter().append("svg:path")
+      .enter().append("path")
+      .attr("class",(d)->
+        if d.properties.name of ob.data.workingData
+          if d.properties.name is ob.selectedCountry
+            'selected'
+          else
+            'unselected'
+        else
+          "feature"
+      )
       .attr("d",(d)-> ob.map.clip(d))
     feature.append("title").text((d)-> d.properties.name)
 
@@ -132,9 +143,21 @@ class Chart
     weekChart.select("path.line").remove()
     weekChart.select("path").remove()
 
-    extended = (instance[i].concat(instance[i][23])for i in d3.range(7))
-
+    extended = (flat[i..i+24] for i in [1..flat.length] by 24)
+    console.log(extended)
     #TODO: Fix the overlapping thing
+    _.map _.range(7),(n)->
+      weekChart.selectAll("path.area")
+      .append("g")
+      .data([instance[n]]).enter()
+      .append("path")
+      .attr("fill",(if n%2 is 0 then "steelblue" else "lightsteelblue"))
+      .attr("d",d3.svg.area()
+        .x((d,i)-> x(i+24*n))
+        .y0(y(0))
+        .y1((d,i)-> y(d))
+        .interpolate("cardinal"))
+
     _.map _.range(7),(n)->
       weekChart.selectAll("path.area")
       .append("g")
@@ -142,7 +165,7 @@ class Chart
       .append("path")
       .attr("fill",(if n%2 is 0 then "steelblue" else "lightsteelblue"))
       .attr("d",d3.svg.area()
-        .x((d,i)-> x(i+24*n))
+        .x((d,i)-> x(i+1+24*n))
         .y0(y(0))
         .y1((d,i)-> y(d))
         .interpolate("cardinal"))
@@ -161,7 +184,7 @@ class Chart
          "Wednesday", "Thursday", "Friday", "Saturday"])
       .enter().append("text")
       .attr("x",(d,i)->Chart.parameters.chart.width/7*(i+0.5))
-      .attr("dy",Chart.parameters.chart.height)
+      .attr("dy",Chart.parameters.chart.height-3)
       .attr("text-anchor","middle")
       .text((d)->d)
 
