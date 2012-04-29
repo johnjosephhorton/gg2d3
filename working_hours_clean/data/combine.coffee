@@ -23,8 +23,8 @@ csv()
     country = item[1]
     if country is "Country" then return
     workers = parseFloat(item[0])
-    day = item[3]
-    hour = item[2]
+    day = item[2]
+    hour = item[3]
 
     #Do we have an object
     if data[country]

@@ -23,8 +23,8 @@ csv().fromPath(__dirname + '/all_working_hours.csv').toPath(__dirname + '/sample
     country = item[1];
     if (country === "Country") return;
     workers = parseFloat(item[0]);
-    day = item[3];
-    hour = item[2];
+    day = item[2];
+    hour = item[3];
     if (data[country]) {
       if (data[country]["hours"][day]) {
         return data[country]["hours"][day][hour] = workers;
