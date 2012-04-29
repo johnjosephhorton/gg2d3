@@ -119,7 +119,7 @@ class Chart
       weekChart.append("path").attr("class","area#{str[n]}r")
 
 
-    weekChart.append("path").attr("class","thickline")
+#    weekChart.append("path").attr("class","thickline")
 
     weekChart.append("text").attr("class","yaxislabels") for i in [0..5]
     weekChart.append("text").attr("class","yaxistoplabel").text("# of workers")
@@ -183,7 +183,8 @@ class Chart
       .append('g')
       .attr("id","statsG")
 
-    len =  _.max(_.pluck(_.keys(@data.workingData),"length"))
+    actual = (key for key, obj of c.data.workingData when not obj.zones)
+    len =  _.max(_.pluck(actual,"length"))
     t = Math.round(ob.parameters.stats.width/len*2)
     stats.append("text")
       .attr("y",t)
@@ -245,7 +246,7 @@ class Chart
 
        weekChart.selectAll("path.area#{str[n]}l")
        .data([instance[n]]).transition().delay(20)
-       .attr("fill", if n%2 is 0 then "steelblue" else "lightsteelblue")
+       .attr("fill", if n%2 is 0 then "#061F32" else "#168CE5")
        .attr("d",d3.svg.area()
          .x((d,i)-> x(i+24*n))
          .y0(y(0))
@@ -254,7 +255,7 @@ class Chart
 
        weekChart.selectAll("path.area#{str[n]}r")
        .data([extended[n]]).transition().delay(20)
-       .attr("fill", if n%2 is 0 then "steelblue" else "lightsteelblue")
+       .attr("fill", if n%2 is 0 then "#061F32" else "#168CE5")
        .attr("d",d3.svg.area()
          .x((d,i)-> x(i+1+24*n))
          .y0(y(0))
@@ -302,11 +303,11 @@ class Chart
          .interpolate("cardinal")
          .angle(angle))
 
-     d3.select("path.line").data([summed]).transition().delay(20)
-       .attr("d", d3.svg.line.radial()
-         .radius((d)-> smallR * d/max)
-         .interpolate("cardinal")
-         .angle(angle))
+     # d3.select("path.line").data([summed]).transition().delay(20)
+     #   .attr("d", d3.svg.line.radial()
+     #     .radius((d)-> smallR * d/max)
+     #     .interpolate("cardinal")
+     #     .angle(angle))
 
      zone = @data.workingData[@selectedCountry]["zones"]
 

@@ -117,7 +117,6 @@ Chart = (function() {
       weekChart.append("path").attr("class", "area" + str[n] + "l");
       return weekChart.append("path").attr("class", "area" + str[n] + "r");
     });
-    weekChart.append("path").attr("class", "thickline");
     for (i = 0; i <= 5; i++) {
       weekChart.append("text").attr("class", "yaxislabels");
     }
@@ -149,9 +148,19 @@ Chart = (function() {
   };
 
   Chart.prototype.createStats = function(ob) {
-    var len, stats, t;
+    var actual, key, len, obj, stats, t;
     stats = d3.select("#stats").append("svg").attr("width", ob.parameters.stats.width).attr("height", ob.parameters.stats.height).append('g').attr("id", "statsG");
-    len = _.max(_.pluck(_.keys(this.data.workingData), "length"));
+    actual = (function() {
+      var _ref, _results;
+      _ref = c.data.workingData;
+      _results = [];
+      for (key in _ref) {
+        obj = _ref[key];
+        if (!obj.zones) _results.push(key);
+      }
+      return _results;
+    })();
+    len = _.max(_.pluck(actual, "length"));
     t = Math.round(ob.parameters.stats.width / len * 2);
     return stats.append("text").attr("y", t).style("font-size", "" + t + "px").attr("id", "country");
   };
@@ -197,12 +206,12 @@ Chart = (function() {
     _.map(_.range(7), function(n) {
       var str;
       str = "abcdefghi";
-      weekChart.selectAll("path.area" + str[n] + "l").data([instance[n]]).transition().delay(20).attr("fill", n % 2 === 0 ? "steelblue" : "lightsteelblue").attr("d", d3.svg.area().x(function(d, i) {
+      weekChart.selectAll("path.area" + str[n] + "l").data([instance[n]]).transition().delay(20).attr("fill", n % 2 === 0 ? "#061F32" : "#168CE5").attr("d", d3.svg.area().x(function(d, i) {
         return x(i + 24 * n);
       }).y0(y(0)).y1(function(d, i) {
         return y(d);
       }).interpolate(mode, 1000));
-      return weekChart.selectAll("path.area" + str[n] + "r").data([extended[n]]).transition().delay(20).attr("fill", n % 2 === 0 ? "steelblue" : "lightsteelblue").attr("d", d3.svg.area().x(function(d, i) {
+      return weekChart.selectAll("path.area" + str[n] + "r").data([extended[n]]).transition().delay(20).attr("fill", n % 2 === 0 ? "#061F32" : "#168CE5").attr("d", d3.svg.area().x(function(d, i) {
         return x(i + 1 + 24 * n);
       }).y0(y(0)).y1(function(d, i) {
         return y(d);
@@ -247,9 +256,6 @@ Chart = (function() {
       return i / 12 * Math.PI;
     };
     d3.select("path.area").data([summed]).transition().delay(20).attr("d", d3.svg.area.radial().innerRadius(0).outerRadius(function(d) {
-      return smallR * d / max;
-    }).interpolate("cardinal").angle(angle));
-    d3.select("path.line").data([summed]).transition().delay(20).attr("d", d3.svg.line.radial().radius(function(d) {
       return smallR * d / max;
     }).interpolate("cardinal").angle(angle));
     zone = this.data.workingData[this.selectedCountry]["zones"];

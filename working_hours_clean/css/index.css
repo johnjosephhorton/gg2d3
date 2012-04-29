@@ -1,17 +1,16 @@
 body {
   font: 10px sans-serif;
+  background-color:white;
+}
+
+text{
+  fill: #68707B;
 }
 
 path.area{
-  fill: lightsteelblue;
-  stroke: lightsteelblue;
+  fill: #68707B;
+  stroke: #68707B;
 }
-
-.feature {
-  fill: #eee;
-  stroke: #ccc;
-}
-
 
 #week{
   right:20px;
@@ -33,48 +32,36 @@ path.area{
 
 .line {
   fill: none;
-  stroke: steelblue;
+  stroke: #168CE5;
   stroke-width: 1.5px;
 }
 
-.thickline {
-  fill: none;
-  stroke: black;
-  stroke-width: 1.5px;
-}
-
-.rule {
-  fill: none;
-  stroke: black;
-  stroke-width: 1.5px;
-}
+/* white */
+/* /\*#061F32*\/ */
+/* #168CE5 */
 
 .feature {
-  fill: #eee;
-  stroke: #ccc;
+  fill: #68707B;
+  stroke: white;
 }
 
 .selected{
-  fill: steelblue;
+  fill: #061F32;
   stroke: #ccc;
 }
 
 .unselected{
-  fill: lightsteelblue;
+  fill: #168CE5;
   stroke: #ccc;
 }
 
 .outerArc{
-  fill: lightsteelblue;
-  stroke: lightsteelblue;
+  fill: #168CE5;
+  stroke: #168CE5;
 }
 
 .outerCircle{
-  fill: steelblue;
-}
-.outerCircleFill{
-  fill: steelblue;
-  stroke: steelblue;
+  fill: #061F32;
 }
 
 #stats {
