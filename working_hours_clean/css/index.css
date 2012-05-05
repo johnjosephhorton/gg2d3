@@ -69,10 +69,21 @@ path.area{
   padding-top:40px;
 }
 
-#alert {
+#alertIcon {
     background: url("/img/navigation-sprite-1.png") no-repeat scroll -48px -64px transparent;
-    display: block;
+    display: inline-block;
     height: 17px;
     width: 17px;
     margin: 4px 0 0 8px;
+}
+#alert{
+    display:inline-block;
+    height: 17px;
+}
+
+#alertText{
+  font: 10px sans-serif;
+  color: #68707B;
+  position: relative;
+  top: -5px;
 }

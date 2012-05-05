@@ -151,7 +151,7 @@ Chart = (function() {
     for (i = 0; i <= 10; i++) {
       clock.append("text").attr("class", "rlabel");
     }
-    return clock.append("text").attr("x", -(ob.parameters.clock.r + 5)).attr("y", -ob.parameters.clock.height / 4 - 20).attr("text-anchor", "middle").text("# of workers");
+    return clock.append("text").attr("x", -(ob.parameters.clock.r + 5)).attr("y", -ob.parameters.clock.height / 4 - 25).attr("text-anchor", "middle").text("# of workers");
   };
 
   Chart.prototype.createStats = function(ob) {
@@ -177,9 +177,9 @@ Chart = (function() {
     week = $("#week");
     weekOffset = week.offset();
     return $("#alert").offset({
-      left: weekOffset.left + week.width() - 20,
-      top: weekOffset.top
-    });
+      left: weekOffset.left,
+      top: weekOffset.top - 20
+    }).width(week.width());
   };
 
   Chart.prototype.onCountryClick = function(d, i) {
@@ -204,7 +204,9 @@ Chart = (function() {
     if (_.any(_.flatten(hours), function(n) {
       return n < 5;
     })) {
-      return $("#alert").show();
+      $("#alert").show();
+      $("span#country").text(this.selectedCountry);
+      return console.log(this.selectedCountry);
     } else {
       return $("#alert").hide();
     }
@@ -215,7 +217,7 @@ Chart = (function() {
     instance = this.data.workingData[this.selectedCountry].hours;
     flat = _.flatten(instance);
     x = d3.scale.linear().domain([0, flat.length]).range([35, ob.parameters.chart.width]);
-    y = d3.scale.linear().domain([0, _.max(flat)]).range([ob.parameters.chart.height - 15, 5]);
+    y = d3.scale.linear().domain([0, _.max(flat)]).range([ob.parameters.chart.height - 30, 5]);
     weekChart = d3.select("#weekChart");
     tickers = y.ticks(10);
     labels = weekChart.selectAll(".yaxislabels").data(tickers);
@@ -223,7 +225,7 @@ Chart = (function() {
       return d;
     });
     labels.exit().remove();
-    weekChart.select(".yaxistoplabel").transition().delay(20).attr("y", 25);
+    weekChart.select(".yaxistoplabel").transition().delay(20).attr("y", 30);
     extended = (function() {
       var _ref, _results;
       _results = [];

@@ -174,7 +174,7 @@ class Chart
 
     clock.append("text")
       .attr("x", -(ob.parameters.clock.r+5))
-      .attr("y", -ob.parameters.clock.height/4-20)
+      .attr("y", -ob.parameters.clock.height/4-25)
       .attr("text-anchor", "middle")
       .text("# of workers")
 
@@ -193,13 +193,15 @@ class Chart
       .attr("y",t)
       .style("font-size","#{t}px")
       .attr("id","country")
-   createAlert: (ob)=>
-     week = $("#week")
-     weekOffset = week.offset()
-     $("#alert").offset(
-       left: weekOffset.left+week.width()-20
-       top: weekOffset.top
-     )
+
+  createAlert: (ob)=>
+    week = $("#week")
+    weekOffset = week.offset()
+    $("#alert").offset(
+      left: weekOffset.left
+      top: weekOffset.top-20
+    ).width(week.width())
+
    ########
    #
    # Mouse events
@@ -228,8 +230,11 @@ class Chart
      hours = ob.data.workingData[@selectedCountry].hours
      if _.any(_.flatten(hours),(n)-> n<5)
        $("#alert").show()
+       $("span#country").text(@selectedCountry)
+       console.log(@selectedCountry)
      else
        $("#alert").hide()
+
 
 
 
@@ -238,7 +243,7 @@ class Chart
      flat  = _.flatten(instance)
 
      x = d3.scale.linear().domain([0, flat.length]).range([35, ob.parameters.chart.width])
-     y = d3.scale.linear().domain([0, _.max(flat)]).range([ob.parameters.chart.height-15,5])
+     y = d3.scale.linear().domain([0, _.max(flat)]).range([ob.parameters.chart.height-30,5])
 
      weekChart = d3.select("#weekChart")
 
@@ -254,7 +259,7 @@ class Chart
      labels.exit().remove()
 
      weekChart.select(".yaxistoplabel").transition().delay(20)
-     .attr("y",25)
+     .attr("y",30)
 
      extended = (flat[i..i+24] for i in [1..flat.length] by 24)
 
