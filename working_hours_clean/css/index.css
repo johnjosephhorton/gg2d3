@@ -68,3 +68,11 @@ path.area{
   padding-left:20px;
   padding-top:40px;
 }
+
+#alert {
+    background: url("/img/navigation-sprite-1.png") no-repeat scroll -48px -64px transparent;
+    display: block;
+    height: 17px;
+    width: 17px;
+    margin: 4px 0 0 8px;
+}

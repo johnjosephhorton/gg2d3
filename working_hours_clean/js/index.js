@@ -6,8 +6,10 @@ Chart = (function() {
   function Chart() {
     this.updateClock = __bind(this.updateClock, this);
     this.updateChart = __bind(this.updateChart, this);
+    this.updateAlert = __bind(this.updateAlert, this);
     this.changeCountry = __bind(this.changeCountry, this);
     this.onCountryClick = __bind(this.onCountryClick, this);
+    this.createAlert = __bind(this.createAlert, this);
     this.createStats = __bind(this.createStats, this);
   }
 
@@ -94,7 +96,6 @@ Chart = (function() {
       y = e.offsetY;
       if (x == null) x = e.screenX - $("#map svg").offset().left;
       if (y == null) y = e.screenY - $("#map svg").offset().top;
-      console.log(x, y);
       ob.map.fisheye.center([x, y]);
       return svg.selectAll("path").attr("d", function(d) {
         var clone, processed, type;
@@ -171,6 +172,16 @@ Chart = (function() {
     return stats.append("text").attr("y", t).style("font-size", "" + t + "px").attr("id", "country");
   };
 
+  Chart.prototype.createAlert = function(ob) {
+    var week, weekOffset;
+    week = $("#week");
+    weekOffset = week.offset();
+    return $("#alert").offset({
+      left: weekOffset.left + week.width() - 20,
+      top: weekOffset.top
+    });
+  };
+
   Chart.prototype.onCountryClick = function(d, i) {
     var clicked;
     clicked = d.properties.name;
@@ -183,7 +194,20 @@ Chart = (function() {
     this.updateMap(ob);
     this.updateChart(ob);
     this.updateClock(ob);
-    return this.updateStats(ob);
+    this.updateStats(ob);
+    return this.updateAlert(ob);
+  };
+
+  Chart.prototype.updateAlert = function(ob) {
+    var hours;
+    hours = ob.data.workingData[this.selectedCountry].hours;
+    if (_.any(_.flatten(hours), function(n) {
+      return n < 5;
+    })) {
+      return $("#alert").show();
+    } else {
+      return $("#alert").hide();
+    }
   };
 
   Chart.prototype.updateChart = function(ob) {
@@ -294,9 +318,11 @@ Chart = (function() {
     this.createChart(c);
     this.createClock(c);
     this.createStats(c);
+    this.createAlert(c);
     this.updateChart(c);
     this.updateClock(c);
-    return this.updateStats(c);
+    this.updateStats(c);
+    return this.updateAlert(c);
   };
 
   return Chart;

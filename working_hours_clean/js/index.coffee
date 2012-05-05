@@ -98,7 +98,7 @@ class Chart
       #TODO: Still a little off on firefox
       x ?= e.screenX - $("#map svg").offset().left
       y ?= e.screenY - $("#map svg").offset().top
-      console.log(x,y)
+
       ob.map.fisheye.center([x,y])
       svg.selectAll("path")
       .attr "d",(d)->
@@ -193,7 +193,13 @@ class Chart
       .attr("y",t)
       .style("font-size","#{t}px")
       .attr("id","country")
-
+   createAlert: (ob)=>
+     week = $("#week")
+     weekOffset = week.offset()
+     $("#alert").offset(
+       left: weekOffset.left+week.width()-20
+       top: weekOffset.top
+     )
    ########
    #
    # Mouse events
@@ -216,6 +222,16 @@ class Chart
      @updateChart(ob)
      @updateClock(ob)
      @updateStats(ob)
+     @updateAlert(ob)
+
+   updateAlert: (ob)=>
+     hours = ob.data.workingData[@selectedCountry].hours
+     if _.any(_.flatten(hours),(n)-> n<5)
+       $("#alert").show()
+     else
+       $("#alert").hide()
+
+
 
    updateChart: (ob)=>
      instance = @data.workingData[@selectedCountry].hours
@@ -349,11 +365,12 @@ class Chart
     @createChart(c)
     @createClock(c)
     @createStats(c)
+    @createAlert(c)
 
     @updateChart(c)
     @updateClock(c)
     @updateStats(c)
-
+    @updateAlert(c)
 
 c = new Chart()
 
