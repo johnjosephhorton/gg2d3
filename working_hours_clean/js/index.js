@@ -89,7 +89,13 @@ Chart = (function() {
       });
     };
     refish = function(e) {
-      ob.map.fisheye.center([e.offsetX, e.offsetY]);
+      var x, y;
+      x = e.offsetX;
+      y = e.offsetY;
+      if (x == null) x = e.screenX - $("#map svg").offset().left;
+      if (y == null) y = e.screenY - $("#map svg").offset().top;
+      console.log(x, y);
+      ob.map.fisheye.center([x, y]);
       return svg.selectAll("path").attr("d", function(d) {
         var clone, processed, type;
         clone = $.extend({}, d);

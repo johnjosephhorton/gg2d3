@@ -93,8 +93,13 @@ class Chart
     refish = (e)->
       #Not sure why you have to get rid of 20
       #Padding maybe?
-
-      ob.map.fisheye.center([e.offsetX,e.offsetY])
+      x = e.offsetX
+      y = e.offsetY
+      #TODO: Still a little off on firefox
+      x ?= e.screenX - $("#map svg").offset().left
+      y ?= e.screenY - $("#map svg").offset().top
+      console.log(x,y)
+      ob.map.fisheye.center([x,y])
       svg.selectAll("path")
       .attr "d",(d)->
         clone = $.extend({},d)
@@ -118,8 +123,6 @@ class Chart
       weekChart.append("path").attr("class","area#{str[n]}l")
       weekChart.append("path").attr("class","area#{str[n]}r")
 
-
-#    weekChart.append("path").attr("class","thickline")
 
     weekChart.append("text").attr("class","yaxislabels") for i in [0..5]
     weekChart.append("text").attr("class","yaxistoplabel").text("# of workers")
