@@ -151,7 +151,7 @@ Chart = (function() {
     for (i = 0; i <= 10; i++) {
       clock.append("text").attr("class", "rlabel");
     }
-    return clock.append("text").attr("x", -(ob.parameters.clock.r + 5)).attr("y", -ob.parameters.clock.height / 4 - 25).attr("text-anchor", "middle").text("# of workers");
+    return clock.append("text").attr("x", -(ob.parameters.clock.r + 5)).attr("y", -ob.parameters.clock.height / 4 - 20).attr("text-anchor", "middle").text("# of workers");
   };
 
   Chart.prototype.createStats = function(ob) {
@@ -202,7 +202,7 @@ Chart = (function() {
     var hours;
     hours = ob.data.workingData[this.selectedCountry].hours;
     if (_.any(_.flatten(hours), function(n) {
-      return n < 5;
+      return n < 10;
     })) {
       $("#alert").show();
       $("span#country").text(this.selectedCountry);
@@ -225,7 +225,7 @@ Chart = (function() {
       return d;
     });
     labels.exit().remove();
-    weekChart.select(".yaxistoplabel").transition().delay(20).attr("y", 30);
+    weekChart.select(".yaxistoplabel").transition().delay(20).attr("y", 20);
     extended = (function() {
       var _ref, _results;
       _results = [];

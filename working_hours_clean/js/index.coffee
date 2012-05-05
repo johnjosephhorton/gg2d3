@@ -174,7 +174,7 @@ class Chart
 
     clock.append("text")
       .attr("x", -(ob.parameters.clock.r+5))
-      .attr("y", -ob.parameters.clock.height/4-25)
+      .attr("y", -ob.parameters.clock.height/4-20)
       .attr("text-anchor", "middle")
       .text("# of workers")
 
@@ -228,7 +228,7 @@ class Chart
 
    updateAlert: (ob)=>
      hours = ob.data.workingData[@selectedCountry].hours
-     if _.any(_.flatten(hours),(n)-> n<5)
+     if _.any(_.flatten(hours),(n)-> n<10)
        $("#alert").show()
        $("span#country").text(@selectedCountry)
        console.log(@selectedCountry)
@@ -259,7 +259,7 @@ class Chart
      labels.exit().remove()
 
      weekChart.select(".yaxistoplabel").transition().delay(20)
-     .attr("y",30)
+     .attr("y",20)
 
      extended = (flat[i..i+24] for i in [1..flat.length] by 24)
 
