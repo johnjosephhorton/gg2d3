@@ -1,4 +1,4 @@
-var csv, fs, rawData, timezones, _;
+var csv, fs, load_time_zones, rawData, timezones, _;
 
 fs = require('fs');
 
@@ -48,8 +48,34 @@ csv().fromPath(__dirname + '/more_working_hours.csv').toPath(__dirname + '/sampl
     return data[country]["hours"][day][hour] = workers;
   };
   _.map(rawData, addToData);
-  console.log(data["Iraq"]);
-  return fs.writeFileSync("working-data.json", JSON.stringify(data));
+  return load_time_zones(data);
 }).on('error', function(error) {
   return console.log(error.message);
 });
+
+load_time_zones = function(data) {
+  rawData = [];
+  return csv().fromPath(__dirname + '/jobtypes_per_country.csv').toPath(__dirname + '/sample.out').transform(function(data) {
+    data.unshift(data.pop());
+    return data;
+  }).on('data', function(data, index) {
+    return rawData.push(data);
+  }).on('end', function(count) {
+    var addToData;
+    addToData = function(item) {
+      var big_cat, country, num, percent, projects, small_cat;
+      percent = item[0], country = item[1], num = item[2], big_cat = item[3], small_cat = item[4], projects = item[5];
+      projects = +projects;
+      if (!(data[country] != null)) return;
+      if (!(data[country]["job_types"] != null)) data[country]["job_types"] = {};
+      if (!(data[country]["job_types"][big_cat] != null)) {
+        data[country]["job_types"][big_cat] = {};
+      }
+      return data[country]["job_types"][big_cat][small_cat] = projects;
+    };
+    _.map(rawData, addToData);
+    return fs.writeFileSync("working-data.json", JSON.stringify(data));
+  }).on('error', function(error) {
+    return console.log(error.message);
+  });
+};

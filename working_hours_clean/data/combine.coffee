@@ -26,7 +26,7 @@ csv()
     #Init empty arrays to deal with sparse arrays
     zeros = (0 for i in [0...24])
     zerozeros = (zeros[0..] for i in [0..6])
-#    console.log(zeros,zerozeros)
+
 
     #Do we have an object
     if not data[country]?
@@ -37,9 +37,44 @@ csv()
     data[country]["hours"][day][hour]=workers
 
   _.map(rawData,addToData)
-  console.log data["Iraq"]
-  fs.writeFileSync("working-data.json",JSON.stringify(data))
+
+  load_time_zones(data)
+
 )
 .on('error',(error)->
     console.log(error.message)
 )
+
+
+load_time_zones =(data)->
+  rawData = []
+
+  csv()
+  .fromPath(__dirname+'/jobtypes_per_country.csv')
+  .toPath(__dirname+'/sample.out')
+  .transform((data)->
+      data.unshift(data.pop())
+      data
+  )
+  .on('data',(data,index)->
+    rawData.push(data)
+  )
+  .on('end',(count)->
+    addToData = (item)->
+      [percent,country,num,big_cat,small_cat,projects]=item
+      projects = +projects
+      if not data[country]? then return
+      if not data[country]["job_types"]?
+        data[country]["job_types"] = {}
+
+      if not data[country]["job_types"][big_cat]?
+        data[country]["job_types"][big_cat]= {}
+
+      data[country]["job_types"][big_cat][small_cat]= projects
+    _.map(rawData,addToData)
+
+    fs.writeFileSync("working-data.json",JSON.stringify(data))
+  )
+  .on('error',(error)->
+      console.log(error.message)
+  )
