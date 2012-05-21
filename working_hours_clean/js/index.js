@@ -4,18 +4,25 @@ var Chart, c, check, i, startQ,
 Chart = (function() {
 
   function Chart() {
-    this.updateClock = __bind(this.updateClock, this);
+    this.updateSmallCat = __bind(this.updateSmallCat, this);
+    this.updateLargeCat = __bind(this.updateLargeCat, this);
     this.updateChart = __bind(this.updateChart, this);
     this.updateAlert = __bind(this.updateAlert, this);
     this.changeCountry = __bind(this.changeCountry, this);
     this.onCountryClick = __bind(this.onCountryClick, this);
     this.createAlert = __bind(this.createAlert, this);
     this.createStats = __bind(this.createStats, this);
+    this.createSmallCat = __bind(this.createSmallCat, this);
   }
 
   Chart.prototype.parameters = (function() {
     var ob;
     ob = {
+      colors: {
+        white: "#FFF",
+        lightblue: "#168CE5",
+        darkblue: "#168CE5"
+      },
       map: {
         width: $(document).width() / 3,
         height: $(document).width() / 3,
@@ -27,17 +34,35 @@ Chart = (function() {
       height: $(document).height() / 3,
       padding: 20
     };
-    ob.clock = {
+    ob.largeCat = {
+      width: $(document).height() / 2,
+      height: $(document).height() / 2,
+      r: $(document).height() / 4 - 20,
+      padding: 20,
+      arcWidth: 20,
+      pie: d3.layout.pie().value(function(d) {
+        return d.value;
+      })
+    };
+    ob.largeCat.arc = d3.svg.arc().outerRadius(ob.largeCat.r).innerRadius(ob.largeCat.r * 2 / 3);
+    ob.largeCat.interpolate = function(q) {
+      if (q < 0.5) {
+        return d3.interpolateRgb(ob.colors.white, ob.colors.lightblue)(q);
+      } else {
+        return d3.interpolateRgb(ob.colors.lightblue, ob.colors.darkblue)(q);
+      }
+    };
+    ob.stats = {
+      width: $(document).width() / 3,
+      height: $(document).height() - ob.chart.height,
+      padding: 20
+    };
+    ob.smallCat = {
       width: $(document).height() / 2,
       height: $(document).height() / 2,
       r: $(document).height() / 4 - 40,
       padding: 20,
       arcWidth: 30
-    };
-    ob.stats = {
-      width: $(document).width() - ob.clock.width,
-      height: $(document).height() - ob.chart.height,
-      padding: 20
     };
     return ob;
   })();
@@ -45,6 +70,8 @@ Chart = (function() {
   Chart.prototype.data = {};
 
   Chart.prototype.selectedCountry = "United States";
+
+  Chart.prototype.selectedCategory = "";
 
   Chart.prototype.map = (function(main) {
     var ob;
@@ -135,24 +162,38 @@ Chart = (function() {
     });
   };
 
-  Chart.prototype.createClock = function(ob) {
-    var arcWidth, clock, h, i, r, w;
-    w = ob.parameters.clock.width;
-    h = ob.parameters.clock.height;
-    r = ob.parameters.clock.r;
-    arcWidth = ob.parameters.clock.arcWidth;
-    clock = d3.select("#clock").append("svg").attr("width", w).attr("height", h).append('g').attr("id", "clockG").attr("transform", "translate(" + (h / 2) + "," + (w / 2) + ")");
-    clock.append("g").data([_.range(370)]).append("path").attr("class", "outerCircle").attr("d", d3.svg.area.radial().innerRadius(r - arcWidth).outerRadius(r).angle(function(d, i) {
-      return i / 180 * Math.PI;
-    }));
-    clock.append("g").append("path").attr("class", "outerArc").attr("id", "outerArc").attr("d", d3.svg.arc().startAngle(0).endAngle(2 * Math.PI / 3).innerRadius(r - arcWidth).outerRadius(r));
-    clock.append("path").attr("class", "area");
-    clock.append("path").attr("class", "line");
-    for (i = 0; i <= 10; i++) {
-      clock.append("text").attr("class", "rlabel");
-    }
-    return clock.append("text").attr("x", -(ob.parameters.clock.r + 5)).attr("y", -ob.parameters.clock.height / 4 - 20).attr("text-anchor", "middle").text("# of workers");
+  Chart.prototype.createLargeCat = function(ob) {
+    var a, arcs, center, chart, h, labeled_data, legend, padding, r, w;
+    w = ob.parameters.largeCat.width;
+    h = ob.parameters.largeCat.height;
+    r = ob.parameters.largeCat.r;
+    padding = ob.parameters.largeCat.padding;
+    $("#category_container").width(ob.parameters.chart.width);
+    labeled_data = (function() {
+      var _i, _len, _ref, _results;
+      _ref = [1];
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        a = _ref[_i];
+        _results.push({
+          "label": "",
+          "value": a
+        });
+      }
+      return _results;
+    })();
+    chart = d3.select("#main_category").append("svg").data([labeled_data]).attr("width", w + padding).attr("height", h + padding).append("g").attr("transform", "translate(" + (w / 2) + "," + (h / 2) + ")");
+    arcs = chart.selectAll("g.arc").data(ob.parameters.largeCat.pie).enter().append("g").attr("class", "arc");
+    arcs.append("path").attr("d", ob.parameters.largeCat.arc).attr("fill", function(d, i) {
+      return ob.parameters.largeCat.interpolate(i / labeled_data.length);
+    });
+    center = chart.append("g").attr("class", "center");
+    center.append("text").text("Projects Completed").attr("transform", "translate(0,-7)");
+    center.append("text").attr("id", "total").text("Waiting...").attr("transform", "translate(0,7)");
+    return legend = d3.select("#main_category_legend").append("svg").attr("id", "main_legend").append("g");
   };
+
+  Chart.prototype.createSmallCat = function(ob) {};
 
   Chart.prototype.createStats = function(ob) {
     var actual, key, len, obj, stats, t;
@@ -193,7 +234,8 @@ Chart = (function() {
     this.selectedCountry = name;
     this.updateMap(ob);
     this.updateChart(ob);
-    this.updateClock(ob);
+    this.updateLargeCat(ob);
+    this.updateSmallCat(ob);
     this.updateStats(ob);
     return this.updateAlert(ob);
   };
@@ -205,8 +247,7 @@ Chart = (function() {
       return n < 10;
     })) {
       $("#alert").show();
-      $("span#country").text(this.selectedCountry);
-      return console.log(this.selectedCountry);
+      return $("span#country").text(this.selectedCountry);
     } else {
       return $("#alert").hide();
     }
@@ -256,45 +297,52 @@ Chart = (function() {
     }).interpolate(mode));
   };
 
-  Chart.prototype.updateClock = function(ob) {
-    var angle, average, degree, instance, labels, max, row, scale, smallR, sum, summed, total, transposed, zone;
-    instance = this.data.workingData[this.selectedCountry]["hours"];
-    transposed = _.zip.apply(this, instance);
-    sum = function(row) {
-      return _.reduce(row, function(a, b) {
-        return a + b;
-      });
-    };
-    summed = (function() {
-      var _i, _len, _results;
+  Chart.prototype.updateLargeCat = function(ob) {
+    var a, arcs, b, chart, colors, data, i, instance, j, key, labeled_data, legends, prop, total;
+    instance = this.data.workingData[this.selectedCountry]["job_types"];
+    data = {};
+    colors = d3.scale.category20();
+    for (key in instance) {
+      prop = instance[key];
+      data[key] = d3.sum((function() {
+        var _ref, _results;
+        _ref = instance[key];
+        _results = [];
+        for (i in _ref) {
+          j = _ref[i];
+          _results.push(j);
+        }
+        return _results;
+      })());
+    }
+    labeled_data = (function() {
+      var _results;
       _results = [];
-      for (_i = 0, _len = transposed.length; _i < _len; _i++) {
-        row = transposed[_i];
-        _results.push(sum(row));
+      for (a in data) {
+        b = data[a];
+        _results.push({
+          "label": a,
+          "value": b
+        });
       }
       return _results;
     })();
-    total = sum(summed);
-    summed.push(summed[0]);
-    max = _.max(summed);
-    smallR = ob.parameters.clock.r - ob.parameters.clock.arcWidth - 1;
-    scale = d3.scale.linear().domain([0, max]).range([0, -smallR]);
-    labels = d3.selectAll("text.rlabel").data(scale.ticks(5));
-    labels.transition().delay(20).attr("x", -(ob.parameters.clock.r + 5)).attr("y", scale).attr("text-anchor", "end").text(function(d) {
-      return d;
-    });
-    labels.exit().remove();
-    angle = function(d, i) {
-      return i / 12 * Math.PI;
-    };
-    d3.select("path.area").data([summed]).transition().delay(20).attr("d", d3.svg.area.radial().innerRadius(0).outerRadius(function(d) {
-      return smallR * d / max;
-    }).interpolate("cardinal").angle(angle));
-    zone = this.data.workingData[this.selectedCountry]["zones"];
-    average = sum(zone) / zone.length + 7.5 + 9;
-    angle = Math.PI * 2 * (average / 24);
-    degree = angle * 180 / Math.PI;
-    return d3.select("#outerArc").transition().delay(40).attr("transform", "rotate(" + degree + "),translate(0,0)");
+    chart = d3.select("#main_category > svg").data([labeled_data]).select("g");
+    arcs = chart.selectAll("g.arc").data(ob.parameters.largeCat.pie);
+    arcs.enter().append("g").attr("class", "arc").append("path").attr("d", ob.parameters.largeCat.arc);
+    arcs.select("path").attr("fill", function(d, i) {
+      return colors(20 - i);
+    }).attr("d", ob.parameters.largeCat.arc);
+    arcs.exit().remove();
+    total = d3.sum(_.values(data));
+    d3.select("text#total").text(total);
+    legends = d3.selectAll("#main_legend > g").data(labeled_data);
+    return legends.enter().append("text");
+  };
+
+  Chart.prototype.updateSmallCat = function(ob) {
+    var instance;
+    return instance = this.data.workingData[this.selectedCountry]["hours"];
   };
 
   Chart.prototype.updateStats = function() {
@@ -318,11 +366,13 @@ Chart = (function() {
   Chart.prototype.begin = function(c) {
     this.createMap(c);
     this.createChart(c);
-    this.createClock(c);
+    this.createLargeCat(c);
+    this.createSmallCat(c);
     this.createStats(c);
     this.createAlert(c);
     this.updateChart(c);
-    this.updateClock(c);
+    this.updateLargeCat(c);
+    this.updateSmallCat(c);
     this.updateStats(c);
     return this.updateAlert(c);
   };

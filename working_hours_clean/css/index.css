@@ -67,6 +67,7 @@ path.area{
 #stats {
   padding-left:20px;
   padding-top:40px;
+  width:10px;
 }
 
 #alertIcon {
@@ -76,6 +77,7 @@ path.area{
     width: 17px;
     margin: 4px 0 0 8px;
 }
+
 #alert{
     display:inline-block;
     height: 17px;
@@ -86,4 +88,14 @@ path.area{
   color: #68707B;
   position: relative;
   top: -5px;
+}
+
+#category_container{
+  float:right;
+}
+
+
+.center > text{
+  text-anchor:middle;
+  font: 14px sans-serif;
 }

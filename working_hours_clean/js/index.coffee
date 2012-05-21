@@ -1,3 +1,4 @@
+
 class Chart
   constructor: ()->
   ########
@@ -8,24 +9,51 @@ class Chart
   parameters: (()->
     #Map parameters
     ob =
+      colors:
+        white: "#FFF"
+        lightblue: "#168CE5"
+        darkblue: "#168CE5"
+
       map:
         width: $(document).width()/3
         height: $(document).width()/3
         padding: 20
+
     ob.chart =
       width: $(document).width()-ob.map.width-50
       height: $(document).height()/3
       padding: 20
-    ob.clock=
+
+    ob.largeCat=
+      width: $(document).height()/2
+      height: $(document).height()/2
+      r: $(document).height()/4-20
+      padding: 20
+      arcWidth: 20
+      pie: d3.layout.pie().value((d)-> d.value)
+
+    ob.largeCat.arc= d3.svg.arc()
+      .outerRadius(ob.largeCat.r)
+      .innerRadius(ob.largeCat.r*2/3)
+
+    ob.largeCat.interpolate = (q)->
+      if q < 0.5
+        d3.interpolateRgb(ob.colors.white,ob.colors.lightblue)(q)
+      else
+        d3.interpolateRgb(ob.colors.lightblue,ob.colors.darkblue)(q)
+
+    ob.stats=
+      width: $(document).width()/3
+      height: $(document).height()-ob.chart.height
+      padding: 20
+
+    ob.smallCat=
       width: $(document).height()/2
       height: $(document).height()/2
       r: $(document).height()/4-40
       padding: 20
       arcWidth: 30
-    ob.stats=
-      width: $(document).width()-ob.clock.width
-      height: $(document).height()-ob.chart.height
-      padding: 20
+
     ob
   )()
   data: {}
@@ -36,7 +64,7 @@ class Chart
   ########
 
   selectedCountry: "United States"
-
+  selectedCategory: ""
   ########
   #
   # d3.js charting objects
@@ -60,7 +88,6 @@ class Chart
   ########
 
   createMap: (ob)->
-
     svg = d3.select("#map").append("svg")
      .attr("width", ob.parameters.map.width)
      .attr("height",ob.parameters.map.height)
@@ -136,47 +163,49 @@ class Chart
       .attr("text-anchor","middle")
       .text((d)->d)
 
-  createClock: (ob)->
+  createLargeCat: (ob)->
 
-    w=ob.parameters.clock.width
-    h=ob.parameters.clock.height
-    r= ob.parameters.clock.r
-    arcWidth= ob.parameters.clock.arcWidth
+    w=ob.parameters.largeCat.width
+    h=ob.parameters.largeCat.height
+    r=ob.parameters.largeCat.r
+    padding=ob.parameters.largeCat.padding
 
-    clock = d3.select("#clock")
-      .append("svg")
-        .attr("width", w)
-        .attr("height",h )
-      .append('g')
-      .attr("id","clockG")
-      .attr("transform","translate(#{h/2},#{w/2})")
+    $("#category_container").width(ob.parameters.chart.width)
 
-    clock.append("g")
-      .data([_.range(370)])
-      .append("path").attr("class","outerCircle")
-      .attr("d", d3.svg.area.radial()
-        .innerRadius(r-arcWidth)
-        .outerRadius(r)
-        .angle((d,i) -> i/180 * Math.PI))
+    labeled_data = ({"label": "", "value": a} for a in [1])
 
-    clock.append("g")
-      .append("path").attr("class","outerArc")
-      .attr("id","outerArc")
-      .attr("d", d3.svg.arc()
-        .startAngle(0)
-        .endAngle(2*Math.PI/3)
-        .innerRadius(r-arcWidth)
-        .outerRadius(r))
+    chart = d3.select("#main_category").append("svg")
+      .data([labeled_data])
+      .attr("width",w+padding)
+      .attr("height",h+padding)
+      .append("g").attr("transform","translate(#{w/2},#{h/2})")
 
-    clock.append("path").attr("class","area")
-    clock.append("path").attr("class","line")
-    clock.append("text").attr("class","rlabel") for i in [0..10]
+    arcs = chart.selectAll("g.arc").data(ob.parameters.largeCat.pie)
+      .enter()
+      .append("g")
+      .attr("class","arc")
 
-    clock.append("text")
-      .attr("x", -(ob.parameters.clock.r+5))
-      .attr("y", -ob.parameters.clock.height/4-20)
-      .attr("text-anchor", "middle")
-      .text("# of workers")
+    arcs.append("path")
+      .attr("d",ob.parameters.largeCat.arc)
+      .attr("fill",(d,i)->
+         ob.parameters.largeCat.interpolate(i/labeled_data.length))
+
+    center = chart.append("g").attr("class","center")
+
+    center.append("text")
+      .text("Projects Completed")
+      .attr("transform","translate(0,-7)")
+
+    center.append("text")
+      .attr("id","total")
+      .text("Waiting...")
+      .attr("transform","translate(0,7)")
+
+    legend = d3.select("#main_category_legend")
+      .append("svg").attr("id","main_legend")
+      .append("g")
+
+  createSmallCat: (ob)=>
 
   createStats : (ob)=>
     stats = d3.select("#stats")
@@ -187,8 +216,11 @@ class Chart
       .attr("id","statsG")
 
     actual = (key for key, obj of c.data.workingData when not obj.zones)
+
     len =  _.max(_.pluck(actual,"length"))
+
     t = Math.round(ob.parameters.stats.width/len*2)
+
     stats.append("text")
       .attr("y",t)
       .style("font-size","#{t}px")
@@ -222,7 +254,8 @@ class Chart
      @selectedCountry = name
      @updateMap(ob)
      @updateChart(ob)
-     @updateClock(ob)
+     @updateLargeCat(ob)
+     @updateSmallCat(ob)
      @updateStats(ob)
      @updateAlert(ob)
 
@@ -231,7 +264,6 @@ class Chart
      if _.any(_.flatten(hours),(n)-> n<10)
        $("#alert").show()
        $("span#country").text(@selectedCountry)
-       console.log(@selectedCountry)
      else
        $("#alert").hide()
 
@@ -293,54 +325,47 @@ class Chart
         .y((d,i)-> y(d))
         .interpolate(mode))
 
-   updateClock: (ob)=>
-     instance = @data.workingData[@selectedCountry]["hours"]
+  updateLargeCat: (ob)=>
+    instance = @data.workingData[@selectedCountry]["job_types"]
 
-     transposed = _.zip.apply(this,instance)
+    data = {}
 
-     sum = (row)-> _.reduce(row,(a,b)-> a+b)
+    colors =  d3.scale.category20()
 
-     summed = (sum(row) for row in transposed)
-     total=sum(summed)
-     summed.push(summed[0])
-     max = _.max(summed)
+    for key,prop of instance
+      data[key] = d3.sum(j for i,j of instance[key])
 
-     smallR = ob.parameters.clock.r-ob.parameters.clock.arcWidth-1
+    labeled_data = ({"label": a, "value": b} for a,b of data)
 
-     scale = d3.scale.linear().domain([0,max]).range([0,-smallR])
+    chart = d3.select("#main_category > svg").data([labeled_data]).select("g")
 
-     labels = d3.selectAll("text.rlabel").data(scale.ticks(5))
+    arcs = chart.selectAll("g.arc").data(ob.parameters.largeCat.pie)
 
-     labels.transition().delay(20)
-       .attr("x", -(ob.parameters.clock.r+5))
-       .attr("y", scale)
-       .attr("text-anchor", "end")
-       .text((d)-> d)
-     labels.exit().remove()
+    arcs.enter()
+      .append("g").attr("class","arc")
+      .append("path")
+      .attr("d",ob.parameters.largeCat.arc)
 
-     angle = (d,i) -> i/12 * Math.PI
+    arcs.select("path")
+      .attr("fill",(d,i)->colors(20-i))
+      .attr("d",ob.parameters.largeCat.arc)
 
-     d3.select("path.area").data([summed]).transition().delay(20)
-         .attr("d", d3.svg.area.radial()
-         .innerRadius(0)
-         .outerRadius((d)-> smallR * d/max)
-         .interpolate("cardinal")
-         .angle(angle))
+    arcs.exit().remove()
 
-     # d3.select("path.line").data([summed]).transition().delay(20)
-     #   .attr("d", d3.svg.line.radial()
-     #     .radius((d)-> smallR * d/max)
-     #     .interpolate("cardinal")
-     #     .angle(angle))
+    total = d3.sum(_.values(data))
 
-     zone = @data.workingData[@selectedCountry]["zones"]
+    d3.select("text#total").text(total)
 
-     #Lots of hand wavy math to get everything to line up the correct way
-     average=sum(zone)/zone.length+7.5+9
-     angle = Math.PI*2*(average/24)
-     degree = (angle)*180/(Math.PI)
-     d3.select("#outerArc").transition().delay(40)
-      .attr("transform","rotate(#{degree}),translate(0,0)")
+    legends = d3.selectAll("#main_legend > g").data(labeled_data)
+    legends.enter().append("text")
+
+
+
+#    tmp.append("rect").attr("class","legend")
+#    tmp.append("text").text((d,i)->"#{d.label}-#{d.value}")
+
+  updateSmallCat: (ob)=>
+    instance = @data.workingData[@selectedCountry]["hours"]
 
   updateStats : ()->
     d3.select("#statsG text#country")
@@ -368,12 +393,14 @@ class Chart
   begin: (c)->
     @createMap(c)
     @createChart(c)
-    @createClock(c)
+    @createLargeCat(c)
+    @createSmallCat(c)
     @createStats(c)
     @createAlert(c)
 
     @updateChart(c)
-    @updateClock(c)
+    @updateLargeCat(c)
+    @updateSmallCat(c)
     @updateStats(c)
     @updateAlert(c)
 
