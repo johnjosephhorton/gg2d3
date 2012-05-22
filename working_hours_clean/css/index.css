@@ -94,6 +94,15 @@ path.area{
   float:right;
 }
 
+#main_category_container{
+  display: inline-block;
+}
+
+#main_legend{
+  display: inline-block;
+}
+
+
 
 .center > text{
   text-anchor:middle;

@@ -13,7 +13,7 @@ class Chart
         white: "#FFF"
         lightblue: "#168CE5"
         darkblue: "#168CE5"
-
+        rainbow: d3.scale.category20().range()
       map:
         width: $(document).width()/3
         height: $(document).width()/3
@@ -174,7 +174,8 @@ class Chart
 
     labeled_data = ({"label": "", "value": a} for a in [1])
 
-    chart = d3.select("#main_category").append("svg")
+    chart = d3.select("#main_category_container").append("svg")
+      .attr("id","main_category")
       .data([labeled_data])
       .attr("width",w+padding)
       .attr("height",h+padding)
@@ -201,9 +202,8 @@ class Chart
       .text("Waiting...")
       .attr("transform","translate(0,7)")
 
-    legend = d3.select("#main_category_legend")
+    legend = d3.select("#main_category_container")
       .append("svg").attr("id","main_legend")
-      .append("g")
 
   createSmallCat: (ob)=>
 
@@ -330,24 +330,23 @@ class Chart
 
     data = {}
 
-    colors =  d3.scale.category20()
-
     for key,prop of instance
       data[key] = d3.sum(j for i,j of instance[key])
 
     labeled_data = ({"label": a, "value": b} for a,b of data)
+      .sort((a,b)-> a.value < b.value)
 
-    chart = d3.select("#main_category > svg").data([labeled_data]).select("g")
-
+    chart = d3.select("#main_category").data([labeled_data]).select("g")
     arcs = chart.selectAll("g.arc").data(ob.parameters.largeCat.pie)
 
     arcs.enter()
       .append("g").attr("class","arc")
       .append("path")
+      .attr("fill",(d,i)->ob.parameters.colors.rainbow[i])
       .attr("d",ob.parameters.largeCat.arc)
 
     arcs.select("path")
-      .attr("fill",(d,i)->colors(20-i))
+      .attr("fill",(d,i)->ob.parameters.colors.rainbow[i])
       .attr("d",ob.parameters.largeCat.arc)
 
     arcs.exit().remove()
@@ -356,13 +355,31 @@ class Chart
 
     d3.select("text#total").text(total)
 
-    legends = d3.selectAll("#main_legend > g").data(labeled_data)
-    legends.enter().append("text")
+    legends = d3.select("#main_legend").selectAll("g")
+      .data(labeled_data)
+
+    l = legends.enter().append("g")
+
+    l.append("rect")
+
+    l.append("text")
+
+    legends.select("rect")
+      .attr("fill",(d,i)-> ob.parameters.colors.rainbow[i])
+      .attr("y",(d,i)-> i*14+10)
+      .attr("height",10)
+      .attr("width",10)
+
+    legends.select("text")
+      .text((d,i)->"#{d.label} - #{d.value}")
+      .attr("y",(d,i)-> i*14+7+10)
+      .attr("x",14)
+    legends.exit().remove()
 
 
 
 #    tmp.append("rect").attr("class","legend")
-#    tmp.append("text").text((d,i)->"#{d.label}-#{d.value}")
+#    tmp.append("text")
 
   updateSmallCat: (ob)=>
     instance = @data.workingData[@selectedCountry]["hours"]

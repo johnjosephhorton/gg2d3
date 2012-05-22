@@ -21,7 +21,8 @@ Chart = (function() {
       colors: {
         white: "#FFF",
         lightblue: "#168CE5",
-        darkblue: "#168CE5"
+        darkblue: "#168CE5",
+        rainbow: d3.scale.category20().range()
       },
       map: {
         width: $(document).width() / 3,
@@ -182,7 +183,7 @@ Chart = (function() {
       }
       return _results;
     })();
-    chart = d3.select("#main_category").append("svg").data([labeled_data]).attr("width", w + padding).attr("height", h + padding).append("g").attr("transform", "translate(" + (w / 2) + "," + (h / 2) + ")");
+    chart = d3.select("#main_category_container").append("svg").attr("id", "main_category").data([labeled_data]).attr("width", w + padding).attr("height", h + padding).append("g").attr("transform", "translate(" + (w / 2) + "," + (h / 2) + ")");
     arcs = chart.selectAll("g.arc").data(ob.parameters.largeCat.pie).enter().append("g").attr("class", "arc");
     arcs.append("path").attr("d", ob.parameters.largeCat.arc).attr("fill", function(d, i) {
       return ob.parameters.largeCat.interpolate(i / labeled_data.length);
@@ -190,7 +191,7 @@ Chart = (function() {
     center = chart.append("g").attr("class", "center");
     center.append("text").text("Projects Completed").attr("transform", "translate(0,-7)");
     center.append("text").attr("id", "total").text("Waiting...").attr("transform", "translate(0,7)");
-    return legend = d3.select("#main_category_legend").append("svg").attr("id", "main_legend").append("g");
+    return legend = d3.select("#main_category_container").append("svg").attr("id", "main_legend");
   };
 
   Chart.prototype.createSmallCat = function(ob) {};
@@ -298,10 +299,9 @@ Chart = (function() {
   };
 
   Chart.prototype.updateLargeCat = function(ob) {
-    var a, arcs, b, chart, colors, data, i, instance, j, key, labeled_data, legends, prop, total;
+    var a, arcs, b, chart, data, i, instance, j, key, l, labeled_data, legends, prop, total;
     instance = this.data.workingData[this.selectedCountry]["job_types"];
     data = {};
-    colors = d3.scale.category20();
     for (key in instance) {
       prop = instance[key];
       data[key] = d3.sum((function() {
@@ -315,7 +315,7 @@ Chart = (function() {
         return _results;
       })());
     }
-    labeled_data = (function() {
+    labeled_data = ((function() {
       var _results;
       _results = [];
       for (a in data) {
@@ -326,18 +326,35 @@ Chart = (function() {
         });
       }
       return _results;
-    })();
-    chart = d3.select("#main_category > svg").data([labeled_data]).select("g");
+    })()).sort(function(a, b) {
+      return a.value < b.value;
+    });
+    chart = d3.select("#main_category").data([labeled_data]).select("g");
     arcs = chart.selectAll("g.arc").data(ob.parameters.largeCat.pie);
-    arcs.enter().append("g").attr("class", "arc").append("path").attr("d", ob.parameters.largeCat.arc);
+    arcs.enter().append("g").attr("class", "arc").append("path").attr("fill", function(d, i) {
+      return ob.parameters.colors.rainbow[i];
+    }).attr("d", ob.parameters.largeCat.arc);
     arcs.select("path").attr("fill", function(d, i) {
-      return colors(20 - i);
+      return ob.parameters.colors.rainbow[i];
     }).attr("d", ob.parameters.largeCat.arc);
     arcs.exit().remove();
     total = d3.sum(_.values(data));
     d3.select("text#total").text(total);
-    legends = d3.selectAll("#main_legend > g").data(labeled_data);
-    return legends.enter().append("text");
+    legends = d3.select("#main_legend").selectAll("g").data(labeled_data);
+    l = legends.enter().append("g");
+    l.append("rect");
+    l.append("text");
+    legends.select("rect").attr("fill", function(d, i) {
+      return ob.parameters.colors.rainbow[i];
+    }).attr("y", function(d, i) {
+      return i * 14 + 10;
+    }).attr("height", 10).attr("width", 10);
+    legends.select("text").text(function(d, i) {
+      return "" + d.label + " - " + d.value;
+    }).attr("y", function(d, i) {
+      return i * 14 + 7 + 10;
+    }).attr("x", 14);
+    return legends.exit().remove();
   };
 
   Chart.prototype.updateSmallCat = function(ob) {
