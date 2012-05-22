@@ -1,3 +1,7 @@
+/* white */
+/* /\*#061F32*\/ */
+/* #168CE5 */
+
 body {
   font: 10px sans-serif;
   background-color:white;
@@ -12,33 +16,49 @@ path.area{
   stroke: #68707B;
 }
 
-#week{
-  right:20px;
-  bottom: 20px;
-  position: absolute;
-}
+/* #stats { */
+/*   padding-left:20px; */
+/*   padding-top:40px; */
+/*   width:10px; */
+/* } */
 
-#clock{
-  right:20px;
-  top: 20px;
-  position: absolute;
-}
 
-#map{
-  left:20px;
-  bottom: 35px;
-  position: absolute;
+/* #category_container{ */
+/*   float:right; */
+/* } */
+
+#main_category_container{
+  display: inline-block;
+  vertical-align: top;
 }
+#main_legend{
+
+} 
+
+
+/* #week{ */
+/*   right:20px; */
+/*   bottom: 20px; */
+/*   position: absolute; */
+/* } */
+
+/* #clock{ */
+/*   right:20px; */
+/*   top: 20px; */
+/*   position: absolute; */
+/* } */
+
+/* #map{ */
+/*   left:20px; */
+/*   bottom: 35px; */
+/*   position: absolute; */
+/* } */
 
 .line {
   fill: none;
   stroke: #168CE5;
   stroke-width: 1.5px;
 }
-
-/* white */
-/* /\*#061F32*\/ */
-/* #168CE5 */
 
 .feature {
   fill: #68707B;
@@ -64,11 +84,6 @@ path.area{
   fill: #061F32;
 }
 
-#stats {
-  padding-left:20px;
-  padding-top:40px;
-  width:10px;
-}
 
 #alertIcon {
     background: url("/img/navigation-sprite-1.png") no-repeat scroll -48px -64px transparent;
@@ -88,18 +103,6 @@ path.area{
   color: #68707B;
   position: relative;
   top: -5px;
-}
-
-#category_container{
-  float:right;
-}
-
-#main_category_container{
-  display: inline-block;
-}
-
-#main_legend{
-  display: inline-block;
 }
 
 

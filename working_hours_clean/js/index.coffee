@@ -13,7 +13,8 @@ class Chart
         white: "#FFF"
         lightblue: "#168CE5"
         darkblue: "#168CE5"
-        rainbow: d3.scale.category20().range()
+        rainbow: d3.scale.category20c().range()
+
       map:
         width: $(document).width()/3
         height: $(document).width()/3
@@ -35,12 +36,6 @@ class Chart
     ob.largeCat.arc= d3.svg.arc()
       .outerRadius(ob.largeCat.r)
       .innerRadius(ob.largeCat.r*2/3)
-
-    ob.largeCat.interpolate = (q)->
-      if q < 0.5
-        d3.interpolateRgb(ob.colors.white,ob.colors.lightblue)(q)
-      else
-        d3.interpolateRgb(ob.colors.lightblue,ob.colors.darkblue)(q)
 
     ob.stats=
       width: $(document).width()/3
@@ -64,7 +59,7 @@ class Chart
   ########
 
   selectedCountry: "United States"
-  selectedCategory: ""
+  selectedCategory: "Writing & Translation"
   ########
   #
   # d3.js charting objects
@@ -181,15 +176,14 @@ class Chart
       .attr("height",h+padding)
       .append("g").attr("transform","translate(#{w/2},#{h/2})")
 
-    arcs = chart.selectAll("g.arc").data(ob.parameters.largeCat.pie)
+    arcs = chart.append("g").attr("id","arcHolder")
+      .selectAll("g.arc").data(ob.parameters.largeCat.pie)
       .enter()
       .append("g")
-      .attr("class","arc")
+      .attr("class", "arc")
 
     arcs.append("path")
       .attr("d",ob.parameters.largeCat.arc)
-      .attr("fill",(d,i)->
-         ob.parameters.largeCat.interpolate(i/labeled_data.length))
 
     center = chart.append("g").attr("class","center")
 
@@ -204,8 +198,18 @@ class Chart
 
     legend = d3.select("#main_category_container")
       .append("svg").attr("id","main_legend")
+      .attr("width",w+padding)
+      .attr("height",h+padding)
+
+    chart.append("g").attr("class","hatch")
+      .append("path").style("opacity",0.5)
+      .attr("fill","black")
+
 
   createSmallCat: (ob)=>
+    chart = d3.select("#sub_category").append("svg")
+      .attr("height",ob.parameters.smallCat.height)
+      .attr("width",ob.parameters.smallCat.width)
 
   createStats : (ob)=>
     stats = d3.select("#stats")
@@ -337,17 +341,43 @@ class Chart
       .sort((a,b)-> a.value < b.value)
 
     chart = d3.select("#main_category").data([labeled_data]).select("g")
-    arcs = chart.selectAll("g.arc").data(ob.parameters.largeCat.pie)
+    arcs = chart.select("g#arcHolder").selectAll("g.arc").data(ob.parameters.largeCat.pie)
 
     arcs.enter()
       .append("g").attr("class","arc")
       .append("path")
-      .attr("fill",(d,i)->ob.parameters.colors.rainbow[i])
-      .attr("d",ob.parameters.largeCat.arc)
+
+    pie_data = {}
+    current = null
+
+    changeCategory = () ->
+      d3.select("g.hatch > path").transition()
+        .attrTween("d",(d,i,a)->
+          selected = pie_data[ob.selectedCategory]
+          interpolater = d3.interpolate current, selected
+          current = selected
+          (t)-> ob.parameters.largeCat.arc(interpolater(t))
+        )
+      d3.selectAll("#main_legend>g>text").transition()
+        .style("font-size",(d,i)->
+          if d.label is ob.selectedCategory then "20px" else "10px")
+
+
+
 
     arcs.select("path")
-      .attr("fill",(d,i)->ob.parameters.colors.rainbow[i])
-      .attr("d",ob.parameters.largeCat.arc)
+      .attr("fill", (d,i) -> ob.parameters.colors.rainbow[i])
+      .attr("d",(d,i) ->
+        pie_data[d.data.label] = d
+        if d.data.label is ob.selectedCategory
+          current = d
+        ob.parameters.largeCat.arc(d)
+      )
+      .on("mouseover", (d,i) ->
+        ob.selectedCategory = d.data.label
+        changeCategory()
+        ob.updateSmallCat()
+      )
 
     arcs.exit().remove()
 
@@ -361,28 +391,33 @@ class Chart
     l = legends.enter().append("g")
 
     l.append("rect")
-
     l.append("text")
+
+    heightY = (d,i)-> i*20+ob.parameters.largeCat.height/3
 
     legends.select("rect")
       .attr("fill",(d,i)-> ob.parameters.colors.rainbow[i])
-      .attr("y",(d,i)-> i*14+10)
+      .attr("y",heightY)
       .attr("height",10)
       .attr("width",10)
 
     legends.select("text")
       .text((d,i)->"#{d.label} - #{d.value}")
-      .attr("y",(d,i)-> i*14+7+10)
+      .attr("y",(d,i)-> heightY(d,i)+10)
       .attr("x",14)
+
     legends.exit().remove()
 
-
-
-#    tmp.append("rect").attr("class","legend")
-#    tmp.append("text")
+    chart.select("g.hatch > path")
+      .attr("d",ob.parameters.largeCat.arc(pie_data[ob.selectedCategory]))
+    changeCategory()
 
   updateSmallCat: (ob)=>
-    instance = @data.workingData[@selectedCountry]["hours"]
+    instance = @data.workingData[@selectedCountry].job_types[@selectedCategory]
+
+    max = _.max(_.values(instance))
+    p = ob.parameters.largeCat
+
 
   updateStats : ()->
     d3.select("#statsG text#country")
