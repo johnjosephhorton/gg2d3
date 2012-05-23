@@ -2,57 +2,48 @@
 /* /\*#061F32*\/ */
 /* #168CE5 */
 
+/*General css */
 body {
   font: 10px sans-serif;
   background-color:white;
 }
 
 text{
-  fill: #68707B;
+
 }
 
+/* Layout*/
+#stats{
+  position: absolute;
+  top: 0px;
+  right: 0px;
+}
+
+#map{
+  padding: 10px;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
+#bubble{
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+}
+
+#week{
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+}
+
+
+/* Map css */
 path.area{
   fill: #68707B;
   stroke: #68707B;
 }
-
-/* #stats { */
-/*   padding-left:20px; */
-/*   padding-top:40px; */
-/*   width:10px; */
-/* } */
-
-
-/* #category_container{ */
-/*   float:right; */
-/* } */
-
-#main_category_container{
-  display: inline-block;
-  vertical-align: top;
-}
-#main_legend{
-
-} 
-
-
-/* #week{ */
-/*   right:20px; */
-/*   bottom: 20px; */
-/*   position: absolute; */
-/* } */
-
-/* #clock{ */
-/*   right:20px; */
-/*   top: 20px; */
-/*   position: absolute; */
-/* } */
-
-/* #map{ */
-/*   left:20px; */
-/*   bottom: 35px; */
-/*   position: absolute; */
-/* } */
 
 .line {
   fill: none;
@@ -75,16 +66,7 @@ path.area{
   stroke: #ccc;
 }
 
-.outerArc{
-  fill: #168CE5;
-  stroke: #168CE5;
-}
-
-.outerCircle{
-  fill: #061F32;
-}
-
-
+/* Alert css*/ 
 #alertIcon {
     background: url("/img/navigation-sprite-1.png") no-repeat scroll -48px -64px transparent;
     display: inline-block;
@@ -103,11 +85,4 @@ path.area{
   color: #68707B;
   position: relative;
   top: -5px;
-}
-
-
-
-.center > text{
-  text-anchor:middle;
-  font: 14px sans-serif;
 }

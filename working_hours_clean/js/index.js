@@ -4,59 +4,69 @@ var Chart, c, check, i, startQ,
 Chart = (function() {
 
   function Chart() {
-    this.updateSmallCat = __bind(this.updateSmallCat, this);
-    this.updateLargeCat = __bind(this.updateLargeCat, this);
     this.updateChart = __bind(this.updateChart, this);
     this.updateAlert = __bind(this.updateAlert, this);
     this.changeCountry = __bind(this.changeCountry, this);
     this.onCountryClick = __bind(this.onCountryClick, this);
+    this.createBubble = __bind(this.createBubble, this);
     this.createAlert = __bind(this.createAlert, this);
     this.createStats = __bind(this.createStats, this);
-    this.createSmallCat = __bind(this.createSmallCat, this);
   }
 
   Chart.prototype.parameters = (function() {
-    var ob;
+    var height, ob, width;
+    width = $(document).width();
+    height = $(document).height();
     ob = {
       colors: {
         white: "#FFF",
         lightblue: "#168CE5",
         darkblue: "#168CE5",
         rainbow: d3.scale.category20c().range()
-      },
-      map: {
-        width: $(document).width() / 3,
-        height: $(document).width() / 3,
-        padding: 20
       }
     };
+    ob.bubble = {
+      r: Math.min(height, width),
+      flatten: function(root) {
+        var classes, recurse;
+        classes = [];
+        recurse = function(name, node) {
+          if (node.children) {
+            return node.children.forEach(function(child) {
+              return recurse(node.name, child);
+            });
+          } else {
+            return classes.push({
+              packageName: name,
+              className: node.name,
+              value: node.size
+            });
+          }
+        };
+        recurse(null, root);
+        return {
+          children: classes,
+          className: "Total"
+        };
+      }
+    };
+    ob.map = {
+      width: width - ob.bubble.r,
+      height: height * 2 / 3,
+      padding: 10
+    };
+    ob.map.projection = d3.geo.mercator().scale(ob.map.width * .9).translate([ob.map.width / 2, ob.map.height * .6]);
+    ob.map.path = d3.geo.path().projection(ob.map.projection);
+    ob.map.fisheye = d3.fisheye().radius(50).power(10);
     ob.chart = {
-      width: $(document).width() - ob.map.width - 50,
-      height: $(document).height() / 3,
+      width: ob.map.width,
+      height: $(document).height() - ob.map.height - ob.map.padding - 20,
       padding: 20
     };
-    ob.largeCat = {
-      width: $(document).height() / 2,
-      height: $(document).height() / 2,
-      r: $(document).height() / 4 - 20,
-      padding: 20,
-      arcWidth: 20,
-      pie: d3.layout.pie().value(function(d) {
-        return d.value;
-      })
-    };
-    ob.largeCat.arc = d3.svg.arc().outerRadius(ob.largeCat.r).innerRadius(ob.largeCat.r * 2 / 3);
     ob.stats = {
-      width: $(document).width() / 3,
-      height: $(document).height() - ob.chart.height,
+      width: $(document).width() / 4,
+      height: $(document).height() / 4,
       padding: 20
-    };
-    ob.smallCat = {
-      width: $(document).height() / 2,
-      height: $(document).height() / 2,
-      r: $(document).height() / 4 - 40,
-      padding: 20,
-      arcWidth: 30
     };
     return ob;
   })();
@@ -64,18 +74,6 @@ Chart = (function() {
   Chart.prototype.data = {};
 
   Chart.prototype.selectedCountry = "United States";
-
-  Chart.prototype.selectedCategory = "Writing & Translation";
-
-  Chart.prototype.map = (function(main) {
-    var ob;
-    ob = {
-      projection: d3.geo.mercator().scale($(document).width() / 3).translate([$(document).width() / 6, $(document).width() / 4])
-    };
-    ob.path = d3.geo.path().projection(ob.projection);
-    ob.fisheye = d3.fisheye().radius(50).power(10);
-    return ob;
-  })(Chart);
 
   Chart.prototype.createMap = function(ob) {
     var feature, fishPolygon, i, refish, svg, _i, _len, _ref, _results;
@@ -91,10 +89,10 @@ Chart = (function() {
         return "feature";
       }
     }).attr("d", function(d) {
-      return ob.map.path(d);
+      return ob.parameters.map.path(d);
     }).each(function(d) {
       return d.org = d.geometry.coordinates;
-    }).on('mouseover', ob.onCountryClick);
+    }).on('click', ob.onCountryClick);
     feature.append("title").text(function(d) {
       return d.properties.name;
     });
@@ -102,12 +100,12 @@ Chart = (function() {
       return _.map(polygon, function(list) {
         return _.map(list, function(tuple) {
           var c, p;
-          p = ob.map.projection(tuple);
-          c = ob.map.fisheye({
+          p = ob.parameters.map.projection(tuple);
+          c = ob.parameters.map.fisheye({
             x: p[0],
             y: p[1]
           });
-          return ob.map.projection.invert([c.x, c.y]);
+          return ob.parameters.map.projection.invert([c.x, c.y]);
         });
       });
     };
@@ -117,14 +115,14 @@ Chart = (function() {
       y = e.offsetY;
       if (x == null) x = e.screenX - $("#map svg").offset().left;
       if (y == null) y = e.screenY - $("#map svg").offset().top;
-      ob.map.fisheye.center([x, y]);
+      ob.parameters.map.fisheye.center([x, y]);
       return svg.selectAll("path").attr("d", function(d) {
         var clone, processed, type;
         clone = $.extend({}, d);
         type = clone.geometry.type;
         processed = type === "Polygon" ? fishPolygon(d.org) : _.map(d.org, fishPolygon);
         clone.geometry.coordinates = processed;
-        return ob.map.path(clone);
+        return ob.parameters.map.path(clone);
       });
     };
     _ref = ["mousemove", "mousein", "mouseout", "touch", "touchmove"];
@@ -156,41 +154,6 @@ Chart = (function() {
     });
   };
 
-  Chart.prototype.createLargeCat = function(ob) {
-    var a, arcs, center, chart, h, labeled_data, legend, padding, r, w;
-    w = ob.parameters.largeCat.width;
-    h = ob.parameters.largeCat.height;
-    r = ob.parameters.largeCat.r;
-    padding = ob.parameters.largeCat.padding;
-    $("#category_container").width(ob.parameters.chart.width);
-    labeled_data = (function() {
-      var _i, _len, _ref, _results;
-      _ref = [1];
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        a = _ref[_i];
-        _results.push({
-          "label": "",
-          "value": a
-        });
-      }
-      return _results;
-    })();
-    chart = d3.select("#main_category_container").append("svg").attr("id", "main_category").data([labeled_data]).attr("width", w + padding).attr("height", h + padding).append("g").attr("transform", "translate(" + (w / 2) + "," + (h / 2) + ")");
-    arcs = chart.append("g").attr("id", "arcHolder").selectAll("g.arc").data(ob.parameters.largeCat.pie).enter().append("g").attr("class", "arc");
-    arcs.append("path").attr("d", ob.parameters.largeCat.arc);
-    center = chart.append("g").attr("class", "center");
-    center.append("text").text("Projects Completed").attr("transform", "translate(0,-7)");
-    center.append("text").attr("id", "total").text("Waiting...").attr("transform", "translate(0,7)");
-    legend = d3.select("#main_category_container").append("svg").attr("id", "main_legend").attr("width", w + padding).attr("height", h + padding);
-    return chart.append("g").attr("class", "hatch").append("path").style("opacity", 0.5).attr("fill", "black");
-  };
-
-  Chart.prototype.createSmallCat = function(ob) {
-    var chart;
-    return chart = d3.select("#sub_category").append("svg").attr("height", ob.parameters.smallCat.height).attr("width", ob.parameters.smallCat.width);
-  };
-
   Chart.prototype.createStats = function(ob) {
     var actual, key, len, obj, stats, t;
     stats = d3.select("#stats").append("svg").attr("width", ob.parameters.stats.width).attr("height", ob.parameters.stats.height).append('g').attr("id", "statsG");
@@ -219,6 +182,10 @@ Chart = (function() {
     }).width(week.width());
   };
 
+  Chart.prototype.createBubble = function(ob) {
+    return d3.select("#bubble").append("svg").attr("width", ob.parameters.bubble.r).attr("height", ob.parameters.bubble.r).attr("class", "pack").append("g").attr("transform", "translate(2,2)");
+  };
+
   Chart.prototype.onCountryClick = function(d, i) {
     var clicked;
     clicked = d.properties.name;
@@ -230,10 +197,9 @@ Chart = (function() {
     this.selectedCountry = name;
     this.updateMap(ob);
     this.updateChart(ob);
-    this.updateLargeCat(ob);
-    this.updateSmallCat(ob);
     this.updateStats(ob);
-    return this.updateAlert(ob);
+    this.updateAlert(ob);
+    return this.updateBubble(ob);
   };
 
   Chart.prototype.updateAlert = function(ob) {
@@ -293,105 +259,6 @@ Chart = (function() {
     }).interpolate(mode));
   };
 
-  Chart.prototype.updateLargeCat = function(ob) {
-    var a, arcs, b, changeCategory, chart, current, data, heightY, i, instance, j, key, l, labeled_data, legends, pie_data, prop, total;
-    instance = this.data.workingData[this.selectedCountry]["job_types"];
-    data = {};
-    for (key in instance) {
-      prop = instance[key];
-      data[key] = d3.sum((function() {
-        var _ref, _results;
-        _ref = instance[key];
-        _results = [];
-        for (i in _ref) {
-          j = _ref[i];
-          _results.push(j);
-        }
-        return _results;
-      })());
-    }
-    labeled_data = ((function() {
-      var _results;
-      _results = [];
-      for (a in data) {
-        b = data[a];
-        _results.push({
-          "label": a,
-          "value": b
-        });
-      }
-      return _results;
-    })()).sort(function(a, b) {
-      return a.value < b.value;
-    });
-    chart = d3.select("#main_category").data([labeled_data]).select("g");
-    arcs = chart.select("g#arcHolder").selectAll("g.arc").data(ob.parameters.largeCat.pie);
-    arcs.enter().append("g").attr("class", "arc").append("path");
-    pie_data = {};
-    current = null;
-    changeCategory = function() {
-      d3.select("g.hatch > path").transition().attrTween("d", function(d, i, a) {
-        var interpolater, selected;
-        selected = pie_data[ob.selectedCategory];
-        interpolater = d3.interpolate(current, selected);
-        current = selected;
-        return function(t) {
-          return ob.parameters.largeCat.arc(interpolater(t));
-        };
-      });
-      return d3.selectAll("#main_legend>g>text").transition().style("font-size", function(d, i) {
-        if (d.label === ob.selectedCategory) {
-          return "20px";
-        } else {
-          return "10px";
-        }
-      });
-    };
-    arcs.select("path").attr("fill", function(d, i) {
-      return ob.parameters.colors.rainbow[i];
-    }).attr("d", function(d, i) {
-      pie_data[d.data.label] = d;
-      if (d.data.label === ob.selectedCategory) current = d;
-      return ob.parameters.largeCat.arc(d);
-    }).on("mouseover", function(d, i) {
-      ob.selectedCategory = d.data.label;
-      changeCategory();
-      return ob.updateSmallCat();
-    });
-    arcs.exit().remove();
-    total = d3.sum(_.values(data));
-    d3.select("text#total").text(total);
-    legends = d3.select("#main_legend").selectAll("g").data(labeled_data);
-    l = legends.enter().append("g");
-    l.append("rect");
-    l.append("text");
-    heightY = function(d, i) {
-      return i * 20 + ob.parameters.largeCat.height / 3;
-    };
-    legends.select("rect").attr("fill", function(d, i) {
-      return ob.parameters.colors.rainbow[i];
-    }).attr("y", heightY).attr("height", 10).attr("width", 10);
-    legends.select("text").text(function(d, i) {
-      return "" + d.label + " - " + d.value;
-    }).attr("y", function(d, i) {
-      return heightY(d, i) + 10;
-    }).attr("x", 14);
-    legends.exit().remove();
-    chart.select("g.hatch > path").attr("d", ob.parameters.largeCat.arc(pie_data[ob.selectedCategory]));
-    return changeCategory();
-  };
-
-  Chart.prototype.updateSmallCat = function(ob) {
-    var instance, max, p;
-    instance = this.data.workingData[this.selectedCountry].job_types[this.selectedCategory];
-    max = _.max(_.values(instance));
-    return p = ob.parameters.largeCat;
-  };
-
-  Chart.prototype.updateStats = function() {
-    return d3.select("#statsG text#country").text(this.selectedCountry);
-  };
-
   Chart.prototype.updateMap = function(ob) {
     return d3.selectAll("#map svg path").transition().delay(10).attr("class", function(d) {
       if (d.properties.name in ob.data.workingData) {
@@ -406,18 +273,104 @@ Chart = (function() {
     });
   };
 
+  Chart.prototype.updateStats = function() {
+    return d3.select("#statsG text#country").text(this.selectedCountry);
+  };
+
+  Chart.prototype.updateBubble = function(ob) {
+    var big_name, big_ob, bubble, children, d, f, fill, format, g, grandchildren, node, r, small_name, small_size, sum, sums, vis;
+    d = this.data.workingData[this.selectedCountry].job_types;
+    f = {
+      name: "jobs"
+    };
+    children = [];
+    sums = {};
+    for (big_name in d) {
+      big_ob = d[big_name];
+      grandchildren = [];
+      sum = 0;
+      for (small_name in big_ob) {
+        small_size = big_ob[small_name];
+        grandchildren.push({
+          "name": small_name,
+          "size": small_size
+        });
+        sum += small_size;
+      }
+      children.push({
+        "name": big_name,
+        "children": grandchildren.sort(function(a, b) {
+          return a.size < b.size;
+        })
+      });
+      sums[big_name] = sum;
+    }
+    f.children = children.sort(function(a, b) {
+      return sums[a.name] < sums[b.name];
+    });
+    r = ob.parameters.bubble.r;
+    format = d3.format(",d");
+    fill = d3.scale.category20();
+    bubble = d3.layout.pack().sort(null).size([r, r]).value(function(d) {
+      return d.value;
+    });
+    vis = d3.select("#bubble >svg > g");
+    console.log(vis);
+    node = vis.selectAll("g.node").data(bubble.nodes(ob.parameters.bubble.flatten(f)));
+    g = node.enter().append("g");
+    g.append("circle");
+    g.append("title");
+    g.filter(function(d) {
+      return !d.children;
+    }).append("text");
+    node.attr("class", function(d) {
+      if (d.children != null) {
+        return "node";
+      } else {
+        return "leaf node";
+      }
+    }).attr("transform", function(d) {
+      return "translate(" + d.x + "," + d.y + ")";
+    });
+    node.select("circle").attr("r", function(d) {
+      return d.r;
+    }).attr("fill", function(d) {
+      if (d.packageName) {
+        return fill(d.packageName);
+      } else {
+        return "none";
+      }
+    });
+    node.select("title").text(function(d) {
+      return "" + d.className + ": " + d.value + " projects completed";
+    });
+    node.attr("class", function(d) {
+      if (d.children != null) {
+        return "node";
+      } else {
+        return "leaf node";
+      }
+    }).attr("transform", function(d) {
+      return "translate(" + d.x + "," + d.y + ")";
+    });
+    node.filter(function(d) {
+      return !d.children;
+    }).select("text").attr("text-anchor", "middle").attr("dy", ".3em").text(function(d) {
+      return d.className.substring(0, d.r / 3);
+    });
+    return node.exit().remove();
+  };
+
   Chart.prototype.begin = function(c) {
     this.createMap(c);
     this.createChart(c);
-    this.createLargeCat(c);
-    this.createSmallCat(c);
-    this.createStats(c);
     this.createAlert(c);
-    this.updateChart(c);
-    this.updateLargeCat(c);
-    this.updateSmallCat(c);
+    this.createBubble(c);
+    this.createStats(c);
     this.updateStats(c);
-    return this.updateAlert(c);
+    this.updateChart(c);
+    this.updateAlert(c);
+    return this.updateBubble(c);
   };
 
   return Chart;

@@ -1,4 +1,3 @@
-
 class Chart
   constructor: ()->
   ########
@@ -7,7 +6,9 @@ class Chart
   #
   ########
   parameters: (()->
-    #Map parameters
+    width = $(document).width()
+    height = $(document).height()
+
     ob =
       colors:
         white: "#FFF"
@@ -15,39 +16,39 @@ class Chart
         darkblue: "#168CE5"
         rainbow: d3.scale.category20c().range()
 
-      map:
-        width: $(document).width()/3
-        height: $(document).width()/3
-        padding: 20
+    ob.bubble=
+      r: Math.min(height,width)
+      flatten: (root)->
+        classes = []
+        recurse = (name,node)->
+          if node.children
+            node.children.forEach((child)-> recurse(node.name,child))
+          else
+              classes.push({packageName: name, className: node.name, value: node.size})
+        recurse(null,root)
+        {children: classes, className: "Total"}
+
+    ob.map=
+      width: width-ob.bubble.r
+      height: height*2/3
+      padding: 10;
+
+    ob.map.projection =  d3.geo.mercator()
+        .scale(ob.map.width*.9)
+        .translate([ob.map.width/2,ob.map.height*.6])
+
+    ob.map.path = d3.geo.path().projection(ob.map.projection)
+    ob.map.fisheye = d3.fisheye().radius(50).power(10)
 
     ob.chart =
-      width: $(document).width()-ob.map.width-50
-      height: $(document).height()/3
+      width: ob.map.width
+      height: $(document).height()-ob.map.height-ob.map.padding-20
       padding: 20
-
-    ob.largeCat=
-      width: $(document).height()/2
-      height: $(document).height()/2
-      r: $(document).height()/4-20
-      padding: 20
-      arcWidth: 20
-      pie: d3.layout.pie().value((d)-> d.value)
-
-    ob.largeCat.arc= d3.svg.arc()
-      .outerRadius(ob.largeCat.r)
-      .innerRadius(ob.largeCat.r*2/3)
 
     ob.stats=
-      width: $(document).width()/3
-      height: $(document).height()-ob.chart.height
+      width: $(document).width()/4
+      height: $(document).height()/4
       padding: 20
-
-    ob.smallCat=
-      width: $(document).height()/2
-      height: $(document).height()/2
-      r: $(document).height()/4-40
-      padding: 20
-      arcWidth: 30
 
     ob
   )()
@@ -59,22 +60,6 @@ class Chart
   ########
 
   selectedCountry: "United States"
-  selectedCategory: "Writing & Translation"
-  ########
-  #
-  # d3.js charting objects
-  #
-  ########
-
-  map: ((main)->
-    ob =
-      projection: d3.geo.mercator()
-        .scale($(document).width()/3)
-        .translate([$(document).width()/6,$(document).width()/4])
-    ob.path = d3.geo.path().projection(ob.projection)
-    ob.fisheye = d3.fisheye().radius(50).power(10)
-    ob
-  )(this)
 
   ########
   #
@@ -99,18 +84,18 @@ class Chart
         else
           "feature"
       )
-      .attr("d",(d)-> ob.map.path(d))
+      .attr("d",(d)-> ob.parameters.map.path(d))
       .each((d)-> d.org = d.geometry.coordinates)
-      .on('mouseover', ob.onCountryClick)
+      .on('click', ob.onCountryClick)
 
     feature.append("title").text((d)-> d.properties.name)
 
     fishPolygon = (polygon)->
       _.map(polygon, (list)->
         _.map(list,(tuple)->
-          p = ob.map.projection(tuple)
-          c =  ob.map.fisheye({x : p[0], y : p[1]})
-          ob.map.projection.invert([c.x, c.y])))
+          p = ob.parameters.map.projection(tuple)
+          c =  ob.parameters.map.fisheye({x : p[0], y : p[1]})
+          ob.parameters.map.projection.invert([c.x, c.y])))
 
     refish = (e)->
       #Not sure why you have to get rid of 20
@@ -121,16 +106,17 @@ class Chart
       x ?= e.screenX - $("#map svg").offset().left
       y ?= e.screenY - $("#map svg").offset().top
 
-      ob.map.fisheye.center([x,y])
+      ob.parameters.map.fisheye.center([x,y])
       svg.selectAll("path")
       .attr "d",(d)->
         clone = $.extend({},d)
         type = clone.geometry.type
         processed = if type is "Polygon" then fishPolygon(d.org) else _.map(d.org,fishPolygon)
         clone.geometry.coordinates = processed
-        ob.map.path(clone)
+        ob.parameters.map.path(clone)
 
     $("#map").on(i,refish) for i in ["mousemove","mousein","mouseout","touch","touchmove"]
+
 
   createChart: (ob)->
     weekChart = d3.select("#week")
@@ -157,59 +143,6 @@ class Chart
       .attr("dy",ob.parameters.chart.height-3)
       .attr("text-anchor","middle")
       .text((d)->d)
-
-  createLargeCat: (ob)->
-
-    w=ob.parameters.largeCat.width
-    h=ob.parameters.largeCat.height
-    r=ob.parameters.largeCat.r
-    padding=ob.parameters.largeCat.padding
-
-    $("#category_container").width(ob.parameters.chart.width)
-
-    labeled_data = ({"label": "", "value": a} for a in [1])
-
-    chart = d3.select("#main_category_container").append("svg")
-      .attr("id","main_category")
-      .data([labeled_data])
-      .attr("width",w+padding)
-      .attr("height",h+padding)
-      .append("g").attr("transform","translate(#{w/2},#{h/2})")
-
-    arcs = chart.append("g").attr("id","arcHolder")
-      .selectAll("g.arc").data(ob.parameters.largeCat.pie)
-      .enter()
-      .append("g")
-      .attr("class", "arc")
-
-    arcs.append("path")
-      .attr("d",ob.parameters.largeCat.arc)
-
-    center = chart.append("g").attr("class","center")
-
-    center.append("text")
-      .text("Projects Completed")
-      .attr("transform","translate(0,-7)")
-
-    center.append("text")
-      .attr("id","total")
-      .text("Waiting...")
-      .attr("transform","translate(0,7)")
-
-    legend = d3.select("#main_category_container")
-      .append("svg").attr("id","main_legend")
-      .attr("width",w+padding)
-      .attr("height",h+padding)
-
-    chart.append("g").attr("class","hatch")
-      .append("path").style("opacity",0.5)
-      .attr("fill","black")
-
-
-  createSmallCat: (ob)=>
-    chart = d3.select("#sub_category").append("svg")
-      .attr("height",ob.parameters.smallCat.height)
-      .attr("width",ob.parameters.smallCat.width)
 
   createStats : (ob)=>
     stats = d3.select("#stats")
@@ -238,6 +171,16 @@ class Chart
       top: weekOffset.top-20
     ).width(week.width())
 
+  createBubble : (ob)=>
+
+    d3.select("#bubble").append("svg")
+      .attr("width",ob.parameters.bubble.r)
+      .attr("height",ob.parameters.bubble.r)
+      .attr("class","pack")
+    .append("g")
+      .attr("transform","translate(2,2)")
+
+
    ########
    #
    # Mouse events
@@ -248,6 +191,7 @@ class Chart
      clicked= d.properties.name
      if not (clicked of @data.workingData) then return
      @changeCountry(clicked,this)
+
    ########
    #
    # Change that which needs to be changed
@@ -258,10 +202,9 @@ class Chart
      @selectedCountry = name
      @updateMap(ob)
      @updateChart(ob)
-     @updateLargeCat(ob)
-     @updateSmallCat(ob)
      @updateStats(ob)
      @updateAlert(ob)
+     @updateBubble(ob)
 
    updateAlert: (ob)=>
      hours = ob.data.workingData[@selectedCountry].hours
@@ -270,9 +213,6 @@ class Chart
        $("span#country").text(@selectedCountry)
      else
        $("#alert").hide()
-
-
-
 
    updateChart: (ob)=>
      instance = @data.workingData[@selectedCountry].hours
@@ -329,100 +269,6 @@ class Chart
         .y((d,i)-> y(d))
         .interpolate(mode))
 
-  updateLargeCat: (ob)=>
-    instance = @data.workingData[@selectedCountry]["job_types"]
-
-    data = {}
-
-    for key,prop of instance
-      data[key] = d3.sum(j for i,j of instance[key])
-
-    labeled_data = ({"label": a, "value": b} for a,b of data)
-      .sort((a,b)-> a.value < b.value)
-
-    chart = d3.select("#main_category").data([labeled_data]).select("g")
-    arcs = chart.select("g#arcHolder").selectAll("g.arc").data(ob.parameters.largeCat.pie)
-
-    arcs.enter()
-      .append("g").attr("class","arc")
-      .append("path")
-
-    pie_data = {}
-    current = null
-
-    changeCategory = () ->
-      d3.select("g.hatch > path").transition()
-        .attrTween("d",(d,i,a)->
-          selected = pie_data[ob.selectedCategory]
-          interpolater = d3.interpolate current, selected
-          current = selected
-          (t)-> ob.parameters.largeCat.arc(interpolater(t))
-        )
-      d3.selectAll("#main_legend>g>text").transition()
-        .style("font-size",(d,i)->
-          if d.label is ob.selectedCategory then "20px" else "10px")
-
-
-
-
-    arcs.select("path")
-      .attr("fill", (d,i) -> ob.parameters.colors.rainbow[i])
-      .attr("d",(d,i) ->
-        pie_data[d.data.label] = d
-        if d.data.label is ob.selectedCategory
-          current = d
-        ob.parameters.largeCat.arc(d)
-      )
-      .on("mouseover", (d,i) ->
-        ob.selectedCategory = d.data.label
-        changeCategory()
-        ob.updateSmallCat()
-      )
-
-    arcs.exit().remove()
-
-    total = d3.sum(_.values(data))
-
-    d3.select("text#total").text(total)
-
-    legends = d3.select("#main_legend").selectAll("g")
-      .data(labeled_data)
-
-    l = legends.enter().append("g")
-
-    l.append("rect")
-    l.append("text")
-
-    heightY = (d,i)-> i*20+ob.parameters.largeCat.height/3
-
-    legends.select("rect")
-      .attr("fill",(d,i)-> ob.parameters.colors.rainbow[i])
-      .attr("y",heightY)
-      .attr("height",10)
-      .attr("width",10)
-
-    legends.select("text")
-      .text((d,i)->"#{d.label} - #{d.value}")
-      .attr("y",(d,i)-> heightY(d,i)+10)
-      .attr("x",14)
-
-    legends.exit().remove()
-
-    chart.select("g.hatch > path")
-      .attr("d",ob.parameters.largeCat.arc(pie_data[ob.selectedCategory]))
-    changeCategory()
-
-  updateSmallCat: (ob)=>
-    instance = @data.workingData[@selectedCountry].job_types[@selectedCategory]
-
-    max = _.max(_.values(instance))
-    p = ob.parameters.largeCat
-
-
-  updateStats : ()->
-    d3.select("#statsG text#country")
-      .text(@selectedCountry)
-
   updateMap: (ob)->
     d3.selectAll("#map svg path")
       .transition().delay(10)
@@ -436,6 +282,74 @@ class Chart
           "feature"
     )
 
+  updateStats : ()->
+    d3.select("#statsG text#country")
+      .text(@selectedCountry)
+
+  updateBubble: (ob)->
+    #Gather and format data
+    d= @data.workingData[@selectedCountry].job_types
+
+    f = name: "jobs"
+
+    children = []
+    sums = {}
+    for big_name, big_ob of d
+      grandchildren = []
+      sum = 0
+      for small_name, small_size of big_ob
+        grandchildren.push({"name": small_name, "size": small_size})
+        sum+= small_size
+
+      children.push({"name": big_name, "children": grandchildren.sort((a,b)-> a.size < b.size)})
+      sums[big_name]=sum
+
+    f.children = children.sort((a,b)-> sums[a.name] < sums[b.name])
+
+    #Start firing up the formating objects
+    r = ob.parameters.bubble.r
+    format = d3.format(",d")
+    fill =d3.scale.category20()
+
+    bubble = d3.layout.pack()
+      .sort(null)
+      .size([r,r]).value((d)-> d.value)
+
+    vis = d3.select("#bubble >svg > g")
+    console.log(vis)
+
+    node = vis.selectAll("g.node").data(bubble.nodes(ob.parameters.bubble.flatten(f)))
+
+    g = node.enter().append("g")
+
+    g.append("circle")
+
+    g.append("title")
+
+    g.filter((d)-> not d.children).append("text")
+
+    node.attr("class",(d)-> if d.children? then "node" else "leaf node")
+      .attr("transform", (d)->  "translate(#{d.x},#{d.y})")
+
+
+    node.select("circle")
+      .attr("r",(d)-> d.r)
+      .attr("fill",(d)->
+        if d.packageName then fill(d.packageName) else "none")
+
+    node.select("title")
+      .text((d)-> "#{d.className}: #{d.value} projects completed")
+
+    node.attr("class",(d)-> if d.children? then "node" else "leaf node")
+      .attr("transform", (d)->  "translate(#{d.x},#{d.y})")
+
+    node.filter((d)->not d.children).select("text")
+      .attr("text-anchor","middle")
+      .attr("dy",".3em")
+      .text((d)-> d.className.substring(0,d.r/3))
+
+
+    node.exit().remove()
   ########
   #
   # Let there be light
@@ -445,16 +359,15 @@ class Chart
   begin: (c)->
     @createMap(c)
     @createChart(c)
-    @createLargeCat(c)
-    @createSmallCat(c)
-    @createStats(c)
     @createAlert(c)
+    @createBubble(c)
+    @createStats(c)
 
-    @updateChart(c)
-    @updateLargeCat(c)
-    @updateSmallCat(c)
     @updateStats(c)
+    @updateChart(c)
     @updateAlert(c)
+    @updateBubble(c)
+
 
 c = new Chart()
 
