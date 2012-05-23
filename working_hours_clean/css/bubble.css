@@ -1,0 +1,11 @@
+circle {
+  stroke-width: 1px;
+}
+
+.leaf circle {
+  fill-opacity: 1;
+}
+
+text {
+  font: 10px sans-serif;
+}
