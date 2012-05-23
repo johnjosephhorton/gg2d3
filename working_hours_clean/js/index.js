@@ -22,7 +22,7 @@ Chart = (function() {
         white: "#FFF",
         lightblue: "#168CE5",
         darkblue: "#168CE5",
-        rainbow: d3.scale.category20c().range()
+        rainbow: d3.scale.category20().domain(["Web Development", "Software Development", "Networking & Information Systems", "Writing & Translation", "Administrative Support", "Design & Multimedia", "Customer Service", "Sales & Marketing", "Business Services"])
       }
     };
     ob.bubble = {
@@ -278,7 +278,7 @@ Chart = (function() {
   };
 
   Chart.prototype.updateBubble = function(ob) {
-    var big_name, big_ob, bubble, children, d, f, fill, format, g, grandchildren, node, r, small_name, small_size, sum, sums, vis;
+    var big_name, big_ob, bubble, children, d, f, format, g, grandchildren, node, r, small_name, small_size, sum, sums, vis;
     d = this.data.workingData[this.selectedCountry].job_types;
     f = {
       name: "jobs"
@@ -310,20 +310,21 @@ Chart = (function() {
     });
     r = ob.parameters.bubble.r;
     format = d3.format(",d");
-    fill = d3.scale.category20();
     bubble = d3.layout.pack().sort(null).size([r, r]).value(function(d) {
       return d.value;
     });
     vis = d3.select("#bubble >svg > g");
     console.log(vis);
-    node = vis.selectAll("g.node").data(bubble.nodes(ob.parameters.bubble.flatten(f)));
+    node = vis.selectAll("g.node").data(bubble.nodes(ob.parameters.bubble.flatten(f)), function(d) {
+      return d.className;
+    });
     g = node.enter().append("g");
     g.append("circle");
     g.append("title");
     g.filter(function(d) {
       return !d.children;
     }).append("text");
-    node.attr("class", function(d) {
+    node.transition().delay(20).attr("class", function(d) {
       if (d.children != null) {
         return "node";
       } else {
@@ -332,30 +333,21 @@ Chart = (function() {
     }).attr("transform", function(d) {
       return "translate(" + d.x + "," + d.y + ")";
     });
-    node.select("circle").attr("r", function(d) {
+    node.select("circle").transition().delay(20).attr("r", function(d) {
       return d.r;
     }).attr("fill", function(d) {
       if (d.packageName) {
-        return fill(d.packageName);
+        return ob.parameters.colors.rainbow(d.packageName);
       } else {
         return "none";
       }
     });
-    node.select("title").text(function(d) {
+    node.select("title").transition().delay(20).text(function(d) {
       return "" + d.className + ": " + d.value + " projects completed";
-    });
-    node.attr("class", function(d) {
-      if (d.children != null) {
-        return "node";
-      } else {
-        return "leaf node";
-      }
-    }).attr("transform", function(d) {
-      return "translate(" + d.x + "," + d.y + ")";
     });
     node.filter(function(d) {
       return !d.children;
-    }).select("text").attr("text-anchor", "middle").attr("dy", ".3em").text(function(d) {
+    }).select("text").transition().delay(20).attr("text-anchor", "middle").attr("dy", ".3em").text(function(d) {
       return d.className.substring(0, d.r / 3);
     });
     return node.exit().remove();

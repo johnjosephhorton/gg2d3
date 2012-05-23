@@ -14,7 +14,7 @@ class Chart
         white: "#FFF"
         lightblue: "#168CE5"
         darkblue: "#168CE5"
-        rainbow: d3.scale.category20c().range()
+        rainbow: d3.scale.category20().domain(["Web Development", "Software Development", "Networking & Information Systems", "Writing & Translation", "Administrative Support", "Design & Multimedia", "Customer Service", "Sales & Marketing", "Business Services"])
 
     ob.bubble=
       r: Math.min(height,width)
@@ -309,7 +309,6 @@ class Chart
     #Start firing up the formating objects
     r = ob.parameters.bubble.r
     format = d3.format(",d")
-    fill =d3.scale.category20()
 
     bubble = d3.layout.pack()
       .sort(null)
@@ -318,7 +317,7 @@ class Chart
     vis = d3.select("#bubble >svg > g")
     console.log(vis)
 
-    node = vis.selectAll("g.node").data(bubble.nodes(ob.parameters.bubble.flatten(f)))
+    node = vis.selectAll("g.node").data(bubble.nodes(ob.parameters.bubble.flatten(f)), (d)-> d.className)
 
     g = node.enter().append("g")
 
@@ -328,22 +327,20 @@ class Chart
 
     g.filter((d)-> not d.children).append("text")
 
-    node.attr("class",(d)-> if d.children? then "node" else "leaf node")
+    node.transition().delay(20)
+      .attr("class",(d)-> if d.children? then "node" else "leaf node")
       .attr("transform", (d)->  "translate(#{d.x},#{d.y})")
 
-
-    node.select("circle")
+    node.select("circle").transition().delay(20)
       .attr("r",(d)-> d.r)
       .attr("fill",(d)->
-        if d.packageName then fill(d.packageName) else "none")
+        if d.packageName then ob.parameters.colors.rainbow(d.packageName) else "none")
 
-    node.select("title")
+    node.select("title").transition().delay(20)
       .text((d)-> "#{d.className}: #{d.value} projects completed")
 
-    node.attr("class",(d)-> if d.children? then "node" else "leaf node")
-      .attr("transform", (d)->  "translate(#{d.x},#{d.y})")
-
     node.filter((d)->not d.children).select("text")
+      .transition().delay(20)
       .attr("text-anchor","middle")
       .attr("dy",".3em")
       .text((d)-> d.className.substring(0,d.r/3))
