@@ -317,30 +317,33 @@ class Chart
     vis = d3.select("#bubble >svg > g")
     console.log(vis)
 
+    timing = 100
     node = vis.selectAll("g.node").data(bubble.nodes(ob.parameters.bubble.flatten(f)), (d)-> d.className)
 
     g = node.enter().append("g")
+      .attr("transform", (d)->  "translate(#{d.x},#{d.y})")
 
     g.append("circle")
+
 
     g.append("title")
 
     g.filter((d)-> not d.children).append("text")
 
-    node.transition().delay(20)
+    node.transition().delay(timing)
       .attr("class",(d)-> if d.children? then "node" else "leaf node")
       .attr("transform", (d)->  "translate(#{d.x},#{d.y})")
 
-    node.select("circle").transition().delay(20)
+    node.select("circle").transition().delay(timing)
       .attr("r",(d)-> d.r)
       .attr("fill",(d)->
         if d.packageName then ob.parameters.colors.rainbow(d.packageName) else "none")
 
-    node.select("title").transition().delay(20)
+    node.select("title").transition().delay(timing)
       .text((d)-> "#{d.className}: #{d.value} projects completed")
 
     node.filter((d)->not d.children).select("text")
-      .transition().delay(20)
+      .transition().delay(timing)
       .attr("text-anchor","middle")
       .attr("dy",".3em")
       .text((d)-> d.className.substring(0,d.r/3))

@@ -278,7 +278,7 @@ Chart = (function() {
   };
 
   Chart.prototype.updateBubble = function(ob) {
-    var big_name, big_ob, bubble, children, d, f, format, g, grandchildren, node, r, small_name, small_size, sum, sums, vis;
+    var big_name, big_ob, bubble, children, d, f, format, g, grandchildren, node, r, small_name, small_size, sum, sums, timing, vis;
     d = this.data.workingData[this.selectedCountry].job_types;
     f = {
       name: "jobs"
@@ -315,16 +315,19 @@ Chart = (function() {
     });
     vis = d3.select("#bubble >svg > g");
     console.log(vis);
+    timing = 100;
     node = vis.selectAll("g.node").data(bubble.nodes(ob.parameters.bubble.flatten(f)), function(d) {
       return d.className;
     });
-    g = node.enter().append("g");
+    g = node.enter().append("g").attr("transform", function(d) {
+      return "translate(" + d.x + "," + d.y + ")";
+    });
     g.append("circle");
     g.append("title");
     g.filter(function(d) {
       return !d.children;
     }).append("text");
-    node.transition().delay(20).attr("class", function(d) {
+    node.transition().delay(timing).attr("class", function(d) {
       if (d.children != null) {
         return "node";
       } else {
@@ -333,7 +336,7 @@ Chart = (function() {
     }).attr("transform", function(d) {
       return "translate(" + d.x + "," + d.y + ")";
     });
-    node.select("circle").transition().delay(20).attr("r", function(d) {
+    node.select("circle").transition().delay(timing).attr("r", function(d) {
       return d.r;
     }).attr("fill", function(d) {
       if (d.packageName) {
@@ -342,12 +345,12 @@ Chart = (function() {
         return "none";
       }
     });
-    node.select("title").transition().delay(20).text(function(d) {
+    node.select("title").transition().delay(timing).text(function(d) {
       return "" + d.className + ": " + d.value + " projects completed";
     });
     node.filter(function(d) {
       return !d.children;
-    }).select("text").transition().delay(20).attr("text-anchor", "middle").attr("dy", ".3em").text(function(d) {
+    }).select("text").transition().delay(timing).attr("text-anchor", "middle").attr("dy", ".3em").text(function(d) {
       return d.className.substring(0, d.r / 3);
     });
     return node.exit().remove();
