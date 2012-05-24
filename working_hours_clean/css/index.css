@@ -8,38 +8,22 @@ body {
   background-color:white;
 }
 
-text{
-
-}
-
 /* Layout*/
-#stats{
-  position: absolute;
-  top: 0px;
-  right: 0px;
+#main{
+
 }
 
 #map{
-  padding: 10px;
-  position: absolute;
-  top: 0px;
-  left: 0px;
 }
 
-#bubble{
-  position: absolute;
-  bottom: 0px;
-  right: 0px;
+#activity{
 }
-
-#week{
-  position: absolute;
-  left: 0px;
-  bottom: 0px;
-}
-
 
 /* Map css */
+#map > svg{
+  background-color: #68707B;
+}
+
 path.area{
   fill: #68707B;
   stroke: #68707B;
@@ -56,13 +40,7 @@ path.area{
   stroke: white;
 }
 
-.selected{
-  fill: #061F32;
-  stroke: #ccc;
-}
-
-.unselected{
-  fill: #168CE5;
+.selectable{
   stroke: #ccc;
 }
 
