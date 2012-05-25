@@ -1,0 +1,77 @@
+/* Jumbotrons
+-------------------------------------------------- */
+.jumbotron {
+  position: relative;
+}
+.jumbotron h1 {
+  margin-bottom: 9px;
+  font-size: 81px;
+  font-weight: bold;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+.jumbotron p {
+  margin-bottom: 18px;
+  font-weight: 300;
+}
+.jumbotron .btn-large {
+  font-size: 20px;
+  font-weight: normal;
+  padding: 14px 24px;
+  margin-right: 10px;
+  -webkit-border-radius: 6px;
+     -moz-border-radius: 6px;
+          border-radius: 6px;
+}
+.jumbotron .btn-large small {
+  font-size: 14px;
+}
+
+.lead {
+margin-bottom: 18px;
+font-size: 20px;
+font-weight: 200;
+line-height: 27px;
+}
+
+.subhead {
+  padding-bottom: 0;
+  margin-bottom: 9px;
+}
+.subhead h1 {
+  font-size: 54px;
+} 
+
+/* Masthead (docs home) */
+.masthead {
+  padding-top: 36px;
+  margin-bottom: 72px;
+}
+.masthead h1,
+.masthead p {
+  text-align: center;
+}
+.masthead h1 {
+  margin-bottom: 18px;
+}
+.masthead p {
+  margin-left: 5%;
+  margin-right: 5%;
+  font-size: 30px;
+  line-height: 36px;
+}
+
+/* Front page iframes*/
+iframe{
+  border: 0px;
+  height: 30px;
+  width: 30px;
+  margin: 7px 10px 0 0;
+}
+
+/* Brand management */
+.odesk-logo{
+  height: 26px;
+  width: 85px;
+  background: url("/assets/homepagesprite.png") no-repeat scroll 0 -175px transparent;
+}
