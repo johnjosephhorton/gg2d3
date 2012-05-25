@@ -36,7 +36,7 @@ create = function() {
 
 createMap = function() {
   var feature, fishPolygon, i, refish, size, _i, _len, _ref, _results;
-  size = $("#map").parent().width();
+  size = $("#map").parent().parent().width();
   map = d3.select("#map").append("svg").attr("height", size).attr("width", size);
   map.projection = d3.geo.mercator().scale(size).translate([size / 2, size / 2]);
   map.path = d3.geo.path().projection(map.projection);
@@ -106,12 +106,12 @@ createMap = function() {
 };
 
 createBubble = function() {
-  var size;
+  var box, c, size, t, _i, _len, _results;
   size = Math.min($("#bubble").width(), $(document).height());
   bubble = d3.select("#bubble").append("svg").attr("width", size).attr("height", size).attr("class", "pack").append("g").attr("transform", "translate(0,0)");
   bubble.size = size;
   bubble.colors = d3.scale.category20().domain(categories);
-  return bubble.flatten = function(root) {
+  bubble.flatten = function(root) {
     var classes, recurse;
     classes = [];
     recurse = function(name, node) {
@@ -133,6 +133,18 @@ createBubble = function() {
       className: "Total"
     };
   };
+  _results = [];
+  for (_i = 0, _len = categories.length; _i < _len; _i++) {
+    t = categories[_i];
+    c = $("<div>");
+    box = $("<div>").css({
+      height: 10,
+      width: 10,
+      "background-color": bubble.colors(t)
+    });
+    _results.push($("#cats").append(box, $("<p>").text(t)));
+  }
+  return _results;
 };
 
 update = function() {
@@ -228,7 +240,7 @@ updateBubble = function() {
   node.filter(function(d) {
     return !d.children;
   }).select("text").transition().delay(timing).attr("text-anchor", "middle").attr("dy", ".3em").text(function(d) {
-    return d.className.substring(0, d.r / 3);
+    return d.className.substring(0, d.r / 4);
   });
   return node.exit().remove();
 };

@@ -94,7 +94,6 @@ iframe{
 .sidebar-nav-fixed {
      position:fixed;
      top:30%;
-     width:21.97%;
  }
 
  @media (max-width: 767px) {

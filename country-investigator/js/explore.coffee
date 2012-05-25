@@ -30,7 +30,7 @@ create = ()->
   createBubble()
 
 createMap = ()->
-  size = $("#map").parent().width()
+  size = $("#map").parent().parent().width()
 
   map = d3.select("#map").append("svg")
     .attr("height",size)
@@ -122,6 +122,10 @@ createBubble = ()->
     recurse(null,root)
     {children: classes, className: "Total"}
 
+  for t in categories
+    c = $("<div>")
+    box = $("<div>").css({height: 10, width: 10, "background-color":bubble.colors(t) })
+    $("#cats").append(box,$("<p>").text(t))
 update = ()->
   updateMap()
   updateBubble()
@@ -195,6 +199,6 @@ updateBubble = ()->
       .transition().delay(timing)
       .attr("text-anchor","middle")
       .attr("dy",".3em")
-      .text((d)-> d.className.substring(0,d.r/3))
+      .text((d)-> d.className.substring(0,d.r/4))
 
     node.exit().remove()

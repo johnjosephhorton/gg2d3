@@ -40,7 +40,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="#">Country Investigator</a>
+          <a class="brand" href="/index.html">Country Investigator</a>
           <a class="odesk-logo" href="https://www.odesk.com" alt="" title="oDesk Home"></a>
           <div class="nav-collapse">
             <ul class="nav">
@@ -56,6 +56,7 @@
     </div>
 
     <div class="container-fluid">
+
       <div class="row offset2">
         <header class="jumbotron subhead">
           <div class="inner">
@@ -73,22 +74,24 @@
         <div class="span4">
           <div class="sidebar-nav-fixed">
             <h2>Map</h2>
-            <p>Click on a country to select. Hover to display names.</p>
+            <p>Click on a country to select. Hover to display
+            names.</p>
+            <b>TODO:Get fixed to work with smaller browser windows</b>
             <div class="well ">
               <div id="map"></div>
             </div><!--/.well -->
           </div><!--/span-->            
         </div>
 
-        <div class="span8">
+        <div class="span7">
           <h2>We do everything</h2>
-          <p>Here at oDesk, we have every contractor break each
-            project down into one of nine different categories before
-            they submit it the site. Within each category, there are
+          <p>Here at oDesk, we have every client break each project
+            down into one of nine different categories before they
+            submit it the site. Within each category, there are
             multiple smaller subcategories each representing a
-            different type of work. For example, a project could be in
-            the category "Software Development" and the sub-category
-            "Mobile Apps".
+            different type of work.We have over 70 different
+            sub-categories representing everything from translation to
+            HR and Payroll services to iPhone development.
           </p>
 
           <p>
@@ -97,15 +100,42 @@
             color of the bubble represent the category of the
             sub-category (see the legend to the right). Hover to see
             the full title and the number of projects completed within
-            each category.<b >TODO: Click a bubble once to show the
+            each category.
+          </p>
+          <p>
+            <b >TODO: Click a bubble once to search the
             contractors on oDesk who do that type of work. Double click a
-            bubble to show all of the jobs available for that type of
+            bubble to search all of the jobs available for that type of
             work.</b>
+          </p>           
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span4"></div>
+        <div class="span6">
+          <div id="bubble"></div>
+        </div>
+        <div class="span1">
+          <div id="cats"></div>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="span4"></div>
+        <div class="span7">
+          <h2>Get work done while you sleep</h2>
+          <p>
+            We have thousands of contractors from across the
+            globe. No matter where you live, there will always be
+            someone awake, ready to work on your big idea. 
+          </p>
+          <p>
           </p>              
           <div id="bubble"></div>
         </div>
-
       </div>
+
+      
 
       <footer>
         <p>&copy; oDesk 2012</p>
