@@ -73,7 +73,7 @@ iframe{
 .odesk-logo{
   height: 26px;
   width: 85px;
-  background: url("/assets/homepagesprite.png") no-repeat scroll 0 -175px transparent;
+  background: url("./assets/homepagesprite.png") no-repeat scroll 0 -175px transparent;
 }
 
 .feature {

@@ -1,13 +1,13 @@
 #Gather the data
 data = {}
 i=0
-d3.json("/data/working_data.json", (d)->
+d3.json("./data/working_data.json", (d)->
   data.working= d
   i++
   if i is 2 then start()
 )
 
-d3.json("/data/world_countries.json", (d)->
+d3.json("./data/world_countries.json", (d)->
   data.countries = d
   i++
   if i is 2 then start()
