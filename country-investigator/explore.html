@@ -61,7 +61,7 @@
           <div class="inner">
             <h1>Explore</h1>
             <blockquote>
-              <p>Catch the trade wind within your sails</p>
+              <p>Catch the trade wind within your sails.</p>
               <small>Mark Twain</small>
             </blockquote>
           </div>
@@ -71,16 +71,38 @@
       <div class="row-fluid">
 
         <div class="span4">
-          <div class="well sidebar-nav">
-            <div id="map"></div>
-          </div><!--/.well -->
-        </div><!--/span-->
+          <div class="sidebar-nav-fixed">
+            <h2>Map</h2>
+            <p>Click on a country to select. Hover to display names.</p>
+            <div class="well ">
+              <div id="map"></div>
+            </div><!--/.well -->
+          </div><!--/span-->            
+        </div>
 
         <div class="span8">
-          <h2>Breakdown of projects completed by category and subcategories.</h2>
+          <h2>We do everything</h2>
+          <p>Here at oDesk, we have every contractor break each
+            project down into one of nine different categories before
+            they submit it the site. Within each category, there are
+            multiple smaller subcategories each representing a
+            different type of work. For example, a project could be in
+            the category "Software Development" and the sub-category
+            "Mobile Apps".
+          </p>
+
           <p>
-            Hover to see the full title and the number of projects completed.
+            Below is a bubble chart that shows the relative size of
+            the number of projects completed in each sub-category. The
+            color of the bubble represent the category of the
+            sub-category (see the legend to the right). Hover to see
+            the full title and the number of projects completed within
+            each category.<b >TODO: Click a bubble once to show the
+            contractors on oDesk who do that type of work. Double click a
+            bubble to show all of the jobs available for that type of
+            work.</b>
           </p>              
+          <div id="bubble"></div>
         </div>
 
       </div>
@@ -96,7 +118,9 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="/js/jquery.js"></script>
     <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/underscore.min.js"></script>
     <script src="/js/d3.v2.min.js"></script>
+    <script src="/js/fisheye.js"></script>
     <script src="/js/explore.js"></script>
   </body>
 </html>

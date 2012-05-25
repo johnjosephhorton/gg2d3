@@ -64,3 +64,23 @@ path.area{
   position: relative;
   top: -5px;
 }
+
+/*Explore css */
+.sidebar-nav-fixed {
+     position:fixed;
+     top:60px;
+     width:21.97%;
+ }
+
+ @media (max-width: 767px) {
+     .sidebar-nav-fixed {
+         width:auto;
+     }
+ }
+
+ @media (max-width: 979px) {
+     .sidebar-nav-fixed {
+         position:static;
+        width: auto;
+     }
+ }

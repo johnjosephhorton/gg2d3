@@ -6,9 +6,9 @@ flatten = (root)->
     if node.children
       node.children.forEach((child)-> recurse(node.name,child))
     else
-      classes.push({packageName: name, className: node.name, value: node.size})
+      classes.push({small: name, big: node.name, value: node.size})
   recurse(null,root)
-  {children: classes, className: "Total"}
+  {children: classes, small: "Total",}
 
 
 d3.json "data/working-data.json", (data)->

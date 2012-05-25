@@ -75,3 +75,37 @@ iframe{
   width: 85px;
   background: url("/assets/homepagesprite.png") no-repeat scroll 0 -175px transparent;
 }
+
+.feature {
+  fill: #68707B;
+  stroke: white;
+}
+
+.selected{
+  stroke: #ccc;
+  fill: #061F32;
+}
+
+.unselected{
+  stroke: #ccc;
+  fill: #168CE5;
+}
+
+.sidebar-nav-fixed {
+     position:fixed;
+     top:30%;
+     width:21.97%;
+ }
+
+ @media (max-width: 767px) {
+     .sidebar-nav-fixed {
+         width:auto;
+     }
+ }
+
+ @media (max-width: 979px) {
+     .sidebar-nav-fixed {
+         position:static;
+        width: auto;
+     }
+ }

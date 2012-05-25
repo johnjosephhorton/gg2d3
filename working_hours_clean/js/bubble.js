@@ -12,8 +12,8 @@ flatten = function(root) {
       });
     } else {
       return classes.push({
-        packageName: name,
-        className: node.name,
+        small: name,
+        big: node.name,
         value: node.size
       });
     }
@@ -21,7 +21,7 @@ flatten = function(root) {
   recurse(null, root);
   return {
     children: classes,
-    className: "Total"
+    small: "Total"
   };
 };
 
