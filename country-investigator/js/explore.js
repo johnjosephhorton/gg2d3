@@ -108,7 +108,7 @@ createMap = function() {
 createBubble = function() {
   var box, c, size, t, _i, _len, _results;
   size = Math.min($("#bubble").width(), $(document).height());
-  bubble = d3.select("#bubble").append("svg").attr("width", size).attr("height", size).attr("class", "pack").append("g").attr("transform", "translate(0,0)");
+  bubble = d3.selectAll("#bubble").append("svg").attr("width", size).attr("height", size).attr("class", "pack").append("g").attr("transform", "translate(0,0)");
   bubble.size = size;
   bubble.colors = d3.scale.category20().domain(categories);
   bubble.flatten = function(root) {

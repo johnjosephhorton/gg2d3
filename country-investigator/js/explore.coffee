@@ -102,7 +102,7 @@ createBubble = ()->
 
   size = Math.min($("#bubble").width(),$(document).height())
 
-  bubble = d3.select("#bubble").append("svg")
+  bubble = d3.selectAll("#bubble").append("svg")
     .attr("width",size)
     .attr("height",size)
     .attr("class","pack")
