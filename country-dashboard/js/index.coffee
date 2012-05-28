@@ -1,26 +1,10 @@
-HashBangs = Backbone.Router.extend
-  routes:
-    "bubble/:country": "bubble"
-    ":url": "display"
-    "": "default"
+#SVG objects (which will later hold onto d3 charting objects)
+map = null
+bubble = null
+categories = ["Web Development", "Software Development", "Networking & Information Systems", "Writing & Translation", "Administrative Support", "Design & Multimedia", "Customer Service", "Sales & Marketing", "Business Services"]
 
-  display: (url,rest)->
-    $(".tab").hide()
-    $("##{url}").show()
-    console.log(rest)
-
-  bubble: (c)->
-    console.log(c,country)
-    country = c
-
-  default: (actions,rest)->
-     $(".tab").hide()
-     $("#home").show()
-
-$(".hidden").toggleClass("hidden").hide()
-a = new HashBangs()
-
-Backbone.history.start()
+#Variables
+country = "United States"
 
 #Gather the data
 data = {}
@@ -36,14 +20,6 @@ d3.json("./data/world_countries.json", (d)->
   i++
   if i is 2 then start()
 )
-
-#SVG objects (which will later hold onto d3 charting objects)
-map = null
-bubble = null
-categories = ["Web Development", "Software Development", "Networking & Information Systems", "Writing & Translation", "Administrative Support", "Design & Multimedia", "Customer Service", "Sales & Marketing", "Business Services"]
-
-#Variables
-country = "United States"
 
 #Start everything up
 start = ()->
@@ -229,3 +205,29 @@ updateBubble = ()->
       .text((d)-> d.className.substring(0,d.r/4))
 
     node.exit().remove()
+
+
+HashBangs = Backbone.Router.extend
+  routes:
+    "bubble/:country": "bubble"
+    ":url": "display"
+    "": "default"
+
+  display: (url,rest)->
+    $(".tab").hide()
+    $("##{url}").show()
+    console.log(rest)
+
+  bubble: (c)->
+    console.log(c,country)
+    country = c
+    this.navigate("bubble",trigger:true)
+
+  default: (actions,rest)->
+     $(".tab").hide()
+     $("#home").show()
+
+$(".hidden").toggleClass("hidden").hide()
+a = new HashBangs()
+
+Backbone.history.start()

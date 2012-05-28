@@ -1,32 +1,12 @@
 var HashBangs, a, bubble, categories, country, create, createBubble, createMap, data, i, map, start, update, updateBubble, updateMap;
 
-HashBangs = Backbone.Router.extend({
-  routes: {
-    "bubble/:country": "bubble",
-    ":url": "display",
-    "": "default"
-  },
-  display: function(url, rest) {
-    $(".tab").hide();
-    $("#" + url).show();
-    return console.log(rest);
-  },
-  bubble: function(c) {
-    var country;
-    console.log(c, country);
-    return country = c;
-  },
-  "default": function(actions, rest) {
-    $(".tab").hide();
-    return $("#home").show();
-  }
-});
+map = null;
 
-$(".hidden").toggleClass("hidden").hide();
+bubble = null;
 
-a = new HashBangs();
+categories = ["Web Development", "Software Development", "Networking & Information Systems", "Writing & Translation", "Administrative Support", "Design & Multimedia", "Customer Service", "Sales & Marketing", "Business Services"];
 
-Backbone.history.start();
+country = "United States";
 
 data = {};
 
@@ -43,14 +23,6 @@ d3.json("./data/world_countries.json", function(d) {
   i++;
   if (i === 2) return start();
 });
-
-map = null;
-
-bubble = null;
-
-categories = ["Web Development", "Software Development", "Networking & Information Systems", "Writing & Translation", "Administrative Support", "Design & Multimedia", "Customer Service", "Sales & Marketing", "Business Services"];
-
-country = "United States";
 
 start = function() {
   create();
@@ -274,3 +246,33 @@ updateBubble = function() {
   });
   return node.exit().remove();
 };
+
+HashBangs = Backbone.Router.extend({
+  routes: {
+    "bubble/:country": "bubble",
+    ":url": "display",
+    "": "default"
+  },
+  display: function(url, rest) {
+    $(".tab").hide();
+    $("#" + url).show();
+    return console.log(rest);
+  },
+  bubble: function(c) {
+    console.log(c, country);
+    country = c;
+    return this.navigate("bubble", {
+      trigger: true
+    });
+  },
+  "default": function(actions, rest) {
+    $(".tab").hide();
+    return $("#home").show();
+  }
+});
+
+$(".hidden").toggleClass("hidden").hide();
+
+a = new HashBangs();
+
+Backbone.history.start();
