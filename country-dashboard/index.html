@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Country Investigator, from oDesk</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="./css/spacelab.min.css" rel="stylesheet">
+    <link href="./css/index.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="./assets/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">Country Dashboard</a>
+          <a class="odesk-logo" href="https://www.odesk.com" alt="" title="oDesk Home"></a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="active"><a href="#/about">About</a></li>
+              <li><a href="#/compare">Compare Activity</a></li>
+              <li><a href="#/watch">Watch Activity</a></li>
+              <li><a href="#/bubble">Project Bubbles</a></li>
+              <li><a href="#/chart">Project Charts</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+      <a href="https://github.com/johnjosephhorton/gg2d3"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
+    </div>
+
+    <section id="home" class="tab">
+      <div class="container">
+        <div class="row">
+
+          <div class="span3">
+            <p>Compare the level of activity between countries. </p>
+            <p><a class="btn btn-large" href="#/compare">Compare Activity</a></p>
+          </div>
+
+          <div class="span3">
+            <p>Watch the entire oDesk market through a typical day.</p>
+            <p><a class="btn btn-large" href="#/watch">Watch Activity</a></p>
+          </div>
+
+          <div class="span3">
+            <p>Explore the types of projects being completed via
+            bubble chart.</p>
+            <p><a class="btn btn-large" href="#/bubble">Project Bubbles</a></p>
+          </div>
+
+          <div class="span3">
+            <p>More traditional view of the types of projects being
+            completed on oDesk.</p>
+            <p><a class="btn btn-large" href="#/chart">Project Charts</a></p>
+          </div>
+
+        </div>
+      </div>
+      </section>
+
+      <section id="about" class="tab hidden">
+        <div class="container">
+        About
+        </div>
+      </section>
+
+      <section id="compare" class="tab hidden">
+        <div class="container">
+          <div class="row">          
+            Compare
+          </div>
+        </div>
+      </section>
+
+      <section id="watch" class="tab hidden">
+        <div class="row">
+          Watch
+        </div>
+      </section>
+
+      <section id="bubble" class="tab hidden">
+        <div class="container-fluid">
+          <div class="row-fluid">
+            <div class="span4">
+              <h3>Map</h3>
+              <p>Click on a country to select. Hover to display
+                names.</p>
+              <div class="well">
+                <div id="map"></div>
+              </div><!--/.well -->
+            </div><!--/span-->            
+
+            <div class="span6">
+              <h3>Bubble Chart</h3>
+              <p>Hover to display category name and number of projects
+              completed.</p>
+              <div class="well">
+                <div id="bubblechart"></div>                
+              </div>
+            </div>
+
+            <div class="span2">
+              <h3>Major Categories</h3>
+              <p>Types of projects.</p>
+              <div class="well">
+                <div id="cats"></div>                
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <section id="chart" class="tab hidden">
+        <div class="row">
+          Chart
+        </div>
+      </section>
+
+      <footer>
+        <p>&copy; oDesk 2012</p>
+      </footer>
+
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+    <script src="./js/underscore.min.js"></script>
+    <script src="./js/backbone.min.js"></script>
+    <script src="./js/d3.v2.min.js"></script>
+    <script src="./js/fisheye.js"></script>
+    <script src="./js/index.js"></script>
+  </body>
+</html>
