@@ -10,6 +10,7 @@
     <!-- Le styles -->
     <link href="./css/spacelab.min.css" rel="stylesheet">
     <link href="./css/index.css" rel="stylesheet">
+    <link href="./css/rickshaw.min.css" rel="stylesheet">
     <style type="text/css">
       body {
         padding-top: 60px;
@@ -96,9 +97,35 @@
     </section>
 
     <section id="compare" class="tab hidden">
-      <div class="container">
-        <div class="row">          
-          Compare
+      <div class="container-fluid">
+        <div class="row-fluid">
+
+          <div class="span4">
+            <h3>Map</h3>
+            <p>Click on a country to select and unselect. Hover to
+            display names.</p>
+            <div class="well">
+              <div id="comparemap"></div>
+            </div>
+          </div>
+
+          <div class="span6">
+            <h3>Activity Chart</h3>
+            <p>Hover to display category name and number of projects
+              completed.</p>
+            <div class="well">
+              <div id="compareline"></div>                
+            </div>
+          </div>
+
+          <div class="span2">
+            <h3>Countries</h3>
+            <p>Countries.</p>
+            <div class="well">
+              <div id="comparelegend"></div>                
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
@@ -163,10 +190,18 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="./js/jquery.min.js"></script>
     <script src="./js/bootstrap.min.js"></script>
+
     <script src="./js/underscore.min.js"></script>
     <script src="./js/backbone.min.js"></script>
+
     <script src="./js/d3.v2.min.js"></script>
     <script src="./js/fisheye.js"></script>
+    <script src="./js/rickshaw.min.js"></script>
+
+    <script src="./js/start.js"></script>
+    <script src="./js/bubble.js"></script>
+    <script src="./js/compare.js"></script>
     <script src="./js/index.js"></script>
+
   </body>
 </html>
