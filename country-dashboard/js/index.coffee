@@ -207,9 +207,7 @@ updateBubble = ()->
     node.exit().remove()
 
 
-shownPreviously = {
-
-}
+showing = null
 
 HashBangs = Backbone.Router.extend
   routes:
@@ -226,14 +224,17 @@ HashBangs = Backbone.Router.extend
 
   showBubble: (givenCountry)->
     if givenCountry then country = givenCountry
-    $("#main").html($("#bubble").html())
-    createMap()
-    createBubble()
+    if showing isnt "bubble"
+      $("#main").html($("#bubble").html())
+      createMap()
+      createBubble()
     updateMap()
     updateBubble()
+    showing="bubble"
 
   showAbout: ()->
     $("#main").html($("#about").html())
+    showing="about"
 
 $(".hidden").toggleClass("hidden").hide()
 

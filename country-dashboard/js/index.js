@@ -1,4 +1,4 @@
-var HashBangs, bubble, categories, country, create, createBubble, createMap, data, i, map, route, shownPreviously, start, update, updateBubble, updateMap;
+var HashBangs, bubble, categories, country, create, createBubble, createMap, data, i, map, route, showing, start, update, updateBubble, updateMap;
 
 map = null;
 
@@ -244,7 +244,7 @@ updateBubble = function() {
   return node.exit().remove();
 };
 
-shownPreviously = {};
+showing = null;
 
 HashBangs = Backbone.Router.extend({
   routes: {
@@ -257,14 +257,18 @@ HashBangs = Backbone.Router.extend({
   home: function() {},
   showBubble: function(givenCountry) {
     if (givenCountry) country = givenCountry;
-    $("#main").html($("#bubble").html());
-    createMap();
-    createBubble();
+    if (showing !== "bubble") {
+      $("#main").html($("#bubble").html());
+      createMap();
+      createBubble();
+    }
     updateMap();
-    return updateBubble();
+    updateBubble();
+    return showing = "bubble";
   },
   showAbout: function() {
-    return $("#main").html($("#about").html());
+    $("#main").html($("#about").html());
+    return showing = "about";
   }
 });
 
