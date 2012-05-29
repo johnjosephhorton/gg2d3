@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Country Investigator, from oDesk</title>
+    <title>Country Dashboard, from oDesk</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -24,10 +24,6 @@
 
     <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href="./assets/favicon.ico">
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
   </head>
 
   <body>
@@ -35,11 +31,6 @@
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </a>
           <a class="brand" href="#">Country Dashboard</a>
           <a class="odesk-logo" href="https://www.odesk.com" alt="" title="oDesk Home"></a>
           <div class="nav-collapse">
@@ -50,13 +41,25 @@
               <li><a href="#/bubble">Project Bubbles</a></li>
               <li><a href="#/chart">Project Charts</a></li>
             </ul>
-          </div><!--/.nav-collapse -->
+          </div>
         </div>
       </div>
-      <a href="https://github.com/johnjosephhorton/gg2d3"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
+      <a href="https://github.com/johnjosephhorton/gg2d3">
+        <img style="position: absolute; top: 0; right: 0; border: 0;"
+             src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+             alt="Fork me on GitHub">
+      </a>
     </div>
+    
+    <section id="main" class="tab">
+      <div class="container">
+        <div class="row">
+      Loading...
+        </div>
+      </div>
+    </section>
 
-    <section id="home" class="tab">
+    <section id="home" class="tab hidden">
       <div class="container">
         <div class="row">
 
@@ -84,73 +87,76 @@
 
         </div>
       </div>
-      </section>
+    </section>
 
-      <section id="about" class="tab hidden">
-        <div class="container">
+    <section id="about" class="tab hidden">
+      <div class="container">
         About
-        </div>
-      </section>
+      </div>
+    </section>
 
-      <section id="compare" class="tab hidden">
-        <div class="container">
-          <div class="row">          
-            Compare
+    <section id="compare" class="tab hidden">
+      <div class="container">
+        <div class="row">          
+          Compare
+        </div>
+      </div>
+    </section>
+
+    <section id="watch" class="tab hidden">
+      <div class="row">
+        Watch
+      </div>
+    </section>
+
+    <section id="bubble" class="tab hidden">
+      <div class="container-fluid">
+        <div class="row-fluid">
+
+          <div class="span4">
+            <h3>Map</h3>
+            <p>Click on a country to select. Hover to display names.</p>
+            <div class="well">
+              <div id="bubblemap"></div>
+            </div>
           </div>
-        </div>
-      </section>
 
-      <section id="watch" class="tab hidden">
-        <div class="row">
-          Watch
-        </div>
-      </section>
-
-      <section id="bubble" class="tab hidden">
-        <div class="container-fluid">
-          <div class="row-fluid">
-            <div class="span4">
-              <h3>Map</h3>
-              <p>Click on a country to select. Hover to display
-                names.</p>
-              <div class="well">
-                <div id="map"></div>
-              </div><!--/.well -->
-            </div><!--/span-->            
-
-            <div class="span6">
-              <h3>Bubble Chart</h3>
-              <p>Hover to display category name and number of projects
+          <div class="span6">
+            <h3>Bubble Chart</h3>
+            <p>Hover to display category name and number of projects
               completed.</p>
-              <div class="well">
-                <div id="bubblechart"></div>                
-              </div>
+            <div class="well">
+              <div id="bubblechart"></div>                
             </div>
-
-            <div class="span2">
-              <h3>Major Categories</h3>
-              <p>Types of projects.</p>
-              <div class="well">
-                <div id="cats"></div>                
-              </div>
-
-            </div>
-
           </div>
+
+          <div class="span2">
+            <h3>Major Categories</h3>
+            <p>Types of projects.</p>
+            <div class="well">
+              <div id="cats"></div>                
+            </div>
+          </div>
+
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section id="chart" class="tab hidden">
-        <div class="row">
-          Chart
-        </div>
-      </section>
+    <section id="chart" class="tab hidden">
+      <div class="row">
+        Chart
+      </div>
+    </section>
 
-      <footer>
-        <p>&copy; oDesk 2012</p>
-      </footer>
+    <section id="chart" class="tab">
+      <div class="row">
+        <footer>
+          <p>&copy; oDesk 2012</p>
+        </footer>
+      </div>
+    </section>
 
-    </div> <!-- /container -->
+
 
     <!-- Le javascript
     ================================================== -->

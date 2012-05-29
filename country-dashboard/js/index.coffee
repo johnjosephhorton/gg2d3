@@ -9,6 +9,7 @@ country = "United States"
 #Gather the data
 data = {}
 i=0
+
 d3.json("./data/working_data.json", (d)->
   data.working= d
   i++
@@ -21,19 +22,15 @@ d3.json("./data/world_countries.json", (d)->
   if i is 2 then start()
 )
 
-#Start everything up
-start = ()->
-  create()
-  update()
 
 create = ()->
   createMap()
   createBubble()
 
 createMap = ()->
-  size = $("#map").parent().width()
+  size = $("#bubblemap").parent().width()
 
-  map = d3.select("#map").append("svg")
+  map = d3.select("#bubblemap").append("svg")
     .attr("height",size)
     .attr("width",size)
 
@@ -63,6 +60,7 @@ createMap = ()->
       clicked= d.properties.name
       if not (clicked of data.working) then return
       country = clicked
+      route.navigate("#bubble/#{country}")
       update()
     )
 
@@ -97,14 +95,14 @@ createMap = ()->
        map.path(clone)
     )
 
-  $("#map").on(i,refish) for i in ["mousemove","mousein","mouseout","touch","touchmove"]
+  $("#bubblemap").on(i,refish) for i in ["mousemove","mousein","mouseout","touch","touchmove"]
 
 createBubble = ()->
 
   w = $("#bubblechart").parent().width()
-  h = $("#map").parent().width()
+  h = $("#bubblemap").parent().width()
 
-  bubble = d3.selectAll("#bubblechart").append("svg")
+  bubble = d3.select("#bubblechart").append("svg")
     .attr("width",w)
     .attr("height",h)
     .attr("class","pack")
@@ -125,10 +123,13 @@ createBubble = ()->
     recurse(null,root)
     {children: classes, className: "Total"}
 
+  cats = $("#cats")
   for t in categories
     c = $("<div>")
     box = $("<div>").css({height: 10, width: 10, "background-color":bubble.colors(t) })
-    $("#cats").append(box,$("<p>").text(t))
+    cats.append(box,$("<p>").text(t))
+
+
 update = ()->
   updateMap()
   updateBubble()
@@ -197,7 +198,6 @@ updateBubble = ()->
       .attr("fill",(d)->
         if d.packageName then bubble.colors(d.packageName) else "none")
 
-
     node.filter((d)->not d.children).select("text")
       .transition().delay(timing)
       .attr("text-anchor","middle")
@@ -207,27 +207,39 @@ updateBubble = ()->
     node.exit().remove()
 
 
+shownPreviously = {
+
+}
+
 HashBangs = Backbone.Router.extend
   routes:
-    "bubble/:country": "bubble"
-    ":url": "display"
-    "": "default"
+    "": "showAbout"
 
-  display: (url,rest)->
-    $(".tab").hide()
-    $("##{url}").show()
-    console.log(rest)
+    "about" : 'showAbout'
 
-  bubble: (c)->
-    console.log(c,country)
-    country = c
-    this.navigate("bubble",trigger:true)
+    "bubble" : 'showBubble'
+    "bubble/:country" : 'showBubble'
 
-  default: (actions,rest)->
-     $(".tab").hide()
-     $("#home").show()
+  initialize: (options)->
+
+  home: ()->
+
+  showBubble: (givenCountry)->
+    if givenCountry then country = givenCountry
+    $("#main").html($("#bubble").html())
+    createMap()
+    createBubble()
+    updateMap()
+    updateBubble()
+
+  showAbout: ()->
+    $("#main").html($("#about").html())
 
 $(".hidden").toggleClass("hidden").hide()
-a = new HashBangs()
 
-Backbone.history.start()
+route = null
+
+#Start everything up
+start = ()->
+  route = new HashBangs()
+  Backbone.history.start()

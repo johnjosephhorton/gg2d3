@@ -1,4 +1,4 @@
-var HashBangs, a, bubble, categories, country, create, createBubble, createMap, data, i, map, start, update, updateBubble, updateMap;
+var HashBangs, bubble, categories, country, create, createBubble, createMap, data, i, map, route, shownPreviously, start, update, updateBubble, updateMap;
 
 map = null;
 
@@ -24,11 +24,6 @@ d3.json("./data/world_countries.json", function(d) {
   if (i === 2) return start();
 });
 
-start = function() {
-  create();
-  return update();
-};
-
 create = function() {
   createMap();
   return createBubble();
@@ -36,8 +31,8 @@ create = function() {
 
 createMap = function() {
   var feature, fishPolygon, i, refish, size, _i, _len, _ref, _results;
-  size = $("#map").parent().width();
-  map = d3.select("#map").append("svg").attr("height", size).attr("width", size);
+  size = $("#bubblemap").parent().width();
+  map = d3.select("#bubblemap").append("svg").attr("height", size).attr("width", size);
   map.projection = d3.geo.mercator().scale(size).translate([size / 2, size / 2]);
   map.path = d3.geo.path().projection(map.projection);
   map.fisheye = d3.fisheye().radius(50).power(10);
@@ -60,6 +55,7 @@ createMap = function() {
     clicked = d.properties.name;
     if (!(clicked in data.working)) return;
     country = clicked;
+    route.navigate("#bubble/" + country);
     return update();
   });
   feature.each(function(d, i) {
@@ -100,16 +96,16 @@ createMap = function() {
   _results = [];
   for (_i = 0, _len = _ref.length; _i < _len; _i++) {
     i = _ref[_i];
-    _results.push($("#map").on(i, refish));
+    _results.push($("#bubblemap").on(i, refish));
   }
   return _results;
 };
 
 createBubble = function() {
-  var box, c, h, t, w, _i, _len, _results;
+  var box, c, cats, h, t, w, _i, _len, _results;
   w = $("#bubblechart").parent().width();
-  h = $("#map").parent().width();
-  bubble = d3.selectAll("#bubblechart").append("svg").attr("width", w).attr("height", h).attr("class", "pack").append("g").attr("transform", "translate(0,0)");
+  h = $("#bubblemap").parent().width();
+  bubble = d3.select("#bubblechart").append("svg").attr("width", w).attr("height", h).attr("class", "pack").append("g").attr("transform", "translate(0,0)");
   bubble.width = w;
   bubble.height = h;
   bubble.colors = d3.scale.category20().domain(categories);
@@ -135,6 +131,7 @@ createBubble = function() {
       className: "Total"
     };
   };
+  cats = $("#cats");
   _results = [];
   for (_i = 0, _len = categories.length; _i < _len; _i++) {
     t = categories[_i];
@@ -144,7 +141,7 @@ createBubble = function() {
       width: 10,
       "background-color": bubble.colors(t)
     });
-    _results.push($("#cats").append(box, $("<p>").text(t)));
+    _results.push(cats.append(box, $("<p>").text(t)));
   }
   return _results;
 };
@@ -247,32 +244,35 @@ updateBubble = function() {
   return node.exit().remove();
 };
 
+shownPreviously = {};
+
 HashBangs = Backbone.Router.extend({
   routes: {
-    "bubble/:country": "bubble",
-    ":url": "display",
-    "": "default"
+    "": "showAbout",
+    "about": 'showAbout',
+    "bubble": 'showBubble',
+    "bubble/:country": 'showBubble'
   },
-  display: function(url, rest) {
-    $(".tab").hide();
-    $("#" + url).show();
-    return console.log(rest);
+  initialize: function(options) {},
+  home: function() {},
+  showBubble: function(givenCountry) {
+    if (givenCountry) country = givenCountry;
+    $("#main").html($("#bubble").html());
+    createMap();
+    createBubble();
+    updateMap();
+    return updateBubble();
   },
-  bubble: function(c) {
-    console.log(c, country);
-    country = c;
-    return this.navigate("bubble", {
-      trigger: true
-    });
-  },
-  "default": function(actions, rest) {
-    $(".tab").hide();
-    return $("#home").show();
+  showAbout: function() {
+    return $("#main").html($("#about").html());
   }
 });
 
 $(".hidden").toggleClass("hidden").hide();
 
-a = new HashBangs();
+route = null;
 
-Backbone.history.start();
+start = function() {
+  route = new HashBangs();
+  return Backbone.history.start();
+};
