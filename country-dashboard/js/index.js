@@ -25,7 +25,7 @@ HashBangs = Backbone.Router.extend({
     return showing = "about";
   },
   showCompare: function(countries) {
-    console.log(selectedCountries);
+    console.log("go");
     if (countries) {
       selectedCountries = _.map(countries.split("/"), function(c) {
         if (c.length === 0) {
@@ -65,3 +65,11 @@ start = function() {
   route = new HashBangs();
   return Backbone.history.start();
 };
+
+$(window).resize(function() {
+  console.log("yo");
+  showing = "none";
+  return route.navigate(Backbone.history.fragment, {
+    trigger: true
+  });
+});

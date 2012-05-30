@@ -27,7 +27,7 @@ HashBangs = Backbone.Router.extend
     showing="about"
 
   showCompare: (countries)->
-    console.log(selectedCountries)
+    console.log("go")
     if countries
       selectedCountries = _.map(countries.split("/"), (c)-> if c.length is 0 then null else decodeURI(c))
     else
@@ -59,3 +59,9 @@ $(".hidden").toggleClass("hidden").hide()
 start = ()->
   route = new HashBangs()
   Backbone.history.start()
+
+$(window).resize(()->
+  console.log("yo")
+  showing = "none"
+  route.navigate(Backbone.history.fragment, {trigger:true})
+  )

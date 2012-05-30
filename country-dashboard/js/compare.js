@@ -17,7 +17,10 @@ selectedCountries = (function() {
 
 updateActivityData = function() {
   var c, enumerated, i, instance, _i, _len;
-  data.activityData = [];
+  data.activity = {
+    absolute: [],
+    normal: []
+  };
   for (_i = 0, _len = selectedCountries.length; _i < _len; _i++) {
     c = selectedCountries[_i];
     if (!(!_.isNull(c))) continue;
@@ -35,13 +38,32 @@ updateActivityData = function() {
       }
       return _results;
     })();
-    data.activityData.push({
+    data.activity.absolute.push({
+      data: enumerated,
+      color: compare.rainbow[selectedCountries.indexOf(c)],
+      name: c
+    });
+    instance = _.flatten(data.working[c].normal_hours);
+    enumerated = (function() {
+      var _j, _len2, _ref, _results;
+      _ref = _.range(instance.length);
+      _results = [];
+      for (_j = 0, _len2 = _ref.length; _j < _len2; _j++) {
+        i = _ref[_j];
+        _results.push({
+          x: i,
+          y: instance[i]
+        });
+      }
+      return _results;
+    })();
+    data.activity.normal.push({
       data: enumerated,
       color: compare.rainbow[selectedCountries.indexOf(c)],
       name: c
     });
   }
-  return data.activityData;
+  return data.activity;
 };
 
 createCompareChart = function() {
@@ -155,46 +177,70 @@ updateCompareMap = function() {
 };
 
 createCompareLines = function() {
-  var ticks, xAxis, yAxis;
+  var ticks;
   updateActivityData();
-  compare.activity = new Rickshaw.Graph({
+  compare.absolute = new Rickshaw.Graph({
     renderer: "line",
-    element: document.querySelector("#compareline"),
-    height: $("#comparemap").parent().height(),
-    width: $("#compareline").parent().width(),
-    series: data.activityData
+    element: document.querySelector("#absolute"),
+    height: $("#comparemap").parent().height() / 2,
+    width: $("#absolute").parent().width(),
+    series: data.activity.absolute
   });
-  compare.activity.render();
+  compare.normal = new Rickshaw.Graph({
+    renderer: "line",
+    element: document.querySelector("#normalized"),
+    height: $("#comparemap").parent().height() / 2,
+    width: $("#absolute").parent().width(),
+    series: data.activity.normal
+  });
+  compare.absolute.render();
+  compare.normal.render();
   ticks = "glow";
-  xAxis = new Rickshaw.Graph.Axis.Time({
-    graph: compare.activity,
+  compare.absolute.xAxis = new Rickshaw.Graph.Axis.Time({
+    graph: compare.absolute,
     ticksTreatment: ticks
   });
-  xAxis.render();
-  yAxis = new Rickshaw.Graph.Axis.Y({
-    graph: compare.activity,
+  compare.absolute.xAxis.render();
+  compare.absolute.yAxis = new Rickshaw.Graph.Axis.Y({
+    graph: compare.absolute,
     tickFormat: Rickshaw.Fixtures.Number.formatKMBT
   }, {
     ticksTreatment: ticks
   });
-  return yAxis.render();
+  compare.absolute.yAxis.render();
+  compare.normal.xAxis = new Rickshaw.Graph.Axis.Time({
+    graph: compare.normal,
+    ticksTreatment: ticks
+  });
+  compare.normal.xAxis.render();
+  compare.normal.yAxis = new Rickshaw.Graph.Axis.Y({
+    graph: compare.normal,
+    tickFormat: Rickshaw.Fixtures.Number.formatKMBT
+  }, {
+    ticksTreatment: ticks
+  });
+  return compare.normal.yAxis.render();
 };
 
 updateCompareLines = function() {
   var d, i, m, n, _i, _len, _ref;
   d = updateActivityData();
-  m = compare.activity.series.length;
-  n = d.length;
+  m = compare.absolute.series.length;
+  n = d.absolute.length;
+  console.log(d, m, n);
   _ref = _.range(d3.max([m, n]));
   for (_i = 0, _len = _ref.length; _i < _len; _i++) {
     i = _ref[_i];
     if (i < n) {
-      compare.activity.series[i] = d[i];
+      compare.absolute.series[i] = d.absolute[i];
+      compare.normal.series[i] = d.normal[i];
     } else {
-      delete compare.activity.series[i];
+      delete compare.absolute.series[i];
+      delete compare.normal.series[i];
     }
   }
-  return compare.activity.update();
+  compare.absolute.update();
+  return compare.normal.update();
 };
 
 createCompareLegend = function() {

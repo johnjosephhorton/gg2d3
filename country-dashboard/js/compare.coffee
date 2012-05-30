@@ -10,17 +10,26 @@ selectedCountries = (()->
     arr)()
 
 updateActivityData = ()->
-    data.activityData = []
+    data.activity = {absolute: [], normal: []}
     for c in selectedCountries when not _.isNull(c)
+
       instance =  _.flatten(data.working[c].hours)
       enumerated = ({x: i, y: instance[i]} for i in _.range(instance.length))
-      data.activityData.push(
+      data.activity.absolute.push(
         data: enumerated
         color: compare.rainbow[selectedCountries.indexOf(c)]
         name: c
       )
 
-    data.activityData
+      instance =  _.flatten(data.working[c].normal_hours)
+      enumerated = ({x: i, y: instance[i]} for i in _.range(instance.length))
+      data.activity.normal.push(
+        data: enumerated
+        color: compare.rainbow[selectedCountries.indexOf(c)]
+        name: c
+      )
+
+    data.activity
 
 createCompareChart = ()->
   createCompareMap()
@@ -132,42 +141,69 @@ updateCompareMap = ()->
 createCompareLines = ()->
   updateActivityData()
 
-  compare.activity = new Rickshaw.Graph({
+  compare.absolute = new Rickshaw.Graph({
       renderer: "line"
-      element: document.querySelector("#compareline")
-      height: $("#comparemap").parent().height()
-      width: $("#compareline").parent().width()
-      series: data.activityData
+      element: document.querySelector("#absolute")
+      height: $("#comparemap").parent().height()/2
+      width: $("#absolute").parent().width()
+      series: data.activity.absolute
     })
 
-  compare.activity.render()
+  compare.normal = new Rickshaw.Graph({
+      renderer: "line"
+      element: document.querySelector("#normalized")
+      height: $("#comparemap").parent().height()/2
+      width: $("#absolute").parent().width()
+      series: data.activity.normal
+    })
+
+  compare.absolute.render()
+  compare.normal.render()
 
   ticks = "glow"
 
-  xAxis = new Rickshaw.Graph.Axis.Time
-      graph: compare.activity
+  compare.absolute.xAxis = new Rickshaw.Graph.Axis.Time
+      graph: compare.absolute
       ticksTreatment: ticks
 
-  xAxis.render()
+  compare.absolute.xAxis.render()
 
-  yAxis = new Rickshaw.Graph.Axis.Y
-  	graph: compare.activity,
+  compare.absolute.yAxis = new Rickshaw.Graph.Axis.Y
+  	graph: compare.absolute,
   	tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
    	ticksTreatment: ticks,
 
 
-  yAxis.render()
+  compare.absolute.yAxis.render()
+
+  compare.normal.xAxis = new Rickshaw.Graph.Axis.Time
+      graph: compare.normal
+      ticksTreatment: ticks
+
+  compare.normal.xAxis.render()
+
+  compare.normal.yAxis = new Rickshaw.Graph.Axis.Y
+  	graph: compare.normal,
+  	tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+   	ticksTreatment: ticks,
+
+  compare.normal.yAxis.render()
 
 updateCompareLines = ()->
   d = updateActivityData()
-  m = compare.activity.series.length
-  n = d.length
+  m = compare.absolute.series.length
+  n = d.absolute.length
+  console.log(d,m,n)
   for i in _.range(d3.max([m,n]))
-    if i < n
-      compare.activity.series[i]= d[i]
-    else
-      delete compare.activity.series[i]
-  compare.activity.update()
+      if i < n
+        compare.absolute.series[i]= d.absolute[i]
+        compare.normal.series[i]= d.normal[i]
+      else
+        delete compare.absolute.series[i]
+        delete compare.normal.series[i]
+
+  compare.absolute.update()
+  compare.normal.update()
 
 createCompareLegend = ()->
  $("#comparelegend").css(
