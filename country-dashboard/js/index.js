@@ -25,7 +25,6 @@ HashBangs = Backbone.Router.extend({
     return showing = "about";
   },
   showCompare: function(countries) {
-    console.log("go");
     if (countries) {
       selectedCountries = _.map(countries.split("/"), function(c) {
         if (c.length === 0) {
@@ -48,13 +47,11 @@ HashBangs = Backbone.Router.extend({
     return showing = "compare";
   },
   showBubble: function(givenCountry) {
-    var country;
-    if (givenCountry) country = decodeURI(givenCountry);
     if (showing !== "bubble") {
       $("#main").html($("#bubble").html());
       createBubbleChart();
     }
-    updateBubbleChart();
+    updateBubbleChart(givenCountry);
     return showing = "bubble";
   }
 });
@@ -67,9 +64,10 @@ start = function() {
 };
 
 $(window).resize(function() {
-  console.log("yo");
+  console.log("yo", Backbone.history.fragment);
   showing = "none";
   return route.navigate(Backbone.history.fragment, {
-    trigger: true
+    trigger: true,
+    replace: true
   });
 });

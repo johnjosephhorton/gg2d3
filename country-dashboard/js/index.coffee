@@ -27,7 +27,6 @@ HashBangs = Backbone.Router.extend
     showing="about"
 
   showCompare: (countries)->
-    console.log("go")
     if countries
       selectedCountries = _.map(countries.split("/"), (c)-> if c.length is 0 then null else decodeURI(c))
     else
@@ -43,11 +42,10 @@ HashBangs = Backbone.Router.extend
 
 
   showBubble: (givenCountry)->
-    if givenCountry then country = decodeURI(givenCountry)
     if showing isnt "bubble"
       $("#main").html($("#bubble").html())
       createBubbleChart()
-    updateBubbleChart()
+    updateBubbleChart(givenCountry)
     showing="bubble"
 
 
@@ -61,7 +59,7 @@ start = ()->
   Backbone.history.start()
 
 $(window).resize(()->
-  console.log("yo")
+  console.log("yo",Backbone.history.fragment)
   showing = "none"
-  route.navigate(Backbone.history.fragment, {trigger:true})
+  route.navigate(Backbone.history.fragment, {trigger: true, replace: true}) #Why isn't this working?
   )

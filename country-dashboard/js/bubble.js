@@ -34,10 +34,8 @@ createBubbleMap = function() {
   }).on('click', function(d, i) {
     var clicked;
     clicked = d.properties.name;
-    console.log(country, clicked);
     if (!(clicked in data.working)) return;
     country = clicked;
-    console.log(country, clicked);
     route.navigate("#bubble/" + country);
     return updateBubbleChart();
   });
@@ -140,7 +138,8 @@ createBubbles = function() {
   return _results;
 };
 
-updateBubbleChart = function() {
+updateBubbleChart = function(c) {
+  if (c) country = c;
   updateBubbleMap();
   return updateBubbles();
 };

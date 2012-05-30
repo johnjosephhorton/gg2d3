@@ -32,7 +32,7 @@ updateActivityData = function() {
       for (_j = 0, _len2 = _ref.length; _j < _len2; _j++) {
         i = _ref[_j];
         _results.push({
-          x: i,
+          x: i * 60 * 60,
           y: instance[i]
         });
       }
@@ -51,7 +51,7 @@ updateActivityData = function() {
       for (_j = 0, _len2 = _ref.length; _j < _len2; _j++) {
         i = _ref[_j];
         _results.push({
-          x: i,
+          x: i * 60 * 60,
           y: instance[i]
         });
       }
@@ -107,7 +107,7 @@ createCompareMap = function() {
     while (str.indexOf("//") !== -1) {
       str = str.replace("//", "/");
     }
-    route.navigate("#compare/" + str);
+    route.navigate("#/compare/" + str);
     return updateCompareChart();
   });
   feature.each(function(d, i) {
@@ -177,7 +177,7 @@ updateCompareMap = function() {
 };
 
 createCompareLines = function() {
-  var ticks;
+  var a, ticks, time, timer, week, xaxa, xaxn, yaxa, yaxn;
   updateActivityData();
   compare.absolute = new Rickshaw.Graph({
     renderer: "line",
@@ -196,30 +196,77 @@ createCompareLines = function() {
   compare.absolute.render();
   compare.normal.render();
   ticks = "glow";
-  compare.absolute.xAxis = new Rickshaw.Graph.Axis.Time({
+  week = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  time = new Rickshaw.Fixtures.Time;
+  timer = time.unit("day");
+  a = timer.formatter;
+  timer.formatter = function(d) {
+    return week[a(d) - 1];
+  };
+  xaxa = {
     graph: compare.absolute,
-    ticksTreatment: ticks
-  });
+    ticksTreatment: ticks,
+    timeUnit: timer,
+    tickFormat: Rickshaw.Fixtures.Number.formatKMBT
+  };
+  yaxa = {
+    graph: compare.absolute,
+    tickFormat: Rickshaw.Fixtures.Number.formatKMBT
+  };
+  xaxn = {
+    graph: compare.normal,
+    ticksTreatment: ticks,
+    timeUnit: timer,
+    tickFormat: Rickshaw.Fixtures.Number.formatKMBT
+  };
+  yaxn = {
+    graph: compare.normal,
+    tickFormat: Rickshaw.Fixtures.Number.formatKMBT
+  };
+  compare.absolute.xAxis = new Rickshaw.Graph.Axis.Time(xaxa);
+  compare.absolute.yAxis = new Rickshaw.Graph.Axis.Y(yaxa);
+  compare.normal.xAxis = new Rickshaw.Graph.Axis.Time(xaxn);
+  compare.normal.yAxis = new Rickshaw.Graph.Axis.Y(yaxn);
   compare.absolute.xAxis.render();
-  compare.absolute.yAxis = new Rickshaw.Graph.Axis.Y({
-    graph: compare.absolute,
-    tickFormat: Rickshaw.Fixtures.Number.formatKMBT
-  }, {
-    ticksTreatment: ticks
-  });
   compare.absolute.yAxis.render();
-  compare.normal.xAxis = new Rickshaw.Graph.Axis.Time({
-    graph: compare.normal,
-    ticksTreatment: ticks
-  });
+  compare.normal.yAxis.render();
   compare.normal.xAxis.render();
-  compare.normal.yAxis = new Rickshaw.Graph.Axis.Y({
-    graph: compare.normal,
-    tickFormat: Rickshaw.Fixtures.Number.formatKMBT
-  }, {
-    ticksTreatment: ticks
+  compare.absolute.hover = new Rickshaw.Graph.HoverDetail({
+    graph: compare.absolute,
+    xFormatter: (function(x) {
+      var day, h, hour;
+      h = x / 3600;
+      day = week[Math.floor(h / 24)];
+      hour = h % 24;
+      return "" + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00";
+    }),
+    yFormatter: function(y) {
+      return Math.floor(y) + " workers online";
+    }
   });
-  return compare.normal.yAxis.render();
+  compare.normal.hover = new Rickshaw.Graph.HoverDetail({
+    graph: compare.normal,
+    xFormatter: (function(x) {
+      var day, h, hour;
+      h = x / 3600;
+      day = week[Math.floor(h / 24)];
+      hour = h % 24;
+      return "" + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00";
+    }),
+    yFormatter: function(y) {
+      return Math.round(y * 1000) / 1000 + "% of total workers ";
+    }
+  });
+  try {
+    compare.absolute.hover.render();
+  } catch (err) {
+
+  }
+  try {
+    return compare.normal.hover.render();
+  } catch (err) {
+
+  }
 };
 
 updateCompareLines = function() {
@@ -227,7 +274,6 @@ updateCompareLines = function() {
   d = updateActivityData();
   m = compare.absolute.series.length;
   n = d.absolute.length;
-  console.log(d, m, n);
   _ref = _.range(d3.max([m, n]));
   for (_i = 0, _len = _ref.length; _i < _len; _i++) {
     i = _ref[_i];

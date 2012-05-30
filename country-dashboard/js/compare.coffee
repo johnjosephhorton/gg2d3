@@ -14,7 +14,7 @@ updateActivityData = ()->
     for c in selectedCountries when not _.isNull(c)
 
       instance =  _.flatten(data.working[c].hours)
-      enumerated = ({x: i, y: instance[i]} for i in _.range(instance.length))
+      enumerated = ({x: i*60*60, y: instance[i]} for i in _.range(instance.length))
       data.activity.absolute.push(
         data: enumerated
         color: compare.rainbow[selectedCountries.indexOf(c)]
@@ -22,7 +22,7 @@ updateActivityData = ()->
       )
 
       instance =  _.flatten(data.working[c].normal_hours)
-      enumerated = ({x: i, y: instance[i]} for i in _.range(instance.length))
+      enumerated = ({x: i*60*60, y: instance[i]} for i in _.range(instance.length))
       data.activity.normal.push(
         data: enumerated
         color: compare.rainbow[selectedCountries.indexOf(c)]
@@ -78,7 +78,7 @@ createCompareMap =  ()->
       str = selectedCountries.join('/')
       while str.indexOf("//") isnt -1
         str = str.replace("//","/")
-      route.navigate("#compare/#{str}")
+      route.navigate("#/compare/#{str}")
       updateCompareChart()
     )
 
@@ -161,39 +161,69 @@ createCompareLines = ()->
   compare.normal.render()
 
   ticks = "glow"
+  week=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
+  time = new Rickshaw.Fixtures.Time
+  timer = time.unit("day")
+  a = timer.formatter
+  timer.formatter = (d)-> week[a(d)-1]
 
-  compare.absolute.xAxis = new Rickshaw.Graph.Axis.Time
-      graph: compare.absolute
-      ticksTreatment: ticks
+  xaxa ={ graph: compare.absolute, ticksTreatment: ticks, timeUnit: timer, tickFormat: Rickshaw.Fixtures.Number.formatKMBT }
+
+  yaxa = {graph: compare.absolute,tickFormat: Rickshaw.Fixtures.Number.formatKMBT}
+
+  xaxn ={ graph: compare.normal, ticksTreatment: ticks, timeUnit: timer, tickFormat: Rickshaw.Fixtures.Number.formatKMBT }
+
+  yaxn = {graph: compare.normal,tickFormat: Rickshaw.Fixtures.Number.formatKMBT}
+
+  compare.absolute.xAxis = new Rickshaw.Graph.Axis.Time xaxa
+  compare.absolute.yAxis = new Rickshaw.Graph.Axis.Y yaxa
+
+  compare.normal.xAxis = new Rickshaw.Graph.Axis.Time xaxn
+  compare.normal.yAxis = new Rickshaw.Graph.Axis.Y yaxn
 
   compare.absolute.xAxis.render()
-
-  compare.absolute.yAxis = new Rickshaw.Graph.Axis.Y
-  	graph: compare.absolute,
-  	tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
-   	ticksTreatment: ticks,
-
-
   compare.absolute.yAxis.render()
-
-  compare.normal.xAxis = new Rickshaw.Graph.Axis.Time
-      graph: compare.normal
-      ticksTreatment: ticks
-
+  compare.normal.yAxis.render()
   compare.normal.xAxis.render()
 
-  compare.normal.yAxis = new Rickshaw.Graph.Axis.Y
-  	graph: compare.normal,
-  	tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
-   	ticksTreatment: ticks,
+  compare.absolute.hover = new Rickshaw.Graph.HoverDetail({
+    graph: compare.absolute,
+    xFormatter: ((x)->
+      h = x/3600
+      day = week[Math.floor(h/24)]
+      hour = h%24
 
-  compare.normal.yAxis.render()
+      "#{day}, #{hour}:00-#{(hour+1)%24}:00"),
+    yFormatter: (y)-> Math.floor(y) + " workers online"
+  })
+
+  compare.normal.hover = new Rickshaw.Graph.HoverDetail({
+    graph: compare.normal,
+    xFormatter: ((x)->
+      h = x/3600
+      day = week[Math.floor(h/24)]
+      hour = h%24
+
+      "#{day}, #{hour}:00-#{(hour+1)%24}:00"),
+    yFormatter: (y)-> Math.round(y*1000)/1000 + "% of total workers "
+  })
+
+  #Errors get thrown all over the place here. Unsure why.
+  #Still works though.
+  try
+    compare.absolute.hover.render()
+  catch err
+
+  try
+    compare.normal.hover.render()
+  catch err
+
 
 updateCompareLines = ()->
   d = updateActivityData()
   m = compare.absolute.series.length
   n = d.absolute.length
-  console.log(d,m,n)
+
   for i in _.range(d3.max([m,n]))
       if i < n
         compare.absolute.series[i]= d.absolute[i]

@@ -38,10 +38,8 @@ createBubbleMap = ()->
     .each((d)-> d.org = d.geometry.coordinates)
     .on('click', (d,i)->
       clicked= d.properties.name
-      console.log country, clicked
       if not (clicked of data.working) then return
       country = clicked
-      console.log country, clicked
       route.navigate("#bubble/#{country}")
       updateBubbleChart()
     )
@@ -123,7 +121,8 @@ createBubbles = ()->
     cats.append(box,$("<p>").text(t))
 
 
-updateBubbleChart = ()->
+updateBubbleChart = (c)->
+  if c then country = c
   updateBubbleMap()
   updateBubbles()
 
