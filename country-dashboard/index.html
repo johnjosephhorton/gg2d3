@@ -70,26 +70,26 @@
         </div>
         <div class="row">
           <div class="span3">
-            <img src="http://www.placekitten.com/200/200"></img>
+            <!-- <img src="http://www.placekitten.com/200/200"></img> -->
             <p>Compare the level of activity between countries. </p>
             <p><a class="btn btn-large" href="#/compare">Compare Activity</a></p>
           </div>
 
           <div class="span3">
-            <img src="http://www.placekitten.com/200/200"></img>
+            <!-- <img src="http://www.placekitten.com/200/200"></img> -->
             <p>Watch the entire oDesk market through a typical day.</p>
             <p><a class="btn btn-large" href="#/watch">Watch Activity</a></p>
           </div>
 
           <div class="span3">
-            <img src="http://www.placekitten.com/200/200"></img>
+            <!-- <img src="http://www.placekitten.com/200/200"></img> -->
             <p>Explore the types of projects being completed via
             bubble chart.</p>
             <p><a class="btn btn-large" href="#/bubble">Project Bubbles</a></p>
           </div>
 
           <div class="span3">
-            <img src="http://www.placekitten.com/200/200"></img>
+            <!-- <img src="http://www.placekitten.com/200/200"></img> -->
             <p>More traditional view of the types of projects being
             completed on oDesk.</p>
             <p><a class="btn btn-large" href="#/chart">Project Charts</a></p>
@@ -149,6 +149,18 @@
 
     <section id="watch" class="tab hidden">
       <div class="container-fluid">
+        <div class="row">
+          <div class="span2">
+            <a class="btn" id="playbutton"><i class="icon-play"></i></a>
+          </div>
+          <div class="span2">
+            <h4 id="time"></h4>
+          </div>
+          <div class="span8">
+            <div id="slider"></div>
+          </div>
+        </div>
+
         <div class="row-fluid">
 
           <div class="span6">
@@ -156,7 +168,7 @@
             <p>Red means many people are logged on. White means not
             so many people are logged on.</p>
             <div class="well">
-              <div id="bubblemap"></div>
+              <div id="absolutemap"></div>
             </div>
           </div>
 
@@ -165,23 +177,10 @@
             <p>Red means many people are logged on. White means not
             so many people are logged on.</p>
             <div class="well">
-              <div id="bubblemap"></div>
+              <div id="relativemap"></div>
             </div>
           </div>
 
-        </div>
-
-        <div class="row">
-          <div class="span2">
-            <a class="btn" id="playbutton"><i class="icon-play"></i></a>
-          </div>
-          <div class="span2">
-            <div id="time"></div>
-          </div>
-          <div class="span10">
-            Time
-            <div id="slider"></div>
-          </div>
         </div>
 
       </div>
@@ -226,11 +225,13 @@
       </div>
     </section>
 
-    <section id="chart" class="tab">
-      <div class="row">
+    <section id="footer" class="tab">
+      <div class="container-fluid">
+        <div class="row-fluid">
         <footer>
           <p>&copy; oDesk 2012</p>
         </footer>
+        </div>
       </div>
     </section>
 
@@ -241,6 +242,7 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="./js/jquery-1.7.2.min.js"></script>
     <script src="./js/jquery-ui-1.8.20.custom.min.js"></script>
+
     <script src="./js/bootstrap.min.js"></script>
 
     <script src="./js/underscore.min.js"></script>

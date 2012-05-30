@@ -1,0 +1,29 @@
+* Home
+** Add in pictures
+** Make title bigger
+* About
+** People 
+*** John
+*** Panos
+*** Zack
+* Compare
+** Better colors for map
+** Customize scroll bar
+** Add in a local time button switcher
+** Countries changing colors when order gets out of whack.
+* Watch Activity
+** Make it. 
+** Formatting
+   Map, color scale, color scale, map
+   Play button, Slider
+* Project Charts
+** Copy over code.
+** See how it looks. 
+* General
+** Rewrite tooltips to center a few minutes above mouse if possible. 
+** Abstarct out map
+** Test in Firefox and IE
+** Investigate footer
+** Figure out how to plaster oDesk logo everywhere.
+** Add in a nice background, so wie ein background von twitter
+** Figure out what is going on with the bubbles getting stuck

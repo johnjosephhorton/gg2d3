@@ -43,22 +43,30 @@ HashBangs = Backbone.Router.extend({
     }
     if (showing !== "compare") {
       $("#main").html($("#compare").html());
+      showing = "compare";
       createCompareChart();
     }
-    updateCompareChart();
-    return showing = "compare";
+    return updateCompareChart();
   },
-  showWatch: function() {
-    $("#main").html($("#watch").html());
-    return showing = "watch";
+  showWatch: function(hour) {
+    if (showing !== "watch") {
+      $("#main").html($("#watch").html());
+      showing = "watch";
+      createWatchChart();
+    }
+    if (hour) {
+      return updateWatchChart(hour);
+    } else {
+      return updateWatchChart();
+    }
   },
   showBubble: function(givenCountry) {
     if (showing !== "bubble") {
       $("#main").html($("#bubble").html());
+      showing = "bubble";
       createBubbleChart();
     }
-    updateBubbleChart(givenCountry);
-    return showing = "bubble";
+    return updateBubbleChart(givenCountry);
   }
 });
 
@@ -67,9 +75,11 @@ $(".hidden").toggleClass("hidden").hide();
 start = function() {
   route = new HashBangs();
   Backbone.history.start();
-  return route.navigate("home", {
-    trigger: true
-  });
+  if (Backbone.history.fragment === "") {
+    return route.navigate("home", {
+      trigger: true
+    });
+  }
 };
 
 $(window).resize(function() {
