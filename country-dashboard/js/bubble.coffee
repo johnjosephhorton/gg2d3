@@ -65,8 +65,18 @@ createBubbleMap = ()->
     x = e.offsetX
     y = e.offsetY
     #TODO: Still a little off on firefox
-    x ?= e.screenX - map.offset().left
-    y ?= e.screenY - map.offset().top
+    m = $("bubblechart > svg").offset()
+    if not x?
+      totalOffsetX = 0
+      totalOffsetY = 0
+      currentElement = this
+      while true
+        totalOffsetX += currentElement.offsetLeft
+        totalOffsetY += currentElement.offsetTop
+        break if (currentElement = currentElement.offsetParent)
+
+      x = e.pageX - totalOffsetX
+      y = e.pageY - totalOffsetY
 
     bubble.map.fisheye.center([x,y])
     bubble.map.selectAll("path")

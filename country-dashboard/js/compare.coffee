@@ -11,7 +11,6 @@ selectedCountries = (()->
 
 updateActivityData = ()->
     data.activityData = []
-
     for c in selectedCountries when not _.isNull(c)
       instance =  _.flatten(data.working[c].hours)
       enumerated = ({x: i, y: instance[i]} for i in _.range(instance.length))
@@ -32,6 +31,7 @@ updateCompareChart = ()->
   updateCompareMap()
   updateCompareLines()
   updateCompareLegend()
+
 createCompareMap =  ()->
   size = $("#comparemap").parent().width()
 
@@ -92,8 +92,19 @@ createCompareMap =  ()->
     x = e.offsetX
     y = e.offsetY
     #TODO: Still a little off on firefox
-    x ?= e.screenX - map.offset().left
-    y ?= e.screenY - map.offset().top
+    m = $("#comparemap > svg").offset()
+    if not x?
+      totalOffsetX = 0
+      totalOffsetY = 0
+      currentElement = this
+      while true
+        totalOffsetX += currentElement.offsetLeft
+        totalOffsetY += currentElement.offsetTop
+        break if (currentElement = currentElement.offsetParent)
+
+      x = e.pageX - totalOffsetX
+      y = e.pageY - totalOffsetY
+
 
     compare.map.fisheye.center([x,y])
     compare.map.selectAll("path")

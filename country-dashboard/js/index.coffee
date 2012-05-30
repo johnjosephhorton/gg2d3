@@ -29,12 +29,12 @@ HashBangs = Backbone.Router.extend
   showCompare: (countries)->
     console.log(selectedCountries)
     if countries
-      selectedCountries = _.map(countries.split("/"), (c)-> if c.length is 0 then null else c)
+      selectedCountries = _.map(countries.split("/"), (c)-> if c.length is 0 then null else decodeURI(c))
     else
       selectedCountries = ["United States"]
     while selectedCountries.length isnt 60 #compare.rainbow.length
       selectedCountries.push(null)
-    console.log(selectedCountries)
+
     if showing isnt "compare"
       $("#main").html($("#compare").html())
       createCompareChart()
@@ -43,7 +43,7 @@ HashBangs = Backbone.Router.extend
 
 
   showBubble: (givenCountry)->
-    if givenCountry then country = givenCountry
+    if givenCountry then country = decodeURI(givenCountry)
     if showing isnt "bubble"
       $("#main").html($("#bubble").html())
       createBubbleChart()

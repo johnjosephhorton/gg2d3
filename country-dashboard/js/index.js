@@ -31,7 +31,7 @@ HashBangs = Backbone.Router.extend({
         if (c.length === 0) {
           return null;
         } else {
-          return c;
+          return decodeURI(c);
         }
       });
     } else {
@@ -40,7 +40,6 @@ HashBangs = Backbone.Router.extend({
     while (selectedCountries.length !== 60) {
       selectedCountries.push(null);
     }
-    console.log(selectedCountries);
     if (showing !== "compare") {
       $("#main").html($("#compare").html());
       createCompareChart();
@@ -50,7 +49,7 @@ HashBangs = Backbone.Router.extend({
   },
   showBubble: function(givenCountry) {
     var country;
-    if (givenCountry) country = givenCountry;
+    if (givenCountry) country = decodeURI(givenCountry);
     if (showing !== "bubble") {
       $("#main").html($("#bubble").html());
       createBubbleChart();

@@ -60,11 +60,22 @@ createBubbleMap = function() {
     });
   };
   refish = function(e) {
-    var x, y;
+    var currentElement, m, totalOffsetX, totalOffsetY, x, y;
     x = e.offsetX;
     y = e.offsetY;
-    if (x == null) x = e.screenX - map.offset().left;
-    if (y == null) y = e.screenY - map.offset().top;
+    m = $("bubblechart > svg").offset();
+    if (!(x != null)) {
+      totalOffsetX = 0;
+      totalOffsetY = 0;
+      currentElement = this;
+      while (true) {
+        totalOffsetX += currentElement.offsetLeft;
+        totalOffsetY += currentElement.offsetTop;
+        if ((currentElement = currentElement.offsetParent)) break;
+      }
+      x = e.pageX - totalOffsetX;
+      y = e.pageY - totalOffsetY;
+    }
     bubble.map.fisheye.center([x, y]);
     return bubble.map.selectAll("path").attr("d", function(d) {
       var clone, processed, type;
