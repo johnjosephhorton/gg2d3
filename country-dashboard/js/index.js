@@ -8,10 +8,12 @@ selectedCountries = null;
 
 HashBangs = Backbone.Router.extend({
   routes: {
-    "": "showHome",
+    "home": "showHome",
     "about": 'showAbout',
     "compare": "showCompare",
     "compare/*countries": "showCompare",
+    "watch": 'showWatch',
+    "watch/:hour": 'showWatch',
     "bubble": 'showBubble',
     "bubble/:country": 'showBubble'
   },
@@ -46,6 +48,10 @@ HashBangs = Backbone.Router.extend({
     updateCompareChart();
     return showing = "compare";
   },
+  showWatch: function() {
+    $("#main").html($("#watch").html());
+    return showing = "watch";
+  },
   showBubble: function(givenCountry) {
     if (showing !== "bubble") {
       $("#main").html($("#bubble").html());
@@ -60,7 +66,10 @@ $(".hidden").toggleClass("hidden").hide();
 
 start = function() {
   route = new HashBangs();
-  return Backbone.history.start();
+  Backbone.history.start();
+  return route.navigate("home", {
+    trigger: true
+  });
 };
 
 $(window).resize(function() {

@@ -11,6 +11,7 @@
     <link href="./css/spacelab.min.css" rel="stylesheet">
     <link href="./css/index.css" rel="stylesheet">
     <link href="./css/rickshaw.min.css" rel="stylesheet">
+    <link href="./css/jquery-ui-1.8.20.custom.css" rel="stylesheet">
     <style type="text/css">
       body {
         padding-top: 60px;
@@ -32,7 +33,7 @@
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
-          <a class="brand" href="#">Country Dashboard</a>
+          <a class="brand" href="#/home">Country Dashboard</a>
           <a class="odesk-logo" href="https://www.odesk.com" alt="" title="oDesk Home"></a>
           <div class="nav-collapse">
             <ul class="nav">
@@ -147,8 +148,42 @@
     </section>
 
     <section id="watch" class="tab hidden">
-      <div class="row">
-        Watch
+      <div class="container-fluid">
+        <div class="row-fluid">
+
+          <div class="span6">
+            <h3>Absolute Map</h3>
+            <p>Red means many people are logged on. White means not
+            so many people are logged on.</p>
+            <div class="well">
+              <div id="bubblemap"></div>
+            </div>
+          </div>
+
+          <div class="span6">
+            <h3>Relative Map</h3>
+            <p>Red means many people are logged on. White means not
+            so many people are logged on.</p>
+            <div class="well">
+              <div id="bubblemap"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="row">
+          <div class="span2">
+            <a class="btn" id="playbutton"><i class="icon-play"></i></a>
+          </div>
+          <div class="span2">
+            <div id="time"></div>
+          </div>
+          <div class="span10">
+            Time
+            <div id="slider"></div>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -204,7 +239,8 @@
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="./js/jquery.min.js"></script>
+    <script src="./js/jquery-1.7.2.min.js"></script>
+    <script src="./js/jquery-ui-1.8.20.custom.min.js"></script>
     <script src="./js/bootstrap.min.js"></script>
 
     <script src="./js/underscore.min.js"></script>
@@ -217,6 +253,7 @@
     <script src="./js/start.js"></script>
     <script src="./js/bubble.js"></script>
     <script src="./js/compare.js"></script>
+    <script src="./js/watch.js"></script>
     <script src="./js/index.js"></script>
 
   </body>

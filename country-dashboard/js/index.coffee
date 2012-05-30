@@ -6,15 +6,19 @@ selectedCountries = null
 
 HashBangs = Backbone.Router.extend
   routes:
-    "": "showHome"
+    "home": "showHome"
 
     "about" : 'showAbout'
 
     "compare" : "showCompare"
     "compare/*countries": "showCompare"
 
+    "watch" : 'showWatch'
+    "watch/:hour" : 'showWatch'
+
     "bubble" : 'showBubble'
     "bubble/:country" : 'showBubble'
+
 
   initialize: (options)->
 
@@ -40,6 +44,10 @@ HashBangs = Backbone.Router.extend
     updateCompareChart()
     showing="compare"
 
+  showWatch: ()->
+    $("#main").html($("#watch").html())
+    showing="watch"
+
 
   showBubble: (givenCountry)->
     if showing isnt "bubble"
@@ -57,6 +65,7 @@ $(".hidden").toggleClass("hidden").hide()
 start = ()->
   route = new HashBangs()
   Backbone.history.start()
+  route.navigate("home",{trigger: true})
 
 $(window).resize(()->
   console.log("yo",Backbone.history.fragment)
