@@ -121,6 +121,7 @@ updateNameMap = (name)->
 
 createWatchChart = ()->
   orderWatchData()
+
   watch.relative.scale = d3.scale.linear()
     .range(["white","blue"])
     .domain([0,0.015])#Hack
@@ -131,12 +132,19 @@ createWatchChart = ()->
 
   _.map(["relative","absolute"], createNameMap)
 
-  $("#playbutton").click(()->
-    watch.hour=0
+  playing = false
+
+  $(document).bind(["click","mousedown","touch"].join(" "),
+    (e)-> playing = false unless e.isDefaultPrevented(); null
+    #If it returns playing, it prevents everything on the document from happening.
+  )
+
+  $("#playbutton").click((e)->
+    e.preventDefault()
+    playing = true
     inc_update = ()->
-      if watch.hour > 24*7-2
+      if watch.hour > 24*7-2 or not playing
         return
-      console.log(watch.hour)
       updateWatchChart(watch.hour+1)
       setTimeout(inc_update,100)
     inc_update()
@@ -147,6 +155,7 @@ createWatchChart = ()->
     max: 24*7-2
     slide: (e,u)->
       updateWatchChart(u.value)
+      playing=false
   )
 
 

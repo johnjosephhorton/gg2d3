@@ -73,20 +73,20 @@ HashBangs = Backbone.Router.extend({
 $(".hidden").toggleClass("hidden").hide();
 
 start = function() {
+  var reset;
   route = new HashBangs();
   Backbone.history.start();
   if (Backbone.history.fragment === "") {
-    return route.navigate("home", {
+    route.navigate("home", {
       trigger: true
     });
   }
+  reset = function() {
+    showing = "none";
+    return route.navigate("#/" + Backbone.history.fragment, {
+      trigger: true,
+      replace: true
+    });
+  };
+  return $(window).resize(reset);
 };
-
-$(window).resize(function() {
-  console.log("yo", Backbone.history.fragment);
-  showing = "none";
-  return route.navigate(Backbone.history.fragment, {
-    trigger: true,
-    replace: true
-  });
-});

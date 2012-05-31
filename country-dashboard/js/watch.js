@@ -136,16 +136,22 @@ updateNameMap = function(name) {
 };
 
 createWatchChart = function() {
+  var playing;
   orderWatchData();
   watch.relative.scale = d3.scale.linear().range(["white", "blue"]).domain([0, 0.015]);
   watch.absolute.scale = d3.scale.log().range(["white", "red"]).domain([0.1, watch.absolute.max]).clamp(true);
   _.map(["relative", "absolute"], createNameMap);
-  $("#playbutton").click(function() {
+  playing = false;
+  $(document).bind(["click", "mousedown", "touch"].join(" "), function(e) {
+    if (!e.isDefaultPrevented()) playing = false;
+    return null;
+  });
+  $("#playbutton").click(function(e) {
     var inc_update;
-    watch.hour = 0;
+    e.preventDefault();
+    playing = true;
     inc_update = function() {
-      if (watch.hour > 24 * 7 - 2) return;
-      console.log(watch.hour);
+      if (watch.hour > 24 * 7 - 2 || !playing) return;
       updateWatchChart(watch.hour + 1);
       return setTimeout(inc_update, 100);
     };
@@ -155,7 +161,8 @@ createWatchChart = function() {
     min: 0,
     max: 24 * 7 - 2,
     slide: function(e, u) {
-      return updateWatchChart(u.value);
+      updateWatchChart(u.value);
+      return playing = false;
     }
   });
 };
