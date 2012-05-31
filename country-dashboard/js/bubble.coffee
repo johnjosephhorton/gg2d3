@@ -182,7 +182,6 @@ updateBubbles = ()->
     g.each((d,i)->
       $(this).tooltip(
         title: "#{d.className} <br /> #{d.value} projects completed"
-        placement: "top"
       )
     )
 

@@ -208,8 +208,7 @@ updateBubbles = function() {
   g.append("circle");
   g.each(function(d, i) {
     return $(this).tooltip({
-      title: "" + d.className + " <br /> " + d.value + " projects completed",
-      placement: "top"
+      title: "" + d.className + " <br /> " + d.value + " projects completed"
     });
   });
   g.filter(function(d) {

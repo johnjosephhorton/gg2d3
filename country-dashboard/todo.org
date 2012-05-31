@@ -30,4 +30,4 @@
 ** Figure out how to plaster oDesk logo everywhere.
 ** Add in a nice background, so wie ein background von twitter
 ** Figure out what is going on with the bubbles getting stuck
-** Take cerulean and design it with oDesk colors and fonts
+** Take cerulean and design it with oDesk colors and fonts. make bootswatch
