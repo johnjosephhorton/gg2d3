@@ -8,7 +8,7 @@
 *** Zack
 * Compare
 ** Figure out what to do about oceans. Maybe a striped background
-** Add in a local time button switcher
+** Add in a local time button switcher.
 ** Write better descriptions of each chart. 
 * Watch Activity
 ** Add in green to heatmap

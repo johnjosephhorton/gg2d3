@@ -170,7 +170,6 @@ updateWatchChart = function(h) {
   week = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   day = week[Math.floor(watch.hour / 24)];
   hour = watch.hour % 24;
-  console.log(watch.hour, day, hour);
   $("#time").text("" + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00 GMT");
   return $("#slider").slider({
     value: watch.hour
