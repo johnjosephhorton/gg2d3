@@ -25,10 +25,12 @@ HashBangs = Backbone.Router.extend
   showHome: ()->
     $("#main").html($("#home").html())
     showing="home"
+    updateTopLinks()
 
   showAbout: ()->
     $("#main").html($("#about").html())
     showing="about"
+    updateTopLinks()
 
   showCompare: (countries)->
     if countries
@@ -41,6 +43,7 @@ HashBangs = Backbone.Router.extend
     if showing isnt "compare"
       $("#main").html($("#compare").html())
       showing="compare"
+      updateTopLinks()
       createCompareChart()
     updateCompareChart()
 
@@ -49,6 +52,7 @@ HashBangs = Backbone.Router.extend
     if showing isnt "watch"
       $("#main").html($("#watch").html())
       showing="watch"
+      updateTopLinks()
       createWatchChart()
     if hour
       updateWatchChart(hour)
@@ -56,12 +60,17 @@ HashBangs = Backbone.Router.extend
       updateWatchChart()
 
   showBubble: (givenCountry)->
+
     if showing isnt "bubble"
       $("#main").html($("#bubble").html())
       showing="bubble"
+      updateTopLinks()
       createBubbleChart()
     updateBubbleChart(givenCountry)
 
+updateTopLinks = ()->
+   $("ul.nav > li").removeClass("active")
+   $("#link-#{showing}").addClass("active")
 
 $(".hidden").toggleClass("hidden").hide()
 

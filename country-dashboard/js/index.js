@@ -1,4 +1,4 @@
-var HashBangs, route, selectedCountries, showing, start;
+var HashBangs, route, selectedCountries, showing, start, updateTopLinks;
 
 showing = null;
 
@@ -20,11 +20,13 @@ HashBangs = Backbone.Router.extend({
   initialize: function(options) {},
   showHome: function() {
     $("#main").html($("#home").html());
-    return showing = "home";
+    showing = "home";
+    return updateTopLinks();
   },
   showAbout: function() {
     $("#main").html($("#about").html());
-    return showing = "about";
+    showing = "about";
+    return updateTopLinks();
   },
   showCompare: function(countries) {
     if (countries) {
@@ -44,6 +46,7 @@ HashBangs = Backbone.Router.extend({
     if (showing !== "compare") {
       $("#main").html($("#compare").html());
       showing = "compare";
+      updateTopLinks();
       createCompareChart();
     }
     return updateCompareChart();
@@ -52,6 +55,7 @@ HashBangs = Backbone.Router.extend({
     if (showing !== "watch") {
       $("#main").html($("#watch").html());
       showing = "watch";
+      updateTopLinks();
       createWatchChart();
     }
     if (hour) {
@@ -64,11 +68,17 @@ HashBangs = Backbone.Router.extend({
     if (showing !== "bubble") {
       $("#main").html($("#bubble").html());
       showing = "bubble";
+      updateTopLinks();
       createBubbleChart();
     }
     return updateBubbleChart(givenCountry);
   }
 });
+
+updateTopLinks = function() {
+  $("ul.nav > li").removeClass("active");
+  return $("#link-" + showing).addClass("active");
+};
 
 $(".hidden").toggleClass("hidden").hide();
 

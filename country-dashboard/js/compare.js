@@ -292,7 +292,7 @@ updateCompareLines = function() {
 createCompareLegend = function() {};
 
 updateCompareLegend = function() {
-  var box, c, cq, i, legend, p, _i, _len, _ref, _results;
+  var box, c, cq, i, legend, _i, _len, _ref, _results;
   legend = $("#comparelegend");
   legend.empty();
   _ref = _.range(selectedCountries.length);
@@ -309,8 +309,7 @@ updateCompareLegend = function() {
         "margin-right": "10px",
         "background-color": compare.rainbow[i]
       });
-      p = $("<p>").text(cq);
-      c.append(box, p);
+      c.text(cq).prepend(box);
       _results.push(legend.append(c));
     } else {
       _results.push(void 0);

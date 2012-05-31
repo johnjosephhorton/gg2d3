@@ -254,8 +254,6 @@ updateCompareLegend = ()->
         display: "inline-block"
         "margin-right": "10px"
         "background-color":compare.rainbow[i]
-
-      p = $("<p>").text(cq)
-      c.append(box,p)
+      c.text(cq).prepend(box)
 
       legend.append(c)
