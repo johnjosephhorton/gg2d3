@@ -7,10 +7,12 @@
 *** Panos
 *** Zack
 * Compare
-** Better colors for map
+** Figure out what to do about oceans. Maybe a striped background
 ** Add in a local time button switcher
+** Write better descriptions of each chart. 
 * Watch Activity
 ** Add in green to heatmap
+** Axes?
 ** Update layout of controls
 ** Write better descriptions of each chart. 
 * Project Charts
@@ -23,3 +25,4 @@
 ** Figure out how to plaster oDesk logo everywhere.
 ** Add in a nice background, so wie ein background von twitter
 ** Figure out what is going on with the bubbles getting stuck
+** Take cerulean and design it with oDesk colors and fonts

@@ -45,11 +45,6 @@ createNameMap = (name)->
   feature = watch[name].map.selectAll("path")
     .data(data.countries.features).enter()
       .append("path")
-    .attr("class",(d)->
-      if d.properties.name of data.working
-        "selectable"
-      else
-        "feature")
     .attr("d",watch[name].map.path)
     .each((d)-> d.org = d.geometry.coordinates)
 
@@ -143,6 +138,7 @@ createWatchChart = ()->
   $("#playbutton").click((e)->
     e.preventDefault()
     playing = true
+    watch.hour = 0 if watch.hour > 24*7-2
     inc_update = ()->
       if watch.hour > 24*7-2 or not playing
         return
@@ -164,9 +160,9 @@ updateWatchChart = (h)->
   if h then watch.hour = +h
   route.navigate("watch/#{watch.hour}")
   _.map(["relative","absolute"], updateNameMap)
-  x = +h/3600
   week=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
-  day = week[Math.floor(h/24)]
-  hour = h%24
-  $("#time").text( "#{day}, #{hour}:00-#{(hour+1)%24}:00")
+  day = week[Math.floor(watch.hour/24)]
+  hour = watch.hour%24
+  console.log(watch.hour,day,hour)
+  $("#time").text( "#{day}, #{hour}:00-#{(hour+1)%24}:00 GMT")
   $("#slider").slider(value:watch.hour)

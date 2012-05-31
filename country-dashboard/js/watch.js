@@ -50,13 +50,7 @@ createNameMap = function(name) {
   watch[name].map.projection = d3.geo.mercator().scale(size).translate([size / 2, size / 2]);
   watch[name].map.path = d3.geo.path().projection(watch[name].map.projection);
   watch[name].map.fisheye = d3.fisheye().radius(50).power(10);
-  feature = watch[name].map.selectAll("path").data(data.countries.features).enter().append("path").attr("class", function(d) {
-    if (d.properties.name in data.working) {
-      return "selectable";
-    } else {
-      return "feature";
-    }
-  }).attr("d", watch[name].map.path).each(function(d) {
+  feature = watch[name].map.selectAll("path").data(data.countries.features).enter().append("path").attr("d", watch[name].map.path).each(function(d) {
     return d.org = d.geometry.coordinates;
   });
   feature.each(function(d, i) {
@@ -150,6 +144,7 @@ createWatchChart = function() {
     var inc_update;
     e.preventDefault();
     playing = true;
+    if (watch.hour > 24 * 7 - 2) watch.hour = 0;
     inc_update = function() {
       if (watch.hour > 24 * 7 - 2 || !playing) return;
       updateWatchChart(watch.hour + 1);
@@ -168,15 +163,15 @@ createWatchChart = function() {
 };
 
 updateWatchChart = function(h) {
-  var day, hour, week, x;
+  var day, hour, week;
   if (h) watch.hour = +h;
   route.navigate("watch/" + watch.hour);
   _.map(["relative", "absolute"], updateNameMap);
-  x = +h / 3600;
   week = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  day = week[Math.floor(h / 24)];
-  hour = h % 24;
-  $("#time").text("" + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00");
+  day = week[Math.floor(watch.hour / 24)];
+  hour = watch.hour % 24;
+  console.log(watch.hour, day, hour);
+  $("#time").text("" + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00 GMT");
   return $("#slider").slider({
     value: watch.hour
   });
