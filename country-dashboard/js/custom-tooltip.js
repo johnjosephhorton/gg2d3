@@ -72,12 +72,12 @@
   , enter: function (e) {
       var self = $(e.currentTarget)[this.type](this._options).data(this.type)
 
-      if (!self.options.delay || !self.options.delay.show) return self.show()
+      if (!self.options.delay || !self.options.delay.show) return self.show(e)
 
       clearTimeout(this.timeout)
       self.hoverState = 'in'
       this.timeout = setTimeout(function() {
-        if (self.hoverState == 'in') self.show()
+        if (self.hoverState == 'in') self.show(e)
       }, self.options.delay.show)
     }
 
@@ -93,7 +93,7 @@
       }, self.options.delay.hide)
     }
 
-  , show: function () {
+  , show: function (e) {
       var $tip
         , inside
         , pos
@@ -101,6 +101,7 @@
         , actualHeight
         , placement
         , tp
+        , tipClass
 
       if (this.hasContent() && this.enabled) {
         $tip = this.tip()
@@ -139,11 +140,19 @@
           case 'right':
             tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width}
             break
+          case 'above':
+            tp = {top: e.pageY-40, left: e.pageX-$tip.width()/2}
+            break
         }
+
+        tipClass = placement
+
+        if (tipClass === "above")
+          tipClass = "top"
 
         $tip
           .css(tp)
-          .addClass(placement)
+          .addClass(tipClass)
           .addClass('in')
       }
     }
@@ -264,7 +273,7 @@
 
   $.fn.tooltip.defaults = {
     animation: true
-  , placement: 'top'
+  , placement: 'above'
   , selector: false
   , template: '<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
   , trigger: 'hover'

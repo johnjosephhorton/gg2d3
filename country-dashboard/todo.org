@@ -19,8 +19,13 @@
 ** Copy over code.
 ** See how it looks. 
 * General
-** Rewrite tooltips to center a few minutes above mouse if possible. 
 ** Abstract out map
+** Put in a timer on the start function to make sure it loads properly
+   startQ = ()->
+    if start 
+      start()
+    else
+     setTimeOut(startQ,100)
 ** Test in Firefox and IE
 ** Figure out how to plaster oDesk logo everywhere.
 ** Add in a nice background, so wie ein background von twitter
