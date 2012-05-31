@@ -73,11 +73,8 @@ start = ()->
   Backbone.history.start()
   if Backbone.history.fragment is "" then route.navigate("home",{trigger: true})
 
-
-
-
-$(window).resize(()->
-  console.log("yo",Backbone.history.fragment)
-  showing = "none"
-  route.navigate(Backbone.history.fragment, {trigger: true, replace: true}) #Why isn't this working?
-  )
+  $(window).resize(()->
+    console.log("#{Backbone.history.fragment}")
+    showing = "none"
+    route.navigate("#/"+Backbone.history.fragment,{trigger: true, replace:true}) #Why isn't this working?
+    )
