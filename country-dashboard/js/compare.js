@@ -289,15 +289,10 @@ updateCompareLines = function() {
   return compare.normal.update();
 };
 
-createCompareLegend = function() {
-  return $("#comparelegend").css({
-    height: $("#comparemap").parent().height(),
-    'overflow-y': 'scroll'
-  });
-};
+createCompareLegend = function() {};
 
 updateCompareLegend = function() {
-  var box, c, cq, i, legend, _i, _len, _ref, _results;
+  var box, c, cq, i, legend, p, _i, _len, _ref, _results;
   legend = $("#comparelegend");
   legend.empty();
   _ref = _.range(selectedCountries.length);
@@ -311,9 +306,11 @@ updateCompareLegend = function() {
         height: 10,
         width: 10,
         display: "inline-block",
+        "margin-right": "10px",
         "background-color": compare.rainbow[i]
       });
-      c.append(box, $("<p>").text(cq));
+      p = $("<p>").text(cq);
+      c.append(box, p);
       _results.push(legend.append(c));
     } else {
       _results.push(void 0);

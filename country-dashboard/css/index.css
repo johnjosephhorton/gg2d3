@@ -24,3 +24,7 @@
 .hidden{
   display: none;
 }
+
+svg{
+  background-color: white;
+}

@@ -236,10 +236,9 @@ updateCompareLines = ()->
   compare.normal.update()
 
 createCompareLegend = ()->
- $("#comparelegend").css(
-  height: $("#comparemap").parent().height()
-  'overflow-y': 'scroll'
- )
+ # $("#comparelegend").css(
+ #  height: $("#comparemap").parent().height()
+ # )
 
 updateCompareLegend = ()->
   legend = $("#comparelegend")
@@ -249,10 +248,14 @@ updateCompareLegend = ()->
     cq = selectedCountries[i]
     if cq
       c = $("<div>")
-      box = $("<div>").css(
+      box = $("<div>").css
         height: 10
         width: 10
         display: "inline-block"
-        "background-color":compare.rainbow[i])
-      c.append(box,$("<p>").text(cq))
+        "margin-right": "10px"
+        "background-color":compare.rainbow[i]
+
+      p = $("<p>").text(cq)
+      c.append(box,p)
+
       legend.append(c)

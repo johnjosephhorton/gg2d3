@@ -136,7 +136,8 @@ createWatchChart = ()->
 
   $(document).bind(["click","mousedown","touch"].join(" "),
     (e)-> playing = false unless e.isDefaultPrevented(); null
-    #If it returns playing, it prevents everything on the document from happening.
+    #If it returns playing, it prevents everything on the document
+    #from happening. So it returns null.
   )
 
   $("#playbutton").click((e)->

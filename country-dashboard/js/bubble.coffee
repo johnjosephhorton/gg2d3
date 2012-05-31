@@ -117,9 +117,16 @@ createBubbles = ()->
   cats = $("#cats")
   for t in categories
     c = $("<div>")
-    box = $("<div>").css({height: 10, width: 10, "background-color":bubble.colors(t) })
-    cats.append(box,$("<p>").text(t))
+    box = $("<div>").css({
+      height: 10,
+      width: 10,
+      display: "inline-block",
+      "white-space":"pre-line"
+      "background-color": bubble.colors(t),
+      "margin-right": "10px"})
 
+    c.text(t).prepend(box)
+    cats.append(c)
 
 updateBubbleChart = (c)->
   if c then country = c

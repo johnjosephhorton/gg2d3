@@ -131,9 +131,13 @@ createBubbles = function() {
     box = $("<div>").css({
       height: 10,
       width: 10,
-      "background-color": bubble.colors(t)
+      display: "inline-block",
+      "white-space": "pre-line",
+      "background-color": bubble.colors(t),
+      "margin-right": "10px"
     });
-    _results.push(cats.append(box, $("<p>").text(t)));
+    c.text(t).prepend(box);
+    _results.push(cats.append(c));
   }
   return _results;
 };
