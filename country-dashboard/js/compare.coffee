@@ -76,8 +76,8 @@ createCompareMap =  ()->
       else
           selectedCountries[i] = null
       str = selectedCountries.join('/')
-      while str.indexOf("//") isnt -1
-        str = str.replace("//","/")
+      while str.slice(-2) is "//"
+        str = str.slice(0,str.length-1)
       route.navigate("#/compare/#{str}")
       updateCompareChart()
     )
