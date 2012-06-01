@@ -19,13 +19,19 @@ HashBangs = Backbone.Router.extend
     "bubble" : 'showBubble'
     "bubble/:country" : 'showBubble'
 
+    "rank" : 'showRank'
+    "rank/:main" : 'showRank'
+    "rank/:main/*sub" : 'showRank' #Splat to take care of sub categories like ERM / CRM
 
+
+    "*path":"showHome"
   initialize: (options)->
 
   showHome: ()->
     $("#main").html($("#home").html())
     showing="home"
     updateTopLinks()
+    route.navigate("/home")
 
   showAbout: ()->
     $("#main").html($("#about").html())
@@ -47,7 +53,6 @@ HashBangs = Backbone.Router.extend
       createCompareChart()
     updateCompareChart()
 
-
   showWatch: (hour)->
     if showing isnt "watch"
       $("#main").html($("#watch").html())
@@ -60,13 +65,22 @@ HashBangs = Backbone.Router.extend
       updateWatchChart()
 
   showBubble: (givenCountry)->
-
     if showing isnt "bubble"
       $("#main").html($("#bubble").html())
       showing="bubble"
       updateTopLinks()
       createBubbleChart()
     updateBubbleChart(givenCountry)
+
+  showRank: (main,sub)->
+    if showing isnt "rank"
+      $("#main").html($("#rank").html())
+      showing="rank"
+      updateTopLinks()
+      createRankChart()
+    m = if main then decodeURI(main) else null
+    s = if sub then decodeURI(sub) else null
+    updateRankChart(m,s)
 
 updateTopLinks = ()->
    $("ul.nav > li").removeClass("active")

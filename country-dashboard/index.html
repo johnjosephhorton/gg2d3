@@ -41,7 +41,7 @@
               <li id="link-compare"><a href="#/compare">Compare Activity</a></li>
               <li id="link-watch"><a href="#/watch">Watch Activity</a></li>
               <li id="link-bubble"><a href="#/bubble">Project Bubbles</a></li>
-              <li id="link-chart"><a href="#/chart">Project Charts</a></li>
+              <li id="link-rank"><a href="#/rank">Project Ranks</a></li>
             </ul>
           </div>
         </div>
@@ -219,9 +219,48 @@
       </div>
     </section>
 
-    <section id="chart" class="tab hidden">
-      <div class="row">
-        Chart
+    <section id="rank" class="tab hidden">
+      <div class="container-fluid">
+
+        <div class="row-fluid">
+
+          <div id="main-pills" class="span2">
+            <h3>
+              Main Category
+            </h3>
+              <ul class="nav nav-pills nav-stacked">
+              </ul>
+          </div>
+
+          <div id="sub-pills" class="span2">
+            <h3>
+              Sub Category
+            </h3>
+
+            <ul class="nav nav-pills nav-stacked">                
+            </ul>
+          </div>
+
+          <div id="winners" class="span5">
+            <h3>
+              Top Countries
+            </h3> 
+            Top three countries for the category and sub category
+            <div id="table">
+            </div>
+          </div>
+
+          <div id="field" class="span3">
+            <h3>
+              The Field
+            </h3>
+            <p>
+              The rest of the countries
+            </p>
+            <div id="table">
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -255,8 +294,9 @@
 
     <script src="./js/start.js"></script>
     <script src="./js/bubble.js"></script>
-    <script src="./js/compare.js"></script>
     <script src="./js/watch.js"></script>
+    <script src="./js/compare.js"></script>
+    <script src="./js/rank.js"></script>
     <script src="./js/index.js"></script>
 
   </body>

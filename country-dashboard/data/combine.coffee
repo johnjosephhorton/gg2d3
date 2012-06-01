@@ -92,4 +92,21 @@ load_normalized = (data)->
         normal_array[i][j]=hours[i][j]/sum
 
     changed[country].normal_hours = normal_array
+
   fs.writeFileSync("working_data.json",JSON.stringify(changed))
+  load_sorted_by_category(data)
+
+load_sorted_by_category = (data)->
+  sorted_by_category = {}
+  for category of data["United States"].job_types
+    sorted_by_category[category] ?= {}
+    for sub of data["United States"].job_types[category]
+      countries = []
+      for country of data
+        if data[country].job_types[category]? and data[country].job_types[category][sub]
+          projects = data[country].job_types[category][sub]
+          countries.push(country: country, projects: projects) if projects?
+      c = countries.sort (arr1,arr2)-> if arr1.projects <= arr2.projects then 1 else -1
+      sorted_by_category[category][sub] = c
+  console.log(sorted_by_category["Business Services"]["Bookkeeping"])
+  fs.writeFileSync("sorted.json",JSON.stringify(sorted_by_category))

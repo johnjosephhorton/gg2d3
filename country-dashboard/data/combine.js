@@ -1,4 +1,4 @@
-var csv, fs, load_normalized, load_time_zones, rawData, timezones, _;
+var csv, fs, load_normalized, load_sorted_by_category, load_time_zones, rawData, timezones, _;
 
 fs = require('fs');
 
@@ -112,5 +112,38 @@ load_normalized = function(data) {
     }
     changed[country].normal_hours = normal_array;
   }
-  return fs.writeFileSync("working_data.json", JSON.stringify(changed));
+  fs.writeFileSync("working_data.json", JSON.stringify(changed));
+  return load_sorted_by_category(data);
+};
+
+load_sorted_by_category = function(data) {
+  var c, category, countries, country, projects, sorted_by_category, sub;
+  sorted_by_category = {};
+  for (category in data["United States"].job_types) {
+    if (sorted_by_category[category] == null) sorted_by_category[category] = {};
+    for (sub in data["United States"].job_types[category]) {
+      countries = [];
+      for (country in data) {
+        if ((data[country].job_types[category] != null) && data[country].job_types[category][sub]) {
+          projects = data[country].job_types[category][sub];
+          if (projects != null) {
+            countries.push({
+              country: country,
+              projects: projects
+            });
+          }
+        }
+      }
+      c = countries.sort(function(arr1, arr2) {
+        if (arr1.projects <= arr2.projects) {
+          return 1;
+        } else {
+          return -1;
+        }
+      });
+      sorted_by_category[category][sub] = c;
+    }
+  }
+  console.log(sorted_by_category["Business Services"]["Bookkeeping"]);
+  return fs.writeFileSync("sorted.json", JSON.stringify(sorted_by_category));
 };

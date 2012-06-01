@@ -15,13 +15,18 @@ HashBangs = Backbone.Router.extend({
     "watch": 'showWatch',
     "watch/:hour": 'showWatch',
     "bubble": 'showBubble',
-    "bubble/:country": 'showBubble'
+    "bubble/:country": 'showBubble',
+    "rank": 'showRank',
+    "rank/:main": 'showRank',
+    "rank/:main/*sub": 'showRank',
+    "*path": "showHome"
   },
   initialize: function(options) {},
   showHome: function() {
     $("#main").html($("#home").html());
     showing = "home";
-    return updateTopLinks();
+    updateTopLinks();
+    return route.navigate("/home");
   },
   showAbout: function() {
     $("#main").html($("#about").html());
@@ -72,6 +77,18 @@ HashBangs = Backbone.Router.extend({
       createBubbleChart();
     }
     return updateBubbleChart(givenCountry);
+  },
+  showRank: function(main, sub) {
+    var m, s;
+    if (showing !== "rank") {
+      $("#main").html($("#rank").html());
+      showing = "rank";
+      updateTopLinks();
+      createRankChart();
+    }
+    m = main ? decodeURI(main) : null;
+    s = sub ? decodeURI(sub) : null;
+    return updateRankChart(m, s);
   }
 });
 
