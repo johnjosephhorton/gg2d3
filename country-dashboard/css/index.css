@@ -1,6 +1,10 @@
 #main{
   margin-top: 20px;
 }
+
+.controls{
+  display: inline-block;
+}
 /* Brand management */
 .odesk-logo{
   height:  26px;

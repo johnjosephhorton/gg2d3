@@ -1,4 +1,4 @@
-var csv, fs, load_normalized, load_sorted_by_category, load_time_zones, rawData, timezones, _;
+var calculate_global, csv, fs, load_normalized, load_sorted_by_category, load_time_zones, rawData, timezones, _;
 
 fs = require('fs');
 
@@ -19,30 +19,30 @@ csv().fromPath(__dirname + '/more_working_hours.csv').toPath(__dirname + '/sampl
   var addToData, data;
   data = new Object;
   addToData = function(item) {
-    var country, d, day, hour, i, key, mouse, num, w, workers, zeros, zerozeros;
+    var country, d, day, hour, i, key, morezeroes, mouse, num, w, workers, zero;
     num = item[0], d = item[1], hour = item[2], country = item[3], w = item[4], key = item[5], mouse = item[6];
     workers = +w;
     day = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].indexOf(d);
     if (country === "Country") return;
-    zeros = (function() {
-      var _results;
+    zero = function() {
+      var i, _results;
       _results = [];
       for (i = 0; i < 24; i++) {
         _results.push(0);
       }
       return _results;
-    })();
-    zerozeros = (function() {
+    };
+    morezeroes = (function() {
       var _results;
       _results = [];
       for (i = 0; i <= 6; i++) {
-        _results.push(zeros.slice(0));
+        _results.push(zero());
       }
       return _results;
     })();
     if (!(data[country] != null)) {
       data[country] = new Object();
-      data[country]["hours"] = zerozeros.slice(0);
+      data[country]["hours"] = morezeroes;
       data[country]["zones"] = timezones[country];
     }
     return data[country]["hours"][day][hour] = workers;
@@ -144,6 +144,34 @@ load_sorted_by_category = function(data) {
       sorted_by_category[category][sub] = c;
     }
   }
-  console.log(sorted_by_category["Business Services"]["Bookkeeping"]);
-  return fs.writeFileSync("sorted.json", JSON.stringify(sorted_by_category));
+  fs.writeFileSync("sorted.json", JSON.stringify(sorted_by_category));
+  return calculate_global(data);
+};
+
+calculate_global = function(data) {
+  var all_hours, country, global, hour, sum;
+  global = {};
+  all_hours = [];
+  for (country in data) {
+    hour = data[country];
+    all_hours.push(hour.hours);
+  }
+  sum = _.reduce(_.flatten(all_hours), function(a, b) {
+    return a + b;
+  });
+  global.reduced = _.reduce(all_hours, function(matrix_a, matrix_b) {
+    var week;
+    week = _.zip(matrix_a, matrix_b);
+    return _.map(week, function(w) {
+      var day, day_a, day_b;
+      day_a = w[0], day_b = w[1];
+      day = _.zip(day_a, day_b);
+      return _.map(day, function(d) {
+        var a, b;
+        a = d[0], b = d[1];
+        return (a + b) / sum;
+      });
+    });
+  });
+  return fs.writeFileSync("global.json", JSON.stringify(global));
 };

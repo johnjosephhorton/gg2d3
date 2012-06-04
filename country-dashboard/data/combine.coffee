@@ -24,15 +24,14 @@ csv()
     if country is "Country" then return
 
     #Init empty arrays to deal with sparse arrays
-    zeros = (0 for i in [0...24])
-    zerozeros = (zeros[0..] for i in [0..6])
-
+    zero = ()-> (0 for i in [0...24])
+    morezeroes = (zero() for i in [0..6])
 
     #Do we have an object
     if not data[country]?
       data[country] = new Object()
-      data[country]["hours"] = zerozeros[0..]
-      data[country]["zones"]= timezones[country]
+      data[country]["hours"] = morezeroes
+      data[country]["zones"] = timezones[country]
 
     data[country]["hours"][day][hour]=workers
 
@@ -108,5 +107,28 @@ load_sorted_by_category = (data)->
           countries.push(country: country, projects: projects) if projects?
       c = countries.sort (arr1,arr2)-> if arr1.projects <= arr2.projects then 1 else -1
       sorted_by_category[category][sub] = c
-  console.log(sorted_by_category["Business Services"]["Bookkeeping"])
   fs.writeFileSync("sorted.json",JSON.stringify(sorted_by_category))
+
+  calculate_global(data)
+
+
+calculate_global = (data)->
+  global = {}
+  all_hours = []
+  for country,hour of data
+    all_hours.push hour.hours
+
+  sum = _.reduce(_.flatten(all_hours),(a,b)-> a+b)
+
+  global.reduced = _.reduce all_hours, (matrix_a,matrix_b)->
+    week = _.zip(matrix_a,matrix_b)
+    _.map(week, (w)->
+      [day_a, day_b] = w
+      day = _.zip(day_a,day_b)
+      _.map(day, (d)->
+        [a,b]=d
+        (a+b)/sum
+      )
+    )
+
+  fs.writeFileSync("global.json",JSON.stringify(global))
