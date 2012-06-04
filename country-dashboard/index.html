@@ -29,7 +29,6 @@
   </head>
 
   <body>
-
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
@@ -38,26 +37,22 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-                <a class="odesk-logo" href="https://www.odesk.com"
-                alt="" title="oDesk Home"></a>
-          <div class="nav-collapse">
+          <a class="brand" href="#/home">Country Dashboard</a>
+          <a class="odesk-logo" href="http://www.odesk.com"></a>
+          <div class="nav-collapse collapse">
             <ul class="nav">
-              <li>
-                <a class="brand" href="#/home">Country Dashboard</a>
-              </li>
               <li class="vertical-divide"></li>
               <li id="link-about"><a href="#/about">About</a></li>
               <li id="link-compare"><a href="#/compare">Compare Activity</a></li>
               <li id="link-watch"><a href="#/watch">Watch Activity</a></li>
               <li id="link-bubble"><a href="#/bubble">Project Bubbles</a></li>
-              <li id="link-rank"><a href="#/rank">Project
-              Ranks</a></li>
+              <li id="link-rank"><a href="#/rank">Project Ranks</a></li>
             </ul>
-
           </div>
         </div>
       </div>
-      <a href="https://github.com/johnjosephhorton/gg2d3">
+
+      <a href="https://github.com/johnjosephhorton/gg2d3/tree/master/country-dashboard">
         <img style="position: absolute; top: 0; right: 0; border: 0;"
              src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
              alt="Fork me on GitHub">
@@ -76,15 +71,15 @@
       <div class="container">
         <div class="row">
           <div class="span10 offset1 jumbotron masthead">
-            <h1>Explore our world.</h1>
+            <h1>Explore our world</h1>
             <p>
-              Dive into the nations of oDesk. 
+              Dive into the nations of oDesk
             </p>
 
           </div>
         </div>
         <div class="row">
-          <div class="span3">
+          <div class="span3 ">
             <img src="./assets/compare.png" width=200
             height=200></img>
             <br />
@@ -125,8 +120,60 @@
 
     <section id="about" class="tab hidden">
       <div class="container">
-        About
+        <div class="row">
+          <div class="span8">
+            <h1>oDesk serves the world</h1>
+            <p>
+              Over 250,000 businesses across the world have used oDesk
+              to connect with contractors. We've helped people connect
+              across oceans, mountains, and cultures. We wanted to
+              give you a way to explore oDesk and see our organization
+              from a global view. Any feedback can be directed to [THE
+              APPROPRIATE PLACE]. 
+            </p>
+          </div>
+        </div>
+
+        <div class="row">
+          <h2>Contributors (who should have better cropped pictures)</h2>
+          <div class="row">
+
+            <div class="span4">
+              <img src="./assets/horton.jpg" height=200></img>
+              <p>
+                John Horton
+                <br />
+                Labor Economist for oDesk
+                <br />
+                <a href="https://twitter.com/#!/johnjhorton">Twitter</a>
+              </p>
+            </div>
+
+            <div class="span4">
+              <img src="./assets/panos.jpg" height=200></img>
+              <p>
+                Panos Ipeirotis
+                <br />
+                Academic in residence, oDesk
+                <br />
+                <a href="https://twitter.com/#!/johnjhorton">Twitter</a>
+              </p>
+            </div>
+
+            <div class="span4">
+              <img src="./assets/maril.jpg" height=200></img>
+              <p>
+                Zack Maril
+                <br />
+                Visualization Consultant
+                <br />
+                <a href="https://twitter.com/#!/ZackMaril">Twitter</a>
+              </p>
+            </div>
+          </div>
+        </div>  
       </div>
+
     </section>
 
     <section id="compare" class="tab hidden">
@@ -172,41 +219,24 @@
     </section>
 
     <section id="watch" class="tab hidden">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="span2">
-            <a class="btn" id="playbutton"><i class="icon-play"></i></a>
-          </div>
-          <div class="span3">
-            <h4 id="time"></h4>
-          </div>
-          <div class="span7">
-            <div id="slider"></div>
-          </div>
-        </div>
-
         <div class="row-fluid">
-
           <div class="span6">
-            <h3>Absolute Map</h3>
-            <p>Red means many people are logged on. White means not
-            so many people are logged on.</p>
-            <div class="well">
-              <div id="absolutemap"></div>
-            </div>
-          </div>
-
-          <div class="span6">
-            <h3>Relative Map</h3>
-            <p>Red means many people are logged on. White means not
-            so many people are logged on.</p>
+            <h3>Activity Map</h3>
+            <p> The map below shows the normalized activity in each
+            country. The darker the blue of the country  </p>
             <div class="well">
               <div id="relativemap"></div>
             </div>
           </div>
-
+          <div class="span6">
+            <h3>Controls</h3>
+            <a class="btn" id="playbutton">
+              <i class="icon-play"></i>
+            </a> 
+            <h4 id="time"></h4>
+            <div id="slider"></div>
+          </div>
         </div>
-
       </div>
     </section>
 
