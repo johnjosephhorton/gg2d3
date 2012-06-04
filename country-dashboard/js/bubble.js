@@ -206,11 +206,6 @@ updateBubbles = function() {
     return "translate(" + d.x + "," + d.y + ")";
   });
   g.append("circle");
-  g.each(function(d, i) {
-    return $(this).tooltip({
-      title: "" + d.className + " <br /> " + d.value + " projects completed"
-    });
-  });
   g.filter(function(d) {
     return !d.children;
   }).append("text");
@@ -237,5 +232,11 @@ updateBubbles = function() {
   }).select("text").transition().delay(timing).attr("text-anchor", "middle").attr("dy", ".3em").text(function(d) {
     return d.className.substring(0, d.r / 4);
   });
-  return node.exit().remove();
+  node.exit().remove();
+  return g.each(function(d, i) {
+    return $(this).tooltip({
+      title: "" + d.className + " <br /> " + d.value + " projects completed",
+      placement: 'middle'
+    });
+  });
 };

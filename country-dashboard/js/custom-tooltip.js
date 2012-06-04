@@ -141,13 +141,19 @@
             tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width}
             break
           case 'above':
-            tp = {top: e.pageY-40, left: e.pageX-$tip.width()/2}
+            tp = {top: e.pageY-50, left: e.pageX-$tip.width()/2}
             break
+          case 'middle':
+            var elem = this.$element[0]
+            var r = +$(elem).children("circle").attr("r")
+            tp = {top: pos.top - actualHeight, left: pos.left + pos.width /2 - actualWidth/ 2 + r}
+            break
+
         }
 
         tipClass = placement
 
-        if (tipClass === "above")
+        if (tipClass === "above" || tipClass==="middle")
           tipClass = "top"
 
         $tip

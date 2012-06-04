@@ -179,12 +179,6 @@ updateBubbles = ()->
 
     g.append("circle")
 
-    g.each((d,i)->
-      $(this).tooltip(
-        title: "#{d.className} <br /> #{d.value} projects completed"
-      )
-    )
-
     g.filter((d)-> not d.children).append("text")
 
     node.transition().delay(timing)
@@ -203,3 +197,10 @@ updateBubbles = ()->
       .text((d)-> d.className.substring(0,d.r/4))
 
     node.exit().remove()
+
+    g.each((d,i)->
+      $(this).tooltip(
+        title: "#{d.className} <br /> #{d.value} projects completed"
+        placement: 'middle'
+      )
+    )
