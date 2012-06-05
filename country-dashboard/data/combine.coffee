@@ -119,16 +119,18 @@ calculate_global = (data)->
     all_hours.push hour.hours
 
   sum = _.reduce(_.flatten(all_hours),(a,b)-> a+b)
-
-  global.reduced = _.reduce all_hours, (matrix_a,matrix_b)->
+  tmp  = _.reduce all_hours, (matrix_a,matrix_b)->
     week = _.zip(matrix_a,matrix_b)
     _.map(week, (w)->
       [day_a, day_b] = w
       day = _.zip(day_a,day_b)
       _.map(day, (d)->
         [a,b]=d
-        (a+b)/sum
+        (a+b)
       )
     )
-
+  global.reduced = _.map(tmp, (arr)->
+    _.map(arr,(h)-> h/1)#sum)
+    )
+  console.log(_.reduce(_.flatten(global.reduced),(a,b)-> a+b),sum)
   fs.writeFileSync("global.json",JSON.stringify(global))

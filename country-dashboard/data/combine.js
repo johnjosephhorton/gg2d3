@@ -149,7 +149,7 @@ load_sorted_by_category = function(data) {
 };
 
 calculate_global = function(data) {
-  var all_hours, country, global, hour, sum;
+  var all_hours, country, global, hour, sum, tmp;
   global = {};
   all_hours = [];
   for (country in data) {
@@ -159,7 +159,7 @@ calculate_global = function(data) {
   sum = _.reduce(_.flatten(all_hours), function(a, b) {
     return a + b;
   });
-  global.reduced = _.reduce(all_hours, function(matrix_a, matrix_b) {
+  tmp = _.reduce(all_hours, function(matrix_a, matrix_b) {
     var week;
     week = _.zip(matrix_a, matrix_b);
     return _.map(week, function(w) {
@@ -169,9 +169,17 @@ calculate_global = function(data) {
       return _.map(day, function(d) {
         var a, b;
         a = d[0], b = d[1];
-        return (a + b) / sum;
+        return a + b;
       });
     });
   });
+  global.reduced = _.map(tmp, function(arr) {
+    return _.map(arr, function(h) {
+      return h / 1;
+    });
+  });
+  console.log(_.reduce(_.flatten(global.reduced), function(a, b) {
+    return a + b;
+  }), sum);
   return fs.writeFileSync("global.json", JSON.stringify(global));
 };
