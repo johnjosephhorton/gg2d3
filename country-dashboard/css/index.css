@@ -2,8 +2,10 @@
   margin-top: 20px;
 }
 
-.controls{
-  display: inline-block;
+#table{
+}
+
+.row:nth-child(odd){
 }
 /* Brand management */
 .odesk-logo{
@@ -87,3 +89,4 @@ svg{
   font-size: 30px;
   line-height: 36px;
 }
+

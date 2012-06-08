@@ -96,9 +96,10 @@ load_normalized = (data)->
   load_sorted_by_category(data)
 
 load_sorted_by_category = (data)->
-  sorted_by_category = {}
+  sorted_by_category = {absolute: {}}
+
   for category of data["United States"].job_types
-    sorted_by_category[category] ?= {}
+    sorted_by_category.absolute[category] ?= {}
     for sub of data["United States"].job_types[category]
       countries = []
       for country of data
@@ -106,7 +107,8 @@ load_sorted_by_category = (data)->
           projects = data[country].job_types[category][sub]
           countries.push(country: country, projects: projects) if projects?
       c = countries.sort (arr1,arr2)-> if arr1.projects <= arr2.projects then 1 else -1
-      sorted_by_category[category][sub] = c
+      sorted_by_category.absolute[category][sub] = c
+
   fs.writeFileSync("sorted.json",JSON.stringify(sorted_by_category))
 
   calculate_global(data)
@@ -132,5 +134,6 @@ calculate_global = (data)->
   global.reduced = _.map(tmp, (arr)->
     _.map(arr,(h)-> h/1)#sum)
     )
+
   console.log(_.reduce(_.flatten(global.reduced),(a,b)-> a+b),sum)
   fs.writeFileSync("global.json",JSON.stringify(global))

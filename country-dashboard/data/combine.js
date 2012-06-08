@@ -117,10 +117,14 @@ load_normalized = function(data) {
 };
 
 load_sorted_by_category = function(data) {
-  var c, category, countries, country, projects, sorted_by_category, sub;
-  sorted_by_category = {};
+  var c, category, countries, country, projects, sorted_by_category, sub, _base;
+  sorted_by_category = {
+    absolute: {}
+  };
   for (category in data["United States"].job_types) {
-    if (sorted_by_category[category] == null) sorted_by_category[category] = {};
+    if ((_base = sorted_by_category.absolute)[category] == null) {
+      _base[category] = {};
+    }
     for (sub in data["United States"].job_types[category]) {
       countries = [];
       for (country in data) {
@@ -141,7 +145,7 @@ load_sorted_by_category = function(data) {
           return -1;
         }
       });
-      sorted_by_category[category][sub] = c;
+      sorted_by_category.absolute[category][sub] = c;
     }
   }
   fs.writeFileSync("sorted.json", JSON.stringify(sorted_by_category));
