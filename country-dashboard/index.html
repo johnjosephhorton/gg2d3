@@ -180,7 +180,7 @@
       <div class="container-fluid">
         <div class="row-fluid">
 
-          <div class="span4">
+          <div class="span5">
             <h3>Map</h3>
             <p>Click on a country to toggle it's selection. Hover to
             display names.</p>
@@ -189,8 +189,8 @@
             </div>
           </div>
 
-          <div class="span5">            
-            <h3>Workers online during the week</h3>
+          <div class="span4">            
+            <h3>Hours worked during week</h3>
             <p>A chart of the number of workers online over the course
               of the week. Hover to see the time interval, country
               name, and number of workers online.
@@ -200,7 +200,7 @@
               <div id="absolute"></div>                
             </div>
 
-            <h3>Relative number of workers online during the week</h3>
+            <h3>Ratio of hours worked during week</h3>
 
             <p>A chart of the relative number of workers online over
               the course of the week. Hover to see the time interval,
@@ -240,50 +240,41 @@
     </section>
 
     <section id="watch" class="tab hidden">
-      <div class="row-fluid">
-        <div class="span1">
-        </div>
-        <div class="span5">
-          <h3>Activity Map</h3>
-          <p> The map below shows the normalized activity in each
-            country. The darker the blue of the country, the more
-            people are online. Hover over the country to see what
-            percentage of people are online  </p>
-          <div class="well">
-            <div id="watchmap"></div>
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <div class="span6">
+            <h3 id="watch-time"></h3>              
+            <p> The map below shows the normalized activity in each
+              country. The darker the blue of the country, the higher
+              the ratio of contractors working to the total number of
+              hours the contractors worked during the week. Hover over
+              the country to see more information.</p>
+            <div class="well">
+              <div id="watchmap"></div>
+            </div>
           </div>
-        </div>
-        <div class="span5 controls">
-          <div class="well">
-            <h1> Watch the World Work </h1>
+          <div class="span6">
+            <div class="well">
+              <h1> Watch the World Work </h1>
+              <p>
+                oDesk has created one of the first truly global labor
+                marketplaces. With our ever growing network of
+                contractors, clients are able to outsource any sort of
+                work at any time of the day. This section provides a way
+                to watch and understand the dynamics of the activity in
+                the oDesk market over the course of a week. Start by
+                moving your mouse across the line chart below.
+              </p>
+            </div>
+            <h3>Weekly Global Activity</h3>
             <p>
-              oDesk has created one of the first truly global labor
-              marketplaces. With our ever growing network of
-              contractors, clients are able to outsource any sort of
-              work at any time of the day. This section provides a way
-              to watch and understand the dynamics of the activity in
-              the oDesk market over the course of a week. 
+              The graph below shows the ratio of contractors working
+              during the given interval to the total number of hours
+              worked during the week. Hover over the chart to change the
+              time and update the map. 
             </p>
+            <div id="global-weekly"></div>
           </div>
-          <h3>Weekly Global Activity</h3>
-          <p>
-            The graph below shows the total percentage of workers
-            online at the given time.
-          </p>
-              <h4 id="watch-time"></h4>              
-          <div class="row">
-            <div class="span6">
-              <!-- <a class="btn" id="playbutton"> -->
-              <!--   <i class="icon-play"></i> -->
-              <!-- </a>  -->
-            </div>
-            <div class="span6">
-
-            </div>
-          </div>
-
-          <div id="global-weekly"></div>
-
         </div>
       </div>
     </section>

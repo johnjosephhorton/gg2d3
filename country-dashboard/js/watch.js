@@ -111,7 +111,7 @@ createWatchMap = function() {
   var feature, fishPolygon, i, refish, size, _i, _len, _ref, _results;
   watch.scale = d3.scale.linear().range(["white", "blue"]).domain([0, 0.015]);
   size = $("#watchmap").parent().width();
-  watch.map = d3.select("#watchmap").append("svg").attr("height", size).attr("width", size);
+  watch.map = d3.select("#watchmap").append("svg").attr("height", size * 0.7).attr("width", size);
   watch.map.projection = d3.geo.mercator().scale(size).translate([size / 2, size / 2]);
   watch.map.path = d3.geo.path().projection(watch.map.projection);
   watch.map.fisheye = d3.fisheye().radius(50).power(10);
@@ -200,7 +200,7 @@ updateWatchChart = function(h) {
   week = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   day = week[Math.floor(watch.hour / 24)];
   hour = watch.hour % 24;
-  return $("#watch-time").text("" + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00 GMT");
+  return $("#watch-time").text("Activity map for " + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00 GMT");
 };
 
 updateNameMap = function() {

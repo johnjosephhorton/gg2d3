@@ -97,7 +97,7 @@ createWatchMap = ()->
   size = $("#watchmap").parent().width()
 
   watch.map = d3.select("#watchmap").append("svg")
-    .attr("height",size)
+    .attr("height",size*0.7)
     .attr("width",size)
 
   watch.map.projection =  d3.geo.mercator()
@@ -186,7 +186,7 @@ updateWatchChart = (h)->
   week=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
   day = week[Math.floor(watch.hour/24)]
   hour = watch.hour%24
-  $("#watch-time").text( "#{day}, #{hour}:00-#{(hour+1)%24}:00 GMT")
+  $("#watch-time").text( "Activity map for #{day}, #{hour}:00-#{(hour+1)%24}:00 GMT")
 
 
 updateNameMap = ()->

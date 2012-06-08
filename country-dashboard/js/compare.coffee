@@ -45,7 +45,7 @@ createCompareMap =  ()->
   size = $("#comparemap").parent().width()
 
   compare.map = d3.select("#comparemap").append("svg")
-    .attr("height",size)
+    .attr("height",size*0.7)
     .attr("width",size)
 
   compare.map.projection =  d3.geo.mercator()

@@ -81,7 +81,7 @@ updateCompareChart = function() {
 createCompareMap = function() {
   var feature, fishPolygon, i, refish, size, _i, _len, _ref, _results;
   size = $("#comparemap").parent().width();
-  compare.map = d3.select("#comparemap").append("svg").attr("height", size).attr("width", size);
+  compare.map = d3.select("#comparemap").append("svg").attr("height", size * 0.7).attr("width", size);
   compare.map.projection = d3.geo.mercator().scale(size).translate([size / 2, size / 2]);
   compare.map.path = d3.geo.path().projection(compare.map.projection);
   compare.map.fisheye = d3.fisheye().radius(50).power(10);
