@@ -181,19 +181,6 @@
         <div class="row-fluid">
 
           <div class="span4">
-            <h1>Compare Activity</h1>
-            <p>
-              There are contractors from over 180 different countries
-              on oDesk, each representing a distinct culture. This
-              section lets you cross these boundaries and compare each
-              country according to their own local time. Examples to
-              get you started:
-              <a href="#/compare/Spain/Portugal/United%20States/Panama/France/United Kingdom/Italy/Japan/"> G8
-              countries</a>, 
-              <a href="#/compare/Bolivia/Argentina/Chile/Paraguay/Brazil/Uruguay/Peru/Ecuador/Colombia/Venezuela/France/Suriname/Trinidad%20and%20Tobago/Panama/Guyana/">
-              South America</a>, and <a href="/#/compare/Russia/United%20States/Norway/Sweden/Finland/Canada/Iceland/">a
-              selection of Northern countries</a>.           
-            </p>
             <h3>Map</h3>
             <p>Click on a country to toggle it's selection. Hover to
             display names.</p>
@@ -202,26 +189,45 @@
             </div>
           </div>
 
-          <div class="span6">
-            
+          <div class="span5">            
             <h3>Workers online during the week</h3>
             <p>A chart of the number of workers online over the course
               of the week. Hover to see the time interval, country
-              name, and number of workers online.</p>
-            <div class="well">
+              name, and number of workers online.
+            </p>
+
+            <div class="">
               <div id="absolute"></div>                
             </div>
+
             <h3>Relative number of workers online during the week</h3>
+
             <p>A chart of the relative number of workers online over
               the course of the week. Hover to see the time interval,
               country name, and relative number of workers online.</p>
-            <div class="well">
+            <div class="">
               <div id="normalized"></div>                
             </div>
 
           </div>
 
-          <div class="span2">
+          <div class="span3">
+            <div class="well">
+              <h1>Compare Activity</h1>
+              <p>
+                There are contractors from over 180 different countries
+                on oDesk, each representing a distinct culture. This
+                section lets you cross these boundaries and compare each
+                country according to their own local time. Examples to
+                get you started:
+                <a href="#/compare/Spain/Portugal/United%20States/Panama/France/United Kingdom/Italy/Japan/"> G8
+                  countries</a>, 
+                <a href="#/compare/Bolivia/Argentina/Chile/Paraguay/Brazil/Uruguay/Peru/Ecuador/Colombia/Venezuela/France/Suriname/Trinidad%20and%20Tobago/Panama/Guyana/">
+                  South America</a>, and <a href="/#/compare/Russia/United%20States/Norway/Sweden/Finland/Canada/Iceland/">a
+                  selection of Northern countries</a>.           
+              </p>
+            </div>
+
             <h3>Legend</h3>
             <p>The countries and colors that represent them.</p>
             <div class="well">
@@ -240,12 +246,25 @@
         <div class="span5">
           <h3>Activity Map</h3>
           <p> The map below shows the normalized activity in each
-            country. The darker the blue of the country  </p>
+            country. The darker the blue of the country, the more
+            people are online. Hover over the country to see what
+            percentage of people are online  </p>
           <div class="well">
             <div id="watchmap"></div>
           </div>
         </div>
         <div class="span5 controls">
+          <div class="well">
+            <h1> Watch the World Work </h1>
+            <p>
+              oDesk has created one of the first truly global labor
+              marketplaces. With our ever growing network of
+              contractors, clients are able to outsource any sort of
+              work at any time of the day. This section provides a way
+              to watch and understand the dynamics of the activity in
+              the oDesk market over the course of a week. 
+            </p>
+          </div>
           <h3>Weekly Global Activity</h3>
           <p>
             The graph below shows the total percentage of workers
@@ -391,7 +410,7 @@
     <script src="./js/bubble.js"></script>
     <script src="./js/watch.js"></script>
     <script src="./js/compare.js"></script>
-    <script src="./js/rank.js"></script>
+    <!-- <script src="./js/rank.js"></script> -->
     <script src="./js/index.js"></script>
 
   </body>
