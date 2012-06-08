@@ -5,8 +5,9 @@
 ** Better copy
 * Compare
 ** Figure out what to do about oceans. Maybe a striped background
-** Add in a local time button switcher.
 ** Write better descriptions of each chart. 
+** Make it unable to deselect the last country.
+** Add in a local time button switcher.
 * Watch Activity
 ** Write better descriptions of each chart. 
 ** Make the hover sections of each country more informative. 
