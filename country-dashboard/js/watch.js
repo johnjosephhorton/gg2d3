@@ -200,7 +200,7 @@ updateWatchChart = function(h) {
   week = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   day = week[Math.floor(watch.hour / 24)];
   hour = watch.hour % 24;
-  return $("#watch-time").text("Activity map for " + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00 GMT");
+  return $("#watch-time").text("Activity Map for " + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00 GMT");
 };
 
 updateNameMap = function() {

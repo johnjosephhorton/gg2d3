@@ -15,7 +15,7 @@ createBubbleChart = function() {
 createBubbleMap = function() {
   var feature, fishPolygon, i, refish, size, _i, _len, _ref, _results;
   size = $("#bubblemap").parent().width();
-  bubble.map = d3.select("#bubblemap").append("svg").attr("height", size).attr("width", size);
+  bubble.map = d3.select("#bubblemap").append("svg").attr("height", size * 0.7).attr("width", size);
   bubble.map.projection = d3.geo.mercator().scale(size).translate([size / 2, size / 2]);
   bubble.map.path = d3.geo.path().projection(bubble.map.projection);
   bubble.map.fisheye = d3.fisheye().radius(50).power(10);
@@ -144,6 +144,7 @@ createBubbles = function() {
 
 updateBubbleChart = function(c) {
   if (c) country = c;
+  $("#bubble-title").text("Packed Bubble Chart for " + country);
   updateBubbleMap();
   return updateBubbles();
 };

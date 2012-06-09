@@ -11,7 +11,7 @@ createBubbleMap = ()->
   size = $("#bubblemap").parent().width()
 
   bubble.map = d3.select("#bubblemap").append("svg")
-    .attr("height",size)
+    .attr("height",size*0.7)
     .attr("width",size)
 
   bubble.map.projection =  d3.geo.mercator()
@@ -130,6 +130,7 @@ createBubbles = ()->
 
 updateBubbleChart = (c)->
   if c then country = c
+  $("#bubble-title").text("Packed Bubble Chart for #{country}")
   updateBubbleMap()
   updateBubbles()
 
