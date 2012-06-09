@@ -36,7 +36,7 @@ createBubbleMap = function() {
     clicked = d.properties.name;
     if (!(clicked in data.working)) return;
     country = clicked;
-    route.navigate("#bubble/" + country);
+    route.navigate("#/bubble/" + country);
     return updateBubbleChart();
   });
   feature.each(function(d, i) {

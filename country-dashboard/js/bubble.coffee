@@ -40,7 +40,7 @@ createBubbleMap = ()->
       clicked= d.properties.name
       if not (clicked of data.working) then return
       country = clicked
-      route.navigate("#bubble/#{country}")
+      route.navigate("#/bubble/#{country}")
       updateBubbleChart()
     )
 
