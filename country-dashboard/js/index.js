@@ -109,10 +109,10 @@ start = function() {
     });
   }
   reset = function() {
-    showing = "none";
+    showing = "";
+    console.log(Backbone.history.fragment);
     return route.navigate("#/" + Backbone.history.fragment, {
-      trigger: true,
-      replace: true
+      trigger: true
     });
   };
   return $(window).resize(reset);

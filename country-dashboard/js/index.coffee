@@ -97,8 +97,9 @@ start = ()->
   if Backbone.history.fragment is "" then route.navigate("home",{trigger: true})
 
   reset = ()->
-    showing = "none"
+    showing = ""
+    console.log(Backbone.history.fragment)
     route.navigate("#/#{Backbone.history.fragment}",
-      {trigger: true, replace:true})
+      {trigger: true})
 
   $(window).resize(reset)

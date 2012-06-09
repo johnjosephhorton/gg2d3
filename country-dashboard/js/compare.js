@@ -182,14 +182,14 @@ createCompareLines = function() {
   compare.absolute = new Rickshaw.Graph({
     renderer: "line",
     element: document.querySelector("#absolute"),
-    height: $("#comparemap").parent().height() / 2,
+    height: $("#comparemap").parent().height() * 0.4,
     width: $("#absolute").parent().width(),
     series: data.activity.absolute
   });
   compare.normal = new Rickshaw.Graph({
     renderer: "line",
     element: document.querySelector("#normalized"),
-    height: $("#comparemap").parent().height() / 2,
+    height: $("#comparemap").parent().height() * 0.4,
     width: $("#absolute").parent().width(),
     series: data.activity.normal
   });

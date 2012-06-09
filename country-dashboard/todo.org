@@ -7,10 +7,8 @@
 * Watch Activity
 ** Make the hover sections of each country more informative. 
 ** Filter out countries with low amounts of activity. Make them white.
-* Project Bubble
 * General
 ** Abstract out map
 ** Test in Firefox and IE
-** Add in a nice background, so wie ein background von twitter
 ** Figure out what is going on with the bubbles getting stuck
 
