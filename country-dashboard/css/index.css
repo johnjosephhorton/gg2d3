@@ -90,3 +90,20 @@ svg{
   line-height: 36px;
 }
 
+
+.front-buttons > div{
+  text-align: center;
+}
+
+.selectable{
+  cursor: pointer;
+}
+
+.selected{
+  cursor: pointer;
+}
+
+.unselected{
+  cursor: pointer;
+}
+
