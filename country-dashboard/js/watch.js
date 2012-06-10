@@ -1,4 +1,4 @@
-var createWatchChart, createWatchControls, createWatchMap, createWatchWeek, orderWatchData, playing, updateNameMap, updateWatchChart, watch;
+var createWatchChart, createWatchMap, createWatchWeek, orderWatchData, playing, updateNameMap, updateWatchChart, watch;
 
 watch = {
   max: 0,
@@ -52,7 +52,6 @@ orderWatchData = function() {
 createWatchChart = function() {
   orderWatchData();
   createWatchMap();
-  createWatchControls();
   return createWatchWeek();
 };
 
@@ -96,10 +95,14 @@ createWatchWeek = function() {
   return watch.hover = new Rickshaw.Graph.HoverDetail({
     graph: watch.chart,
     xFormatter: (function(x) {
+      var day, h, hour;
       watch.hour = x / 3600;
       playing = false;
       updateWatchChart();
-      return "";
+      h = x / 3600;
+      day = week[Math.floor(h / 24)];
+      hour = h % 24;
+      return "" + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00";
     }),
     yFormatter: function(y) {
       return "" + y + " total workers online ";
@@ -120,7 +123,7 @@ createWatchMap = function() {
   });
   feature.each(function(d, i) {
     return $(this).tooltip({
-      title: d.properties.name
+      title: "" + d.properties.name
     });
   });
   fishPolygon = function(polygon) {
@@ -172,55 +175,36 @@ createWatchMap = function() {
   return _results;
 };
 
-createWatchControls = function() {
-  playing = false;
-  $(document).bind(["click", "mousedown", "touch"].join(" "), function(e) {
-    if (!e.isDefaultPrevented()) playing = false;
-    return null;
-  });
-  return $("#playbutton").click(function(e) {
-    var inc_update;
-    e.preventDefault();
-    playing = true;
-    if (watch.hour > 24 * 7 - 2) watch.hour = 0;
-    inc_update = function() {
-      if (watch.hour > 24 * 7 - 2 || !playing) return;
-      updateWatchChart(watch.hour + 1);
-      return setTimeout(inc_update, 100);
-    };
-    return inc_update();
-  });
-};
-
 updateWatchChart = function(h) {
   var day, hour, week;
   if (h) watch.hour = +h;
   route.navigate("watch/" + watch.hour);
-  updateNameMap();
   week = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   day = week[Math.floor(watch.hour / 24)];
   hour = watch.hour % 24;
-  return $("#watch-time").text("Activity Map for " + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00 GMT");
+  watch.text = "" + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00 GMT";
+  $("#watch-time").text("Activity Map for " + watch.text);
+  return updateNameMap();
 };
 
 updateNameMap = function() {
-  return watch.map.selectAll("path").transition().delay(10).attr("fill", function(d, i) {
-    var country, hours;
+  return watch.map.selectAll("path").transition().delay(100).attr("fill", function(d, i) {
+    var country, hours, number, tmp, _ref;
     country = d.properties.name;
     hours = data.watch.relative[country];
-    if (hours) {
-      return watch.scale(hours[watch.hour]);
+    tmp = hours != null ? hours[watch.hour] : void 0;
+    number = _.flatten((_ref = data.working[country]) != null ? _ref.hours : void 0)[watch.hour];
+    if (number > 10) {
+      return watch.scale(tmp);
     } else {
       return "white";
     }
   }).attr("stroke", "black").each(function(d, i) {
-    var country, hours;
+    var country, hours, _ref;
     country = d.properties.name;
-    hours = data.watch[country];
+    hours = _.flatten((_ref = data.working[country]) != null ? _ref.hours : void 0)[watch.hour];
     if (hours) {
-      return $(this).tooltip({
-        title: d.properties.name + "hours"
-      });
+      return $(this).attr('data-original-title', "" + country + " <br /> " + hours + " worker" + (hours !== 1 ? "s" : "") + " online now").tooltip('fixTitle');
     }
   });
 };

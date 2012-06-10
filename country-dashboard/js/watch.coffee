@@ -33,7 +33,6 @@ orderWatchData = ()->
 createWatchChart = ()->
   orderWatchData()
   createWatchMap()
-  createWatchControls()
   createWatchWeek()
 
 createWatchWeek = ()->
@@ -80,11 +79,10 @@ createWatchWeek = ()->
       watch.hour = x/3600
       playing = false
       updateWatchChart()
-#      h = x/3600
-#      day = week[Math.floor(h/24)]
-#      hour = h%24
-#      "#{day}, #{hour}:00-#{(hour+1)%24}:00"
-      ""
+      h = x/3600
+      day = week[Math.floor(h/24)]
+      hour = h%24
+      "#{day}, #{hour}:00-#{(hour+1)%24}:00"
       ),
     yFormatter: (y)->  "#{y} total workers online "
   })
@@ -115,7 +113,7 @@ createWatchMap = ()->
 
   feature.each((d,i)->
     $(this).tooltip(
-      title: d.properties.name
+      title: "#{d.properties.name}"
     )
   )
 
@@ -158,54 +156,36 @@ createWatchMap = ()->
 
   $("#watchmap").on(i,refish) for i in ["mousemove","mousein","mouseout","touch","touchmove"]
 
-createWatchControls = ()->
-  playing = false
-
-  $(document).bind(["click","mousedown","touch"].join(" "),
-    (e)-> playing = false unless e.isDefaultPrevented(); null
-    #If it returns playing, it prevents everything on the document
-    #from happening. So it returns null.
-  )
-
-  $("#playbutton").click((e)->
-    e.preventDefault()
-    playing = true
-    watch.hour = 0 if watch.hour > 24*7-2
-    inc_update = ()->
-      if watch.hour > 24*7-2 or not playing
-        return
-      updateWatchChart(watch.hour+1)
-      setTimeout(inc_update,100)
-    inc_update()
-  )
-
 updateWatchChart = (h)->
   if h then watch.hour = +h
   route.navigate("watch/#{watch.hour}")
-  updateNameMap()
+
   week=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
   day = week[Math.floor(watch.hour/24)]
   hour = watch.hour%24
-  $("#watch-time").text( "Activity Map for #{day}, #{hour}:00-#{(hour+1)%24}:00 GMT")
-
+  watch.text = "#{day}, #{hour}:00-#{(hour+1)%24}:00 GMT"
+  $("#watch-time").text( "Activity Map for #{watch.text}")
+  updateNameMap()
 
 updateNameMap = ()->
   watch.map.selectAll("path")
-    .transition().delay(10)
+    .transition().delay(100)
     .attr("fill",(d,i)->
       country = d.properties.name
       hours = data.watch.relative[country]
-      if hours
-        watch.scale(hours[watch.hour])
+      tmp = hours?[watch.hour]
+      number = _.flatten(data.working[country]?.hours)[watch.hour]
+      if number > 10
+        watch.scale(tmp)
       else
         "white"
     )
     .attr("stroke","black")
     .each((d,i)->
       country = d.properties.name
-      hours = data.watch[country]
+      hours = _.flatten(data.working[country]?.hours)[watch.hour]
       if hours
-        $(this).tooltip(
-         title: d.properties.name+"hours"
-        )
+        #http://twigstechtips.blogspot.com/2012/04/twitter-bootstrap-change-tooltip-label.html
+        $(this).attr('data-original-title',"#{country} <br /> #{hours} worker#{if hours isnt 1 then "s" else ""} online now")
+          .tooltip('fixTitle')
     )
