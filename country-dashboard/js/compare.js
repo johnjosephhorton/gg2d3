@@ -100,7 +100,10 @@ createCompareMap = function() {
     i = selectedCountries.indexOf(clicked);
     if (i === -1) {
       selectedCountries[selectedCountries.indexOf(null)] = clicked;
-    } else {
+    } else if (_.filter(selectedCountries, function(n) {
+      return !_.isNull(n);
+    }).length !== 1) {
+      console.log("Countries", selectedCountries.length);
       selectedCountries[i] = null;
     }
     str = selectedCountries.join('/');

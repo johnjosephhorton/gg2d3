@@ -73,8 +73,9 @@ createCompareMap =  ()->
       i = selectedCountries.indexOf(clicked)
       if i is -1
         selectedCountries[selectedCountries.indexOf(null)]= clicked
-      else
-          selectedCountries[i] = null
+      else if _.filter(selectedCountries, (n)-> not _.isNull(n)).length isnt 1
+        console.log("Countries",selectedCountries.length)
+        selectedCountries[i] = null
       str = selectedCountries.join('/')
       while str.slice(-2) is "//"
         str = str.slice(0,str.length-1)

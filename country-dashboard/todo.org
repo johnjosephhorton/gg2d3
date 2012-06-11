@@ -1,12 +1,7 @@
 * Home
 * About
-** Better copy
 * Compare
-** Figure out what to do about oceans. Maybe a striped background
-** Make it unable to deselect the last country.
 * Watch Activity
-** Make the hover sections of each country more informative. 
-** Filter out countries with low amounts of activity. Make them white.
 * General
 ** Abstract out map
 ** Test in Firefox and IE
