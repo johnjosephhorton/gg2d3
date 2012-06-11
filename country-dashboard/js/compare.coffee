@@ -35,6 +35,10 @@ createCompareChart = ()->
   createCompareMap()
   createCompareLines()
   createCompareLegend()
+  $(".active-ex").tooltip(
+    placement: "right"
+    title: "Active here means that the worker billed time for an hourly project. Fixed rate projects are not included in these graphs."
+  )
 
 updateCompareChart = ()->
   updateCompareMap()
@@ -172,7 +176,10 @@ createCompareLines = ()->
 
   xaxn ={ graph: compare.normal, ticksTreatment: ticks, timeUnit: timer, tickFormat: Rickshaw.Fixtures.Number.formatKMBT }
 
-  yaxn = {graph: compare.normal,tickFormat: Rickshaw.Fixtures.Number.formatKMBT}
+  yaxn = {graph: compare.normal,tickFormat: (n)->
+    if n is 0 then "" else "#{n*100}%"
+
+  }
 
   compare.absolute.xAxis = new Rickshaw.Graph.Axis.Time xaxa
   compare.absolute.yAxis = new Rickshaw.Graph.Axis.Y yaxa
@@ -204,7 +211,10 @@ createCompareLines = ()->
       hour = h%24
 
       "#{day}, #{hour}:00-#{(hour+1)%24}:00"),
-    yFormatter: (y)-> Math.round(y*1000)/1000 + "% of total workers "
+    yFormatter: (y)->
+      p = Math.round(y*100*100)/100
+
+      "#{p}% of total workers "
   })
 
   #Errors get thrown all over the place here. Unsure why.

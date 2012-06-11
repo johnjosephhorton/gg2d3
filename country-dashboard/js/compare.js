@@ -69,7 +69,11 @@ updateActivityData = function() {
 createCompareChart = function() {
   createCompareMap();
   createCompareLines();
-  return createCompareLegend();
+  createCompareLegend();
+  return $(".active-ex").tooltip({
+    placement: "right",
+    title: "Active here means that the worker billed time for an hourly project. Fixed rate projects are not included in these graphs."
+  });
 };
 
 updateCompareChart = function() {
@@ -224,7 +228,13 @@ createCompareLines = function() {
   };
   yaxn = {
     graph: compare.normal,
-    tickFormat: Rickshaw.Fixtures.Number.formatKMBT
+    tickFormat: function(n) {
+      if (n === 0) {
+        return "";
+      } else {
+        return "" + (n * 100) + "%";
+      }
+    }
   };
   compare.absolute.xAxis = new Rickshaw.Graph.Axis.Time(xaxa);
   compare.absolute.yAxis = new Rickshaw.Graph.Axis.Y(yaxa);
@@ -257,7 +267,9 @@ createCompareLines = function() {
       return "" + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00";
     }),
     yFormatter: function(y) {
-      return Math.round(y * 1000) / 1000 + "% of total workers ";
+      var p;
+      p = Math.round(y * 100 * 100) / 100;
+      return "" + p + "% of total workers ";
     }
   });
   try {
