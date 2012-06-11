@@ -210,3 +210,6 @@ updateBubbles = ()->
       t = "#{d.className} <br /> #{d.value} projects completed"
       $(this).attr('data-original-title', t).tooltip('fixTitle')
     )
+
+    s = d3.sum((v for i,v of sums))
+    $("#bubble-projects").text("Total projects completed: #{s}")

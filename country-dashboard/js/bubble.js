@@ -165,7 +165,7 @@ updateBubbleMap = function() {
 };
 
 updateBubbles = function() {
-  var big_name, big_ob, children, d, f, format, g, grandchildren, node, packer, small_name, small_size, sum, sums, timing;
+  var big_name, big_ob, children, d, f, format, g, grandchildren, i, node, packer, s, small_name, small_size, sum, sums, timing, v;
   d = data.working[country].job_types;
   f = {
     name: "jobs"
@@ -240,9 +240,19 @@ updateBubbles = function() {
     return d.className.substring(0, d.r / 4);
   });
   node.exit().remove();
-  return node.each(function(d, i) {
+  node.each(function(d, i) {
     var t;
     t = "" + d.className + " <br /> " + d.value + " projects completed";
     return $(this).attr('data-original-title', t).tooltip('fixTitle');
   });
+  s = d3.sum((function() {
+    var _results;
+    _results = [];
+    for (i in sums) {
+      v = sums[i];
+      _results.push(v);
+    }
+    return _results;
+  })());
+  return $("#bubble-projects").text("Total projects completed: " + s);
 };
