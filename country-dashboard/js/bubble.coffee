@@ -182,6 +182,13 @@ updateBubbles = ()->
 
     g.filter((d)-> not d.children).append("text")
 
+    g.each((d,i)->
+      $(this).tooltip(
+         title: ""
+         placement: 'middle'
+      )
+    )
+
     node.transition().delay(timing)
       .attr("class",(d)-> if d.children? then "node" else "leaf node")
       .attr("transform", (d)->  "translate(#{d.x},#{d.y})")
@@ -199,9 +206,7 @@ updateBubbles = ()->
 
     node.exit().remove()
 
-    g.each((d,i)->
-      $(this).tooltip(
-        title: "#{d.className} <br /> #{d.value} projects completed"
-        placement: 'middle'
-      )
+    node.each((d,i)->
+      t = "#{d.className} <br /> #{d.value} projects completed"
+      $(this).attr('data-original-title', t).tooltip('fixTitle')
     )

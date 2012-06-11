@@ -4,6 +4,8 @@
 * Watch Activity
 * General
 ** Abstract out map
+** Write better copy
+** Social buttons
 ** Test in Firefox and IE
 ** Figure out what is going on with the bubbles getting stuck
 

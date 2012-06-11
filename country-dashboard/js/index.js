@@ -110,7 +110,6 @@ start = function() {
   }
   reset = function() {
     showing = "";
-    console.log(Backbone.history.fragment);
     return route.navigate("#/" + Backbone.history.fragment, {
       trigger: true
     });

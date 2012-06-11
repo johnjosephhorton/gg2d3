@@ -97,8 +97,6 @@ createCompareMap =  ()->
         compare.map.projection.invert([c.x, c.y])))
 
   refish = (e)->
-    #Not sure why you have to get rid of 20
-    #Padding maybe?
     x = e.offsetX
     y = e.offsetY
     #TODO: Still a little off on firefox

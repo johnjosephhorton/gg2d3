@@ -98,7 +98,6 @@ start = ()->
 
   reset = ()->
     showing = ""
-    console.log(Backbone.history.fragment)
     route.navigate("#/#{Backbone.history.fragment}",
       {trigger: true})
 

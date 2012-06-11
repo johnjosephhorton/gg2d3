@@ -210,6 +210,12 @@ updateBubbles = function() {
   g.filter(function(d) {
     return !d.children;
   }).append("text");
+  g.each(function(d, i) {
+    return $(this).tooltip({
+      title: "",
+      placement: 'middle'
+    });
+  });
   node.transition().delay(timing).attr("class", function(d) {
     if (d.children != null) {
       return "node";
@@ -234,10 +240,9 @@ updateBubbles = function() {
     return d.className.substring(0, d.r / 4);
   });
   node.exit().remove();
-  return g.each(function(d, i) {
-    return $(this).tooltip({
-      title: "" + d.className + " <br /> " + d.value + " projects completed",
-      placement: 'middle'
-    });
+  return node.each(function(d, i) {
+    var t;
+    t = "" + d.className + " <br /> " + d.value + " projects completed";
+    return $(this).attr('data-original-title', t).tooltip('fixTitle');
   });
 };
