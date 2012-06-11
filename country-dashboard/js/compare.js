@@ -2,7 +2,15 @@ var compare, createCompareChart, createCompareLegend, createCompareLines, create
 
 compare = {
   rainbow: _.flatten([d3.scale.category20().range(), d3.scale.category20b().range(), d3.scale.category20c().range()]),
-  log_q: false
+  log_q: false,
+  navigate: function() {
+    var str;
+    str = selectedCountries.join('/');
+    while (str.slice(-2) === "//") {
+      str = str.slice(0, str.length - 1);
+    }
+    return route.navigate("#/compare/" + compare.log_q + "/" + str);
+  }
 };
 
 selectedCountries = (function() {
@@ -79,6 +87,7 @@ updateActivityData = function() {
 };
 
 createCompareChart = function() {
+  var log_update;
   createCompareMap();
   createCompareLines();
   createCompareLegend();
@@ -87,20 +96,21 @@ createCompareChart = function() {
     title: "Active here means that the worker billed time for an hourly project. Fixed rate projects are not included in these graphs."
   });
   $("#radio-scale").button();
-  $("#radio-scale > button:first").button('toggle').click(function() {
-    console.log(compare.log_q);
+  log_update = function() {
+    updateActivityData();
+    updateCompareChart();
+    return compare.navigate();
+  };
+  $("#radio-scale > button:first").click(function() {
     if (compare.log_q) {
       compare.log_q = false;
-      updateActivityData();
-      return updateCompareChart();
+      return log_update();
     }
   });
   return $("#radio-scale > button:last").click(function() {
-    console.log(compare.log_q);
     if (!compare.log_q) {
       compare.log_q = true;
-      updateActivityData();
-      return updateCompareChart();
+      return log_update();
     }
   });
 };
@@ -108,7 +118,12 @@ createCompareChart = function() {
 updateCompareChart = function() {
   updateCompareMap();
   updateCompareLines();
-  return updateCompareLegend();
+  updateCompareLegend();
+  if (compare.log_q) {
+    return $("#radio-scale > button:last").button('toggle');
+  } else {
+    return $("#radio-scale > button:first").button('toggle');
+  }
 };
 
 createCompareMap = function() {
@@ -127,7 +142,7 @@ createCompareMap = function() {
   }).attr("d", compare.map.path).each(function(d) {
     return d.org = d.geometry.coordinates;
   }).on('click', function(d, i) {
-    var clicked, str;
+    var clicked;
     clicked = d.properties.name;
     if (!(clicked in data.working)) return;
     i = selectedCountries.indexOf(clicked);
@@ -136,14 +151,9 @@ createCompareMap = function() {
     } else if (_.filter(selectedCountries, function(n) {
       return !_.isNull(n);
     }).length !== 1) {
-      console.log("Countries", selectedCountries.length);
       selectedCountries[i] = null;
     }
-    str = selectedCountries.join('/');
-    while (str.slice(-2) === "//") {
-      str = str.slice(0, str.length - 1);
-    }
-    route.navigate("#/compare/" + str);
+    compare.navigate();
     return updateCompareChart();
   });
   feature.each(function(d, i) {

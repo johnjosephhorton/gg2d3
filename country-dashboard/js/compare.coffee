@@ -4,6 +4,11 @@ compare =
     d3.scale.category20b().range(),
     d3.scale.category20c().range()])
   log_q: false
+  navigate: ()->
+    str = selectedCountries.join('/')
+    while str.slice(-2) is "//"
+      str = str.slice(0,str.length-1)
+    route.navigate("#/compare/#{compare.log_q}/#{str}")
 
 selectedCountries = (()->
     arr = ["United States", "Canada", "Russia", "India"]
@@ -50,20 +55,25 @@ createCompareChart = ()->
     title: "Active here means that the worker billed time for an hourly project. Fixed rate projects are not included in these graphs."
   )
   $("#radio-scale").button()
-  $("#radio-scale > button:first").button('toggle').click(()->
-    console.log(compare.log_q)
+
+  log_update = ()->
+    updateActivityData()
+    updateCompareChart()
+    compare.navigate()
+
+  $("#radio-scale > button:first").click(()->
     if compare.log_q
       compare.log_q = false
-      updateActivityData()
-      updateCompareChart()
+      log_update()
   )
+
   $("#radio-scale > button:last").click(()->
-    console.log(compare.log_q)
     if !compare.log_q
       compare.log_q = true
-      updateActivityData()
-      updateCompareChart()
+      log_update()
   )
+
+
 
 
 
@@ -71,6 +81,11 @@ updateCompareChart = ()->
   updateCompareMap()
   updateCompareLines()
   updateCompareLegend()
+
+  if compare.log_q
+    $("#radio-scale > button:last").button('toggle')
+  else
+    $("#radio-scale > button:first").button('toggle')
 
 createCompareMap =  ()->
   size = $("#comparemap").parent().width()
@@ -105,12 +120,8 @@ createCompareMap =  ()->
       if i is -1
         selectedCountries[selectedCountries.indexOf(null)]= clicked
       else if _.filter(selectedCountries, (n)-> not _.isNull(n)).length isnt 1
-        console.log("Countries",selectedCountries.length)
         selectedCountries[i] = null
-      str = selectedCountries.join('/')
-      while str.slice(-2) is "//"
-        str = str.slice(0,str.length-1)
-      route.navigate("#/compare/#{str}")
+      compare.navigate()
       updateCompareChart()
     )
 

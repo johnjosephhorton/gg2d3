@@ -11,7 +11,7 @@ HashBangs = Backbone.Router.extend({
     "home": "showHome",
     "about": 'showAbout',
     "compare": "showCompare",
-    "compare/*countries": "showCompare",
+    "compare/:log/*countries": "showCompare",
     "watch": 'showWatch',
     "watch/:hour": 'showWatch',
     "bubble": 'showBubble',
@@ -33,7 +33,8 @@ HashBangs = Backbone.Router.extend({
     showing = "about";
     return updateTopLinks();
   },
-  showCompare: function(countries) {
+  showCompare: function(log_q, countries) {
+    if (log_q) compare.log_q = log_q === "true";
     if (countries) {
       selectedCountries = _.map(countries.split("/"), function(c) {
         if (c.length === 0) {

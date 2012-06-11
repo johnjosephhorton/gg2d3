@@ -11,7 +11,7 @@ HashBangs = Backbone.Router.extend
     "about" : 'showAbout'
 
     "compare" : "showCompare"
-    "compare/*countries": "showCompare"
+    "compare/:log/*countries": "showCompare"
 
     "watch" : 'showWatch'
     "watch/:hour" : 'showWatch'
@@ -38,7 +38,9 @@ HashBangs = Backbone.Router.extend
     showing="about"
     updateTopLinks()
 
-  showCompare: (countries)->
+  showCompare: (log_q,countries)->
+    if log_q
+      compare.log_q = (log_q == "true") #logic hack
     if countries
       selectedCountries = _.map(countries.split("/"), (c)-> if c.length is 0 then null else decodeURI(c))
     else
