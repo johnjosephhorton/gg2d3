@@ -240,11 +240,6 @@ updateBubbles = function() {
     return d.className.substring(0, d.r / 4);
   });
   node.exit().remove();
-  node.each(function(d, i) {
-    var t;
-    t = "" + d.className + " <br /> " + d.value + " projects completed";
-    return $(this).attr('data-original-title', t).tooltip('fixTitle');
-  });
   s = d3.sum((function() {
     var _results;
     _results = [];
@@ -254,5 +249,10 @@ updateBubbles = function() {
     }
     return _results;
   })());
+  node.each(function(d, i) {
+    var t;
+    t = "" + d.className + " <br /> " + d.value + " projects completed <br />      " + (Math.round(100 * d.value / s)) + "% of total projects completed";
+    return $(this).attr('data-original-title', t).tooltip('fixTitle');
+  });
   return $("#bubble-projects").text("Total projects completed: " + s);
 };

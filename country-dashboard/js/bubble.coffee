@@ -206,10 +206,12 @@ updateBubbles = ()->
 
     node.exit().remove()
 
+    s = d3.sum((v for i,v of sums))
     node.each((d,i)->
-      t = "#{d.className} <br /> #{d.value} projects completed"
+      t = "#{d.className} <br /> #{d.value} projects completed <br />
+      #{Math.round(100*d.value/s)}% of total projects completed"
       $(this).attr('data-original-title', t).tooltip('fixTitle')
     )
 
-    s = d3.sum((v for i,v of sums))
+
     $("#bubble-projects").text("Total projects completed: #{s}")
