@@ -3,6 +3,7 @@ compare =
   rainbow:  _.flatten([d3.scale.category20().range(),
     d3.scale.category20b().range(),
     d3.scale.category20c().range()])
+  log_q: false
 
 selectedCountries = (()->
     arr = ["United States", "Canada", "Russia", "India"]
@@ -11,10 +12,19 @@ selectedCountries = (()->
 
 updateActivityData = ()->
     data.activity = {absolute: [], normal: []}
+
+    transform = (d)->
+      if compare.log_q
+        if d is 0
+          0
+        else
+          Math.log(d)
+      else d
+
     for c in selectedCountries when not _.isNull(c)
 
       instance =  _.flatten(data.working[c].hours)
-      enumerated = ({x: i*60*60, y: instance[i]} for i in _.range(instance.length))
+      enumerated = ({x: i*60*60, y: transform(instance[i])} for i in _.range(instance.length))
       data.activity.absolute.push(
         data: enumerated
         color: compare.rainbow[selectedCountries.indexOf(c)]
@@ -39,6 +49,23 @@ createCompareChart = ()->
     placement: "right"
     title: "Active here means that the worker billed time for an hourly project. Fixed rate projects are not included in these graphs."
   )
+  $("#radio-scale").button()
+  $("#radio-scale > button:first").button('toggle').click(()->
+    console.log(compare.log_q)
+    if compare.log_q
+      compare.log_q = false
+      updateActivityData()
+      updateCompareChart()
+  )
+  $("#radio-scale > button:last").click(()->
+    console.log(compare.log_q)
+    if !compare.log_q
+      compare.log_q = true
+      updateActivityData()
+      updateCompareChart()
+  )
+
+
 
 updateCompareChart = ()->
   updateCompareMap()
@@ -200,7 +227,11 @@ createCompareLines = ()->
       hour = h%24
 
       "#{day}, #{hour}:00-#{(hour+1)%24}:00"),
-    yFormatter: (y)-> Math.floor(y) + " workers online"
+    yFormatter: (y)->
+      if compare.log_q
+        Math.round(y*100)/100 +  " log workers online, which is about #{Math.round(Math.exp(y))} workers"
+      else
+        Math.floor(y) + " workers online"
   })
 
   compare.normal.hover = new Rickshaw.Graph.HoverDetail({
@@ -245,9 +276,6 @@ updateCompareLines = ()->
   compare.normal.update()
 
 createCompareLegend = ()->
- # $("#comparelegend").css(
- #  height: $("#comparemap").parent().height()
- # )
 
 updateCompareLegend = ()->
   legend = $("#comparelegend")

@@ -1,7 +1,19 @@
 * Home
 * About
 * Compare
+** Data
+   I also noticed that the numbers seem off. I checked Russia/Ukraine
+   that tend to reach a top of ~20% of activity, and they have much lower
+   numbers in the chart. Similarly, Algeria, with activity ~1% to 2% seem
+   to have higher numbers. I attach the Excel Spreadsheet with the
+   correct data for the % of workers that are active from each country.
+** Load time
+   I also noticed that the chart took a long time to load. Is there a way
+   to have a "percent loaded" counter? I could not quite understand if my
+   browser was crashed or if my connection was too slow, etc. and I was
+   ready to give up, until the visualization loaded.
 * Watch Activity
+* Bubble
 * General
 ** Abstract out map
 ** Write better copy

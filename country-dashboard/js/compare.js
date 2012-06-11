@@ -1,7 +1,8 @@
 var compare, createCompareChart, createCompareLegend, createCompareLines, createCompareMap, selectedCountries, updateActivityData, updateCompareChart, updateCompareLegend, updateCompareLines, updateCompareMap;
 
 compare = {
-  rainbow: _.flatten([d3.scale.category20().range(), d3.scale.category20b().range(), d3.scale.category20c().range()])
+  rainbow: _.flatten([d3.scale.category20().range(), d3.scale.category20b().range(), d3.scale.category20c().range()]),
+  log_q: false
 };
 
 selectedCountries = (function() {
@@ -16,10 +17,21 @@ selectedCountries = (function() {
 })();
 
 updateActivityData = function() {
-  var c, enumerated, i, instance, _i, _len;
+  var c, enumerated, i, instance, transform, _i, _len;
   data.activity = {
     absolute: [],
     normal: []
+  };
+  transform = function(d) {
+    if (compare.log_q) {
+      if (d === 0) {
+        return 0;
+      } else {
+        return Math.log(d);
+      }
+    } else {
+      return d;
+    }
   };
   for (_i = 0, _len = selectedCountries.length; _i < _len; _i++) {
     c = selectedCountries[_i];
@@ -33,7 +45,7 @@ updateActivityData = function() {
         i = _ref[_j];
         _results.push({
           x: i * 60 * 60,
-          y: instance[i]
+          y: transform(instance[i])
         });
       }
       return _results;
@@ -70,9 +82,26 @@ createCompareChart = function() {
   createCompareMap();
   createCompareLines();
   createCompareLegend();
-  return $(".active-ex").tooltip({
+  $(".active-ex").tooltip({
     placement: "right",
     title: "Active here means that the worker billed time for an hourly project. Fixed rate projects are not included in these graphs."
+  });
+  $("#radio-scale").button();
+  $("#radio-scale > button:first").button('toggle').click(function() {
+    console.log(compare.log_q);
+    if (compare.log_q) {
+      compare.log_q = false;
+      updateActivityData();
+      return updateCompareChart();
+    }
+  });
+  return $("#radio-scale > button:last").click(function() {
+    console.log(compare.log_q);
+    if (!compare.log_q) {
+      compare.log_q = true;
+      updateActivityData();
+      return updateCompareChart();
+    }
   });
 };
 
@@ -254,7 +283,11 @@ createCompareLines = function() {
       return "" + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00";
     }),
     yFormatter: function(y) {
-      return Math.floor(y) + " workers online";
+      if (compare.log_q) {
+        return Math.round(y * 100) / 100 + (" log workers online, which is about " + (Math.round(Math.exp(y))) + " workers");
+      } else {
+        return Math.floor(y) + " workers online";
+      }
     }
   });
   compare.normal.hover = new Rickshaw.Graph.HoverDetail({
