@@ -3,7 +3,7 @@ watch = {max: 0 , hour:0}
 playing = false
 
 orderWatchData = ()->
-  data.watch = {relative: {}}
+  data.watch = {relative: {}, absolute:{}}
 
   for country of data.working when data.working[country].normal_hours?
 
@@ -11,15 +11,19 @@ orderWatchData = ()->
     average_zone = if zones then Math.round(d3.sum(zones)/zones.length)
 
     norm =  _.flatten(data.working[country].normal_hours)
+    abs =  _.flatten(data.working[country].hours)
     watch.max = d3.max(norm.concat(watch.max))
     #Shift to get everything roughly back to GMT
     if average_zone < 0
       for i in [0..Math.abs(average_zone)]
         norm.unshift(norm.pop())
+        abs.unshift(abs.pop())
     else
       for i in [0..Math.abs(average_zone)]
         norm.push(norm.shift())
+        abs.push(abs.shift())
     data.watch.relative[country] = norm
+    data.watch.absolute[country] = abs
 
   instance = _.flatten(data.global.reduced)
   time = 60*60
@@ -85,9 +89,7 @@ createWatchWeek = ()->
   })
 
 createWatchMap = ()->
-  watch.scale = d3.scale.linear()
-    .range(["white","blue"])
-    .domain([0.001,watch.max])#Hack
+  watch.scale = d3.scale.linear().range(["white","blue","black"]).domain([0,watch.max,1])
 
   size = $("#watchmap").parent().width()
 
@@ -111,7 +113,7 @@ createWatchMap = ()->
   feature.each((d,i)->
     $(this).tooltip(
       title: "#{d.properties.name}"
-      space: 70
+      space: 90
     )
   )
 
@@ -165,14 +167,21 @@ updateWatchChart = (h)->
   $("#watch-time").text( "Activity Map for #{watch.text}")
   updateNameMap()
 
+last = 0
 updateNameMap = ()->
   watch.map.selectAll("path")
     .transition().delay(100)
     .attr("fill",(d,i)->
       country = d.properties.name
       percent = data.watch.relative[country]?[watch.hour]
-      number = _.flatten(data.working[country]?.hours)[watch.hour]
+      number = data.watch.absolute[country]?[watch.hour]
       if percent and number > 10
+
+        if country is "Russia"
+          if last isnt percent
+            console.log(Math.round(1000*percent)/1000,watch.scale(percent))
+        last = percent
+
         watch.scale(percent)
       else
         "white"
@@ -188,6 +197,8 @@ updateNameMap = ()->
         p = Math.round(percent*10000)/100
         t += "#{p}% of registered workers are active <br />"
         t += "#{hours} worker#{if hours isnt 1 then "s" else ""} online now <br />"
+        t += "Estimated workers: #{Math.round(hours/percent)} "
+
         $(this).attr('data-original-title',t)
           .tooltip('fixTitle')
     )
