@@ -19,18 +19,15 @@
 
 /*Map css*/
 .feature {
-  fill: #68707B;
   stroke: white;
 }
 
 .selected{
   stroke: #ccc;
-  fill: #061F32;
 }
 
 .unselected{
   stroke: #ccc;
-  fill: #168CE5;
 }
 
 .hidden{

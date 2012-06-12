@@ -1,13 +1,38 @@
-var bubble, country, createBubbleChart, createBubbleMap, createBubbles, updateBubbleChart, updateBubbleMap, updateBubbles;
+var bubble, country, createBubbleChart, createBubbleMap, createBubbles, processData, updateBubbleChart, updateBubbleMap, updateBubbles;
 
 country = "United States";
 
 bubble = {
   bubble: null,
-  map: null
+  map: null,
+  sums: {},
+  scale: null
+};
+
+processData = function() {
+  var c_ob, country, main, main_ob, mini, sum, val, _ref, _ref2, _results;
+  _ref = data.working;
+  _results = [];
+  for (country in _ref) {
+    c_ob = _ref[country];
+    sum = 0;
+    _ref2 = c_ob.job_types;
+    for (main in _ref2) {
+      main_ob = _ref2[main];
+      for (mini in main_ob) {
+        val = main_ob[mini];
+        sum += val;
+      }
+    }
+    bubble.sums[country] = sum;
+    _results.push(bubble.max = d3.max([bubble.max, sum]));
+  }
+  return _results;
 };
 
 createBubbleChart = function() {
+  processData();
+  bubble.scale = d3.scale.log().domain([1, bubble.max]).range(["#FFFFFF", "red"]);
   createBubbleMap();
   return createBubbles();
 };
@@ -21,13 +46,19 @@ createBubbleMap = function() {
   bubble.map.fisheye = d3.fisheye().radius(50).power(10);
   feature = bubble.map.selectAll("path").data(data.countries.features).enter().append("path").attr("class", function(d) {
     if (d.properties.name in data.working) {
+      return "unselected";
+    } else {
+      return "feature";
+    }
+  }).attr("fill", function(d) {
+    if (d.properties.name in data.working) {
       if (d.properties.name === country) {
-        return 'selected';
+        return 'black';
       } else {
-        return 'unselected';
+        return bubble.scale(bubble.sums[country]);
       }
     } else {
-      return 'feature';
+      return 'white';
     }
   }).attr("d", bubble.map.path).each(function(d) {
     return d.org = d.geometry.coordinates;
@@ -40,8 +71,14 @@ createBubbleMap = function() {
     return updateBubbleChart();
   });
   feature.each(function(d, i) {
+    var c, p, t;
+    c = d.properties.name;
+    t = "" + c + " <br />";
+    p = bubble.sums[c] ? bubble.sums[c] : 0;
+    t += "" + p + " projects completed";
     return $(this).tooltip({
-      title: d.properties.name
+      title: t,
+      space: 70
     });
   });
   fishPolygon = function(polygon) {
@@ -144,22 +181,22 @@ createBubbles = function() {
 
 updateBubbleChart = function(c) {
   if (c) country = c;
-  $("#bubble-title").text("Packed Bubble Chart for " + country);
+  $("#bubble-title").text("Breakdown of Projects for " + country);
   updateBubbleMap();
   return updateBubbles();
 };
 
 updateBubbleMap = function() {
   var feature;
-  return feature = bubble.map.selectAll("path").attr("class", function(d) {
+  return feature = bubble.map.selectAll("path").attr("fill", function(d) {
     if (d.properties.name in data.working) {
       if (d.properties.name === country) {
-        return 'selected';
+        return 'black';
       } else {
-        return 'unselected';
+        return bubble.scale(bubble.sums[d.properties.name]);
       }
     } else {
-      return 'feature';
+      return 'white';
     }
   });
 };

@@ -1,9 +1,22 @@
 country = "United States"
 
 #Bubble chart methods and objects
-bubble = {bubble: null, map: null}
+bubble = {bubble: null, map: null, sums: {}, scale: null}
+
+processData = ()->
+  for country,c_ob of data.working
+    sum = 0
+    for main, main_ob of c_ob.job_types
+      for mini, val of main_ob
+        sum += val
+    bubble.sums[country]=sum
+    bubble.max = d3.max([bubble.max,sum])
 
 createBubbleChart = ()->
+  processData()
+  bubble.scale = d3.scale.log()
+    .domain([1,bubble.max])
+    .range(["#FFFFFF","red"])
   createBubbleMap()
   createBubbles()
 
@@ -21,18 +34,23 @@ createBubbleMap = ()->
   bubble.map.path = d3.geo.path().projection(bubble.map.projection)
   bubble.map.fisheye = d3.fisheye().radius(50).power(10)
 
-
   feature = bubble.map.selectAll("path")
     .data(data.countries.features).enter()
     .append("path")
     .attr("class",(d)->
       if d.properties.name of data.working
-        if d.properties.name is country
-          'selected'
-        else
-          'unselected'
+        "unselected"
       else
-        'feature'
+        "feature"
+    )
+    .attr("fill",(d)->
+      if d.properties.name of data.working
+        if d.properties.name is country
+          'black'
+        else
+          bubble.scale(bubble.sums[country])
+      else
+        'white'
     )
     .attr("d",bubble.map.path)
     .each((d)-> d.org = d.geometry.coordinates)
@@ -45,8 +63,13 @@ createBubbleMap = ()->
     )
 
   feature.each((d,i)->
+    c = d.properties.name
+    t = "#{c} <br />"
+    p = if bubble.sums[c] then bubble.sums[c] else 0
+    t += "#{p} projects completed"
     $(this).tooltip(
-      title: d.properties.name
+      title: t
+      space: 70
     )
   )
 
@@ -99,6 +122,7 @@ createBubbles = ()->
     .attr("class","pack")
     .append("g")
     .attr("transform","translate(0,0)")
+
   bubble.width = w
   bubble.height= h
 
@@ -130,20 +154,20 @@ createBubbles = ()->
 
 updateBubbleChart = (c)->
   if c then country = c
-  $("#bubble-title").text("Packed Bubble Chart for #{country}")
+  $("#bubble-title").text("Breakdown of Projects for #{country}")
   updateBubbleMap()
   updateBubbles()
 
 updateBubbleMap = ()->
     feature = bubble.map.selectAll("path")
-    .attr("class",(d)->
+    .attr("fill",(d)->
       if d.properties.name of data.working
         if d.properties.name is country
-          'selected'
+          'black'
         else
-          'unselected'
+          bubble.scale(bubble.sums[d.properties.name])
       else
-        'feature'
+        'white'
     )
 
 updateBubbles = ()->
@@ -153,6 +177,7 @@ updateBubbles = ()->
 
     children = []
     sums = {}
+
     for big_name, big_ob of d
       grandchildren = []
       sum = 0
@@ -207,6 +232,7 @@ updateBubbles = ()->
     node.exit().remove()
 
     s = d3.sum((v for i,v of sums))
+
     node.each((d,i)->
       t = "#{d.className} <br /> #{d.value} projects completed <br />
       #{Math.round(100*d.value/s)}% of total projects completed"
