@@ -137,7 +137,7 @@ createCompareMap = function() {
     if (d.properties.name in data.working && (data.working[d.properties.name].normal_hours != null)) {
       return "selectable";
     } else {
-      return "feature";
+      return "feature grey";
     }
   }).attr("d", compare.map.path).each(function(d) {
     return d.org = d.geometry.coordinates;

@@ -105,7 +105,7 @@ createCompareMap =  ()->
       if d.properties.name of data.working and data.working[d.properties.name].normal_hours?
         "selectable"
       else
-        "feature"
+        "feature grey"
     )
     .attr("d",compare.map.path)
     .each((d)-> d.org = d.geometry.coordinates)

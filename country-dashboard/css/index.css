@@ -22,6 +22,9 @@
   stroke: white;
 }
 
+.grey{
+  fill: #68707B;
+}
 .selected{
   stroke: #ccc;
 }
