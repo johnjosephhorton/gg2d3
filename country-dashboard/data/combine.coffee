@@ -78,22 +78,41 @@ load_time_zones =(data)->
   )
 
 load_normalized = (data)->
-  changed = data
-  for country of data
-    hours = data[country].hours
-    zeros = (0 for i in [0...24])
-    zerozeros = (zeros[0..] for i in [0..6])
-    normal_array = zerozeros[0..]
-    sum = _.reduce(_.flatten(data[country].hours),(a,b)-> a+b)
+  rawData = []
+  csv()
+  .fromPath(__dirname+'/normal_hours.csv')
+    .toPath(__dirname+'/sample.out')
+  .transform((data)->
+      data.unshift(data.pop())
+      data
+  )
+  .on('data',(data,index)->
+    rawData.push(data)
+  )
+  .on('end',(count)->
+    addToData = (item)->
+      [hour, country, workers, key, mouse, day] = item
+      console.log(country, country.length)
+      workers = +workers
+      day = +day
 
-    for i in [0..6]
-      for j in [0..23]
-        normal_array[i][j]=hours[i][j]/sum
+      if country is "country" or country.length is 0 then return
 
-    changed[country].normal_hours = normal_array
+      #Init empty arrays to deal with sparse arrays
+      if not data[country]["normal_hours"]?
+        zero = ()-> (0 for i in [0...24])
+        morezeroes = (zero() for i in [0..6])
+        data[country]["normal_hours"]=morezeroes
 
-  fs.writeFileSync("working_data.json",JSON.stringify(changed))
-  load_sorted_by_category(data)
+      data[country]["normal_hours"][day][hour]=workers
+
+    _.map(rawData,addToData)
+    fs.writeFileSync("working_data.json",JSON.stringify(data))
+    load_sorted_by_category(data)
+  )
+  .on('error',(error)->
+      console.log(error.message)
+  )
 
 load_sorted_by_category = (data)->
   sorted_by_category = {absolute: {}}

@@ -134,7 +134,7 @@ createCompareMap = function() {
   compare.map.path = d3.geo.path().projection(compare.map.projection);
   compare.map.fisheye = d3.fisheye().radius(50).power(10);
   feature = compare.map.selectAll("path").data(data.countries.features).enter().append("path").attr("class", function(d) {
-    if (d.properties.name in data.working) {
+    if (d.properties.name in data.working && (data.working[d.properties.name].normal_hours != null)) {
       return "selectable";
     } else {
       return "feature";
@@ -144,7 +144,9 @@ createCompareMap = function() {
   }).on('click', function(d, i) {
     var clicked;
     clicked = d.properties.name;
-    if (!(clicked in data.working)) return;
+    if (!(data.working[clicked] != null) || !(data.working[clicked].normal_hours != null)) {
+      return;
+    }
     i = selectedCountries.indexOf(clicked);
     if (i === -1) {
       selectedCountries[selectedCountries.indexOf(null)] = clicked;
@@ -312,7 +314,7 @@ createCompareLines = function() {
     yFormatter: function(y) {
       var p;
       p = Math.round(y * 100 * 100) / 100;
-      return "" + p + "% of total workers ";
+      return "" + p + "% of registered workers were active";
     }
   });
   try {

@@ -73,10 +73,6 @@ createCompareChart = ()->
       log_update()
   )
 
-
-
-
-
 updateCompareChart = ()->
   updateCompareMap()
   updateCompareLines()
@@ -106,7 +102,7 @@ createCompareMap =  ()->
     .data(data.countries.features).enter()
       .append("path")
     .attr("class",(d)->
-      if d.properties.name of data.working
+      if d.properties.name of data.working and data.working[d.properties.name].normal_hours?
         "selectable"
       else
         "feature"
@@ -115,7 +111,8 @@ createCompareMap =  ()->
     .each((d)-> d.org = d.geometry.coordinates)
     .on('click', (d,i)->
       clicked= d.properties.name
-      if not (clicked of data.working) then return
+      if not data.working[clicked]? or not data.working[clicked].normal_hours?
+        return;
       i = selectedCountries.indexOf(clicked)
       if i is -1
         selectedCountries[selectedCountries.indexOf(null)]= clicked
@@ -256,7 +253,7 @@ createCompareLines = ()->
     yFormatter: (y)->
       p = Math.round(y*100*100)/100
 
-      "#{p}% of total workers "
+      "#{p}% of registered workers were active"
   })
 
   #Errors get thrown all over the place here. Unsure why.

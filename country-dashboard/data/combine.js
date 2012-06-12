@@ -81,39 +81,48 @@ load_time_zones = function(data) {
 };
 
 load_normalized = function(data) {
-  var changed, country, hours, i, j, normal_array, sum, zeros, zerozeros;
-  changed = data;
-  for (country in data) {
-    hours = data[country].hours;
-    zeros = (function() {
-      var _results;
-      _results = [];
-      for (i = 0; i < 24; i++) {
-        _results.push(0);
+  rawData = [];
+  return csv().fromPath(__dirname + '/normal_hours.csv').toPath(__dirname + '/sample.out').transform(function(data) {
+    data.unshift(data.pop());
+    return data;
+  }).on('data', function(data, index) {
+    return rawData.push(data);
+  }).on('end', function(count) {
+    var addToData;
+    addToData = function(item) {
+      var country, day, hour, i, key, morezeroes, mouse, workers, zero;
+      hour = item[0], country = item[1], workers = item[2], key = item[3], mouse = item[4], day = item[5];
+      console.log(country, country.length);
+      workers = +workers;
+      day = +day;
+      if (country === "country" || country.length === 0) return;
+      if (!(data[country]["normal_hours"] != null)) {
+        zero = function() {
+          var i, _results;
+          _results = [];
+          for (i = 0; i < 24; i++) {
+            _results.push(0);
+          }
+          return _results;
+        };
+        morezeroes = (function() {
+          var _results;
+          _results = [];
+          for (i = 0; i <= 6; i++) {
+            _results.push(zero());
+          }
+          return _results;
+        })();
+        data[country]["normal_hours"] = morezeroes;
       }
-      return _results;
-    })();
-    zerozeros = (function() {
-      var _results;
-      _results = [];
-      for (i = 0; i <= 6; i++) {
-        _results.push(zeros.slice(0));
-      }
-      return _results;
-    })();
-    normal_array = zerozeros.slice(0);
-    sum = _.reduce(_.flatten(data[country].hours), function(a, b) {
-      return a + b;
-    });
-    for (i = 0; i <= 6; i++) {
-      for (j = 0; j <= 23; j++) {
-        normal_array[i][j] = hours[i][j] / sum;
-      }
-    }
-    changed[country].normal_hours = normal_array;
-  }
-  fs.writeFileSync("working_data.json", JSON.stringify(changed));
-  return load_sorted_by_category(data);
+      return data[country]["normal_hours"][day][hour] = workers;
+    };
+    _.map(rawData, addToData);
+    fs.writeFileSync("working_data.json", JSON.stringify(data));
+    return load_sorted_by_category(data);
+  }).on('error', function(error) {
+    return console.log(error.message);
+  });
 };
 
 load_sorted_by_category = function(data) {
