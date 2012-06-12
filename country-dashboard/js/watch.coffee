@@ -5,22 +5,19 @@ playing = false
 orderWatchData = ()->
   data.watch = {relative: {}}
 
-  for country of data.working
+  for country of data.working when data.working[country].normal_hours?
 
     zones = data.working[country].zones
     average_zone = if zones then Math.round(d3.sum(zones)/zones.length)
 
-    abs =  _.flatten(data.working[country].hours)
     norm =  _.flatten(data.working[country].normal_hours)
     watch.max = d3.max(norm.concat(watch.max))
     #Shift to get everything roughly back to GMT
     if average_zone < 0
       for i in [0..Math.abs(average_zone)]
-        abs.unshift(abs.pop())
         norm.unshift(norm.pop())
     else
       for i in [0..Math.abs(average_zone)]
-        abs.push(abs.shift())
         norm.push(norm.shift())
     data.watch.relative[country] = norm
 
@@ -90,7 +87,7 @@ createWatchWeek = ()->
 createWatchMap = ()->
   watch.scale = d3.scale.linear()
     .range(["white","blue"])
-    .domain([0,0.015])#Hack
+    .domain([0.001,watch.max])#Hack
 
   size = $("#watchmap").parent().width()
 
@@ -114,6 +111,7 @@ createWatchMap = ()->
   feature.each((d,i)->
     $(this).tooltip(
       title: "#{d.properties.name}"
+      space: 70
     )
   )
 
@@ -172,11 +170,10 @@ updateNameMap = ()->
     .transition().delay(100)
     .attr("fill",(d,i)->
       country = d.properties.name
-      hours = data.watch.relative[country]
-      tmp = hours?[watch.hour]
+      percent = data.watch.relative[country]?[watch.hour]
       number = _.flatten(data.working[country]?.hours)[watch.hour]
-      if number > 10
-        watch.scale(tmp)
+      if percent and number > 10
+        watch.scale(percent)
       else
         "white"
     )
@@ -184,8 +181,13 @@ updateNameMap = ()->
     .each((d,i)->
       country = d.properties.name
       hours = _.flatten(data.working[country]?.hours)[watch.hour]
-      if hours
+      percent = _.flatten(data.working[country]?.normal_hours)[watch.hour]
+      if hours and percent
         #http://twigstechtips.blogspot.com/2012/04/twitter-bootstrap-change-tooltip-label.html
-        $(this).attr('data-original-title',"#{country} <br /> #{hours} worker#{if hours isnt 1 then "s" else ""} online now")
+        t = "#{country} <br />"
+        p = Math.round(percent*10000)/100
+        t += "#{p}% of registered workers are active <br />"
+        t += "#{hours} worker#{if hours isnt 1 then "s" else ""} online now <br />"
+        $(this).attr('data-original-title',t)
           .tooltip('fixTitle')
     )

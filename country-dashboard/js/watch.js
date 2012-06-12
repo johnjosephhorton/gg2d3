@@ -8,24 +8,22 @@ watch = {
 playing = false;
 
 orderWatchData = function() {
-  var abs, average_zone, country, i, instance, norm, ranges, time, zones, _ref, _ref2;
+  var average_zone, country, i, instance, norm, ranges, time, zones, _ref, _ref2;
   data.watch = {
     relative: {}
   };
   for (country in data.working) {
+    if (!(data.working[country].normal_hours != null)) continue;
     zones = data.working[country].zones;
     average_zone = zones ? Math.round(d3.sum(zones) / zones.length) : void 0;
-    abs = _.flatten(data.working[country].hours);
     norm = _.flatten(data.working[country].normal_hours);
     watch.max = d3.max(norm.concat(watch.max));
     if (average_zone < 0) {
       for (i = 0, _ref = Math.abs(average_zone); 0 <= _ref ? i <= _ref : i >= _ref; 0 <= _ref ? i++ : i--) {
-        abs.unshift(abs.pop());
         norm.unshift(norm.pop());
       }
     } else {
       for (i = 0, _ref2 = Math.abs(average_zone); 0 <= _ref2 ? i <= _ref2 : i >= _ref2; 0 <= _ref2 ? i++ : i--) {
-        abs.push(abs.shift());
         norm.push(norm.shift());
       }
     }
@@ -112,7 +110,7 @@ createWatchWeek = function() {
 
 createWatchMap = function() {
   var feature, fishPolygon, i, refish, size, _i, _len, _ref, _results;
-  watch.scale = d3.scale.linear().range(["white", "blue"]).domain([0, 0.015]);
+  watch.scale = d3.scale.linear().range(["white", "blue"]).domain([0.001, watch.max]);
   size = $("#watchmap").parent().width();
   watch.map = d3.select("#watchmap").append("svg").attr("height", size * 0.7).attr("width", size);
   watch.map.projection = d3.geo.mercator().scale(size).translate([size / 2, size / 2]);
@@ -123,7 +121,8 @@ createWatchMap = function() {
   });
   feature.each(function(d, i) {
     return $(this).tooltip({
-      title: "" + d.properties.name
+      title: "" + d.properties.name,
+      space: 70
     });
   });
   fishPolygon = function(polygon) {
@@ -189,22 +188,26 @@ updateWatchChart = function(h) {
 
 updateNameMap = function() {
   return watch.map.selectAll("path").transition().delay(100).attr("fill", function(d, i) {
-    var country, hours, number, tmp, _ref;
+    var country, number, percent, _ref, _ref2;
     country = d.properties.name;
-    hours = data.watch.relative[country];
-    tmp = hours != null ? hours[watch.hour] : void 0;
-    number = _.flatten((_ref = data.working[country]) != null ? _ref.hours : void 0)[watch.hour];
-    if (number > 10) {
-      return watch.scale(tmp);
+    percent = (_ref = data.watch.relative[country]) != null ? _ref[watch.hour] : void 0;
+    number = _.flatten((_ref2 = data.working[country]) != null ? _ref2.hours : void 0)[watch.hour];
+    if (percent && number > 10) {
+      return watch.scale(percent);
     } else {
       return "white";
     }
   }).attr("stroke", "black").each(function(d, i) {
-    var country, hours, _ref;
+    var country, hours, p, percent, t, _ref, _ref2;
     country = d.properties.name;
     hours = _.flatten((_ref = data.working[country]) != null ? _ref.hours : void 0)[watch.hour];
-    if (hours) {
-      return $(this).attr('data-original-title', "" + country + " <br /> " + hours + " worker" + (hours !== 1 ? "s" : "") + " online now").tooltip('fixTitle');
+    percent = _.flatten((_ref2 = data.working[country]) != null ? _ref2.normal_hours : void 0)[watch.hour];
+    if (hours && percent) {
+      t = "" + country + " <br />";
+      p = Math.round(percent * 10000) / 100;
+      t += "" + p + "% of registered workers are active <br />";
+      t += "" + hours + " worker" + (hours !== 1 ? "s" : "") + " online now <br />";
+      return $(this).attr('data-original-title', t).tooltip('fixTitle');
     }
   });
 };

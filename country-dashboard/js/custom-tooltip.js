@@ -141,7 +141,7 @@
             tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width}
             break
           case 'above':
-            tp = {top: e.pageY-50, left: e.pageX-$tip.width()/2}
+            tp = {top: e.pageY-this.options.space, left: e.pageX-$tip.width()/2}
             break
           case 'middle':
             var elem = this.$element[0]
@@ -285,6 +285,7 @@
   , trigger: 'hover'
   , title: ''
   , delay: 0
+  , space: 50
   }
 
 }(window.jQuery);
