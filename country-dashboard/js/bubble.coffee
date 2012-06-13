@@ -39,9 +39,9 @@ createBubbleMap = ()->
     .append("path")
     .attr("class",(d)->
       if d.properties.name of data.working
-        "unselected"
+        "unselected country"
       else
-        "feature"
+        "feature country"
     )
     .attr("fill",(d)->
       if d.properties.name of data.working
@@ -114,7 +114,7 @@ createBubbleMap = ()->
 createBubbles = ()->
 
   w = $("#bubblechart").parent().width()
-  h = $("#bubblemap").parent().width()
+  h = $("#bubblemap").height()
 
   bubble.bubble = d3.select("#bubblechart").append("svg")
     .attr("width",w)
@@ -163,7 +163,7 @@ updateBubbleMap = ()->
     .attr("fill",(d)->
       if d.properties.name of data.working
         if d.properties.name is country
-          'black'
+          '#168CE5'
         else
           bubble.scale(bubble.sums[d.properties.name])
       else

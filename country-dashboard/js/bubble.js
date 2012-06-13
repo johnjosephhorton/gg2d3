@@ -46,9 +46,9 @@ createBubbleMap = function() {
   bubble.map.fisheye = d3.fisheye().radius(50).power(10);
   feature = bubble.map.selectAll("path").data(data.countries.features).enter().append("path").attr("class", function(d) {
     if (d.properties.name in data.working) {
-      return "unselected";
+      return "unselected country";
     } else {
-      return "feature";
+      return "feature country";
     }
   }).attr("fill", function(d) {
     if (d.properties.name in data.working) {
@@ -133,7 +133,7 @@ createBubbleMap = function() {
 createBubbles = function() {
   var box, c, cats, h, t, w, _i, _len, _results;
   w = $("#bubblechart").parent().width();
-  h = $("#bubblemap").parent().width();
+  h = $("#bubblemap").height();
   bubble.bubble = d3.select("#bubblechart").append("svg").attr("width", w).attr("height", h).attr("class", "pack").append("g").attr("transform", "translate(0,0)");
   bubble.width = w;
   bubble.height = h;
@@ -191,7 +191,7 @@ updateBubbleMap = function() {
   return feature = bubble.map.selectAll("path").attr("fill", function(d) {
     if (d.properties.name in data.working) {
       if (d.properties.name === country) {
-        return 'black';
+        return '#168CE5';
       } else {
         return bubble.scale(bubble.sums[d.properties.name]);
       }

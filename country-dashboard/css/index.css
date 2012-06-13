@@ -19,26 +19,23 @@
 
 /*Map css*/
 .feature {
-  stroke: white;
-}
-
-.grey{
-  fill: #68707B;
-}
-.selected{
   stroke: #ccc;
 }
 
-.unselected{
+.country{
+  stroke: black;
+}
+.grey{
+  fill: #68707B;
+  stroke: #ccc;
+}
+
+.selected{
   stroke: #ccc;
 }
 
 .hidden{
   display: none;
-}
-
-svg{
-
 }
 
 .active-ex{
