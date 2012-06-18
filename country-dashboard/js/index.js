@@ -1,10 +1,12 @@
-var HashBangs, route, selectedCountries, showing, start, updateTopLinks;
+var HashBangs, route, selectedCountries, showing, start, updateTopLinks, worldCountries;
 
 showing = null;
 
 route = null;
 
 selectedCountries = null;
+
+worldCountries = null;
 
 HashBangs = Backbone.Router.extend({
   routes: {
@@ -21,7 +23,11 @@ HashBangs = Backbone.Router.extend({
     "rank/:main/*sub": 'showRank',
     "*path": "showHome"
   },
-  initialize: function(options) {},
+  initialize: function(options) {
+    return worldCountries = _.map(data.countries.features, function(d) {
+      return d.properties.name;
+    });
+  },
   showHome: function() {
     $("#main").html($("#home").html());
     showing = "home";
@@ -44,7 +50,9 @@ HashBangs = Backbone.Router.extend({
         }
       });
     } else {
-      selectedCountries = ["United States"];
+      selectedCountries = _.chain(data.working).keys().intersect(worldCountries).intersect().filter(function(d) {
+        return data.working[d].normal_hours != null;
+      }).shuffle().value().slice(10, 20);
     }
     while (selectedCountries.length !== 60) {
       selectedCountries.push(null);

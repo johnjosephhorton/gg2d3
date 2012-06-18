@@ -3,6 +3,7 @@ showing = null
 route = null
 #F coffescript scope
 selectedCountries = null
+worldCountries = null
 
 HashBangs = Backbone.Router.extend
   routes:
@@ -26,6 +27,7 @@ HashBangs = Backbone.Router.extend
 
     "*path":"showHome"
   initialize: (options)->
+    worldCountries = _.map(data.countries.features,(d)-> d.properties.name)
 
   showHome: ()->
     $("#main").html($("#home").html())
@@ -44,7 +46,12 @@ HashBangs = Backbone.Router.extend
     if countries
       selectedCountries = _.map(countries.split("/"), (c)-> if c.length is 0 then null else decodeURI(c))
     else
-      selectedCountries = ["United States"]
+      selectedCountries = _.chain(data.working).keys()
+        .intersect(worldCountries)
+        .intersect()
+        .filter((d)-> data.working[d].normal_hours?)
+        .shuffle().value()
+        .slice(10,20)
     while selectedCountries.length isnt 60 #compare.rainbow.length
       selectedCountries.push(null)
 
