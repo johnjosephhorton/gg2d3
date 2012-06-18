@@ -131,9 +131,9 @@ createBubbleMap = function() {
 };
 
 createBubbles = function() {
-  var box, c, cats, h, t, w, _i, _len, _results;
+  var box, c, cats, h, i, t, w, _len, _results;
   w = $("#bubblechart").parent().width();
-  h = $("#bubblemap").height();
+  h = $("#bubblemap").height() * 3;
   bubble.bubble = d3.select("#bubblechart").append("svg").attr("width", w).attr("height", h).attr("class", "pack").append("g").attr("transform", "translate(0,0)");
   bubble.width = w;
   bubble.height = h;
@@ -162,8 +162,8 @@ createBubbles = function() {
   };
   cats = $("#cats");
   _results = [];
-  for (_i = 0, _len = categories.length; _i < _len; _i++) {
-    t = categories[_i];
+  for (i = 0, _len = categories.length; i < _len; i++) {
+    t = categories[i];
     c = $("<div>");
     box = $("<div>").css({
       height: 10,

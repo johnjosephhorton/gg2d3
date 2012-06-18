@@ -114,7 +114,7 @@ createBubbleMap = ()->
 createBubbles = ()->
 
   w = $("#bubblechart").parent().width()
-  h = $("#bubblemap").height()
+  h = $("#bubblemap").height()*3
 
   bubble.bubble = d3.select("#bubblechart").append("svg")
     .attr("width",w)
@@ -139,7 +139,7 @@ createBubbles = ()->
     {children: classes, className: "Total"}
 
   cats = $("#cats")
-  for t in categories
+  for t,i in categories
     c = $("<div>")
     box = $("<div>").css({
       height: 10,
