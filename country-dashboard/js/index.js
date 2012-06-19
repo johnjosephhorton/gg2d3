@@ -115,7 +115,7 @@ start = function() {
   }
   reset = function() {
     showing = "";
-    return route.navigate("#/" + Backbone.history.fragment, {
+    return route.navigate("" + Backbone.history.fragment, {
       trigger: true
     });
   };

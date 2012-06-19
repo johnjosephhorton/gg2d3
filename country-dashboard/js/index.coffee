@@ -104,7 +104,7 @@ start = ()->
 
   reset = ()->
     showing = ""
-    route.navigate("#/#{Backbone.history.fragment}",
+    route.navigate("#{Backbone.history.fragment}",
       {trigger: true})
 
   $(window).resize(reset)
