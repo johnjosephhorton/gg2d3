@@ -8,30 +8,20 @@ watch = {
 playing = false;
 
 orderWatchData = function() {
-  var abs, average_zone, country, i, instance, norm, ranges, time, zones, _ref, _ref2;
+  var abs, country, i, instance, ranges, rel, time;
   data.watch = {
     relative: {},
     absolute: {}
   };
   for (country in data.working) {
     if (!(data.working[country].normal_hours != null)) continue;
-    zones = data.working[country].zones;
-    average_zone = zones ? Math.round(d3.sum(zones) / zones.length) : void 0;
-    norm = _.flatten(data.working[country].normal_hours);
-    abs = _.flatten(data.working[country].hours);
-    watch.max = d3.max(norm.concat(watch.max));
-    if (average_zone < 0) {
-      for (i = 0, _ref = Math.abs(average_zone); 0 <= _ref ? i <= _ref : i >= _ref; 0 <= _ref ? i++ : i--) {
-        norm.unshift(norm.pop());
-        abs.unshift(abs.pop());
-      }
-    } else {
-      for (i = 0, _ref2 = Math.abs(average_zone); 0 <= _ref2 ? i <= _ref2 : i >= _ref2; 0 <= _ref2 ? i++ : i--) {
-        norm.push(norm.shift());
-        abs.push(abs.shift());
-      }
-    }
-    data.watch.relative[country] = norm;
+    abs = _.flatten(data.working[country].utc_hours);
+    rel = _.chain(data.working[country].utc_hours).flatten().map(function(n) {
+      return n / data.working[country].total;
+    }).value();
+    watch.max = Math.max(watch.max, d3.max(rel));
+    console.log(watch.max, country);
+    data.watch.relative[country] = rel;
     data.watch.absolute[country] = abs;
   }
   instance = _.flatten(data.global.reduced);
@@ -115,7 +105,7 @@ createWatchWeek = function() {
 
 createWatchMap = function() {
   var feature, fishPolygon, i, refish, size, _i, _len, _ref, _results;
-  watch.scale = d3.scale.linear().range(["white", "blue", "black"]).domain([0, watch.max, 1]);
+  watch.scale = d3.scale.linear().range(["white", "blue"]).domain([0, watch.max]);
   size = $("#watchmap").parent().width();
   watch.map = d3.select("#watchmap").append("svg").attr("height", size * 0.7).attr("width", size);
   watch.map.projection = d3.geo.mercator().scale(size).translate([size / 2, size / 2]);
@@ -200,12 +190,8 @@ updateNameMap = function() {
     percent = (_ref = data.watch.relative[country]) != null ? _ref[watch.hour] : void 0;
     number = (_ref2 = data.watch.absolute[country]) != null ? _ref2[watch.hour] : void 0;
     if (percent && number > 10) {
-      if (country === "Russia") {
-        if (last !== percent) {
-          console.log(Math.round(1000 * percent) / 1000, watch.scale(percent));
-        }
-      }
       last = percent;
+      console.log("Number", country, percent);
       return watch.scale(percent);
     } else {
       return "white";
@@ -213,14 +199,13 @@ updateNameMap = function() {
   }).attr("stroke", "black").each(function(d, i) {
     var country, hours, p, percent, t, _ref, _ref2;
     country = d.properties.name;
-    hours = _.flatten((_ref = data.working[country]) != null ? _ref.hours : void 0)[watch.hour];
-    percent = _.flatten((_ref2 = data.working[country]) != null ? _ref2.normal_hours : void 0)[watch.hour];
+    hours = Math.round((_ref = data.watch.absolute[country]) != null ? _ref[watch.hour] : void 0);
+    percent = (_ref2 = data.watch.relative[country]) != null ? _ref2[watch.hour] : void 0;
     if (hours && percent) {
       t = "" + country + " <br />";
       p = Math.round(percent * 10000) / 100;
       t += "" + p + "% of registered workers are active <br />";
       t += "" + hours + " worker" + (hours !== 1 ? "s" : "") + " online now <br />";
-      t += "Estimated workers: " + (Math.round(hours / percent)) + " ";
       return $(this).attr('data-original-title', t).tooltip('fixTitle');
     }
   });
