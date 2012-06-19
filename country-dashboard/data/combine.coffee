@@ -143,6 +143,44 @@ load_utc = (data)->
       data[country]["utc_hours"][day][hour]= absolute
 
     _.map(rawData,addToData)
+    load_local(data)
+    load_sorted_by_category(data)
+  )
+  .on('error',(error)->
+      console.log(error.message)
+  )
+
+load_local = (data)->
+  rawData = []
+  csv()
+  .fromPath(__dirname+'/contractor_activity_over_time_local.csv')
+    .toPath(__dirname+'/sample.out')
+  .transform((data)->
+      data.unshift(data.pop())
+      data
+  )
+  .on('data',(data,index)->
+    rawData.push(data)
+  )
+  .on('end',(count)->
+    addToData = (item)->
+      [total, country, day, hour, relative, absolute] = item
+      relative = +relative
+      absolute = +absolute
+#      console.log(item)
+      if country is "country" or country.length is 0 then return
+
+      data[country].total = total if not data[country].total?
+
+     #Init empty arrays to deal with sparse arrays
+      if not data[country]["local_hours"]?
+        zero = ()-> (0 for i in [0...24])
+        morezeroes = (zero() for i in [0..6])
+        data[country]["local_hours"]=morezeroes
+
+      data[country]["local_hours"][day][hour]= absolute
+
+    _.map(rawData,addToData)
     fs.writeFileSync("working_data.json",JSON.stringify(data))
     load_sorted_by_category(data)
   )

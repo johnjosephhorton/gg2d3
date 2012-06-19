@@ -28,7 +28,7 @@ updateActivityData = ()->
 
     for c in selectedCountries when not _.isNull(c)
 
-      instance =  _.flatten(data.working[c].hours)
+      instance =  _.flatten(data.working[c].local_hours)
       enumerated = ({x: i*60*60, y: transform(instance[i])} for i in _.range(instance.length))
       data.activity.absolute.push(
         data: enumerated
@@ -36,7 +36,10 @@ updateActivityData = ()->
         name: c
       )
 
-      instance =  _.flatten(data.working[c].normal_hours)
+      tmp =  _.chain(data.working[c].local_hours)
+        .flatten().value()
+
+      instance = _.map(tmp,(d)-> d/d3.sum(tmp))
       enumerated = ({x: i*60*60, y: instance[i]} for i in _.range(instance.length))
       data.activity.normal.push(
         data: enumerated
@@ -102,7 +105,7 @@ createCompareMap =  ()->
     .data(data.countries.features).enter()
       .append("path")
     .attr("class",(d)->
-      if d.properties.name of data.working and data.working[d.properties.name].normal_hours?
+      if d.properties.name of data.working and data.working[d.properties.name].local_hours?
         "selectable"
       else
         "feature grey"
@@ -111,7 +114,7 @@ createCompareMap =  ()->
     .each((d)-> d.org = d.geometry.coordinates)
     .on('click', (d,i)->
       clicked= d.properties.name
-      if not data.working[clicked]? or not data.working[clicked].normal_hours?
+      if not data.working[clicked]? or not data.working[clicked].local_hours?
         return;
       i = selectedCountries.indexOf(clicked)
       if i is -1

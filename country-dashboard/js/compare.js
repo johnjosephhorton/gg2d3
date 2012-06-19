@@ -25,7 +25,7 @@ selectedCountries = (function() {
 })();
 
 updateActivityData = function() {
-  var c, enumerated, i, instance, transform, _i, _len;
+  var c, enumerated, i, instance, tmp, transform, _i, _len;
   data.activity = {
     absolute: [],
     normal: []
@@ -44,7 +44,7 @@ updateActivityData = function() {
   for (_i = 0, _len = selectedCountries.length; _i < _len; _i++) {
     c = selectedCountries[_i];
     if (!(!_.isNull(c))) continue;
-    instance = _.flatten(data.working[c].hours);
+    instance = _.flatten(data.working[c].local_hours);
     enumerated = (function() {
       var _j, _len2, _ref, _results;
       _ref = _.range(instance.length);
@@ -63,7 +63,10 @@ updateActivityData = function() {
       color: compare.rainbow[selectedCountries.indexOf(c)],
       name: c
     });
-    instance = _.flatten(data.working[c].normal_hours);
+    tmp = _.chain(data.working[c].local_hours).flatten().value();
+    instance = _.map(tmp, function(d) {
+      return d / d3.sum(tmp);
+    });
     enumerated = (function() {
       var _j, _len2, _ref, _results;
       _ref = _.range(instance.length);
@@ -134,7 +137,7 @@ createCompareMap = function() {
   compare.map.path = d3.geo.path().projection(compare.map.projection);
   compare.map.fisheye = d3.fisheye().radius(50).power(10);
   feature = compare.map.selectAll("path").data(data.countries.features).enter().append("path").attr("class", function(d) {
-    if (d.properties.name in data.working && (data.working[d.properties.name].normal_hours != null)) {
+    if (d.properties.name in data.working && (data.working[d.properties.name].local_hours != null)) {
       return "selectable";
     } else {
       return "feature grey";
@@ -144,7 +147,7 @@ createCompareMap = function() {
   }).on('click', function(d, i) {
     var clicked;
     clicked = d.properties.name;
-    if (!(data.working[clicked] != null) || !(data.working[clicked].normal_hours != null)) {
+    if (!(data.working[clicked] != null) || !(data.working[clicked].local_hours != null)) {
       return;
     }
     i = selectedCountries.indexOf(clicked);

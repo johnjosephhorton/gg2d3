@@ -1,4 +1,4 @@
-var calculate_global, csv, fs, load_normalized, load_sorted_by_category, load_time_zones, load_utc, rawData, timezones, _;
+var calculate_global, csv, fs, load_local, load_normalized, load_sorted_by_category, load_time_zones, load_utc, rawData, timezones, _;
 
 fs = require('fs');
 
@@ -159,6 +159,51 @@ load_utc = function(data) {
         data[country]["utc_hours"] = morezeroes;
       }
       return data[country]["utc_hours"][day][hour] = absolute;
+    };
+    _.map(rawData, addToData);
+    load_local(data);
+    return load_sorted_by_category(data);
+  }).on('error', function(error) {
+    return console.log(error.message);
+  });
+};
+
+load_local = function(data) {
+  rawData = [];
+  return csv().fromPath(__dirname + '/contractor_activity_over_time_local.csv').toPath(__dirname + '/sample.out').transform(function(data) {
+    data.unshift(data.pop());
+    return data;
+  }).on('data', function(data, index) {
+    return rawData.push(data);
+  }).on('end', function(count) {
+    var addToData;
+    addToData = function(item) {
+      var absolute, country, day, hour, i, morezeroes, relative, total, zero;
+      total = item[0], country = item[1], day = item[2], hour = item[3], relative = item[4], absolute = item[5];
+      relative = +relative;
+      absolute = +absolute;
+      if (country === "country" || country.length === 0) return;
+      if (!(data[country].total != null)) data[country].total = total;
+      if (!(data[country]["local_hours"] != null)) {
+        zero = function() {
+          var i, _results;
+          _results = [];
+          for (i = 0; i < 24; i++) {
+            _results.push(0);
+          }
+          return _results;
+        };
+        morezeroes = (function() {
+          var _results;
+          _results = [];
+          for (i = 0; i <= 6; i++) {
+            _results.push(zero());
+          }
+          return _results;
+        })();
+        data[country]["local_hours"] = morezeroes;
+      }
+      return data[country]["local_hours"][day][hour] = absolute;
     };
     _.map(rawData, addToData);
     fs.writeFileSync("working_data.json", JSON.stringify(data));
