@@ -137,6 +137,7 @@ load_utc = function(data) {
       country = item[0], absolute = item[1], total = item[2], relative = item[3], day = item[4], hour = item[5];
       relative = +relative;
       absolute = +absolute;
+      hour = (hour - 1) % 6;
       if (country === "country" || country.length === 0) return;
       if (!(data[country].total != null)) data[country].total = total;
       if (!(data[country]["utc_hours"] != null)) {
@@ -182,6 +183,8 @@ load_local = function(data) {
       total = item[0], country = item[1], day = item[2], hour = item[3], relative = item[4], absolute = item[5];
       relative = +relative;
       absolute = +absolute;
+      day = +day;
+      day = (day + 6) % 7;
       if (country === "country" || country.length === 0) return;
       if (!(data[country].total != null)) data[country].total = total;
       if (!(data[country]["local_hours"] != null)) {

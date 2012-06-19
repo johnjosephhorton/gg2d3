@@ -129,7 +129,7 @@ load_utc = (data)->
       [country, absolute, total, relative, day, hour] = item
       relative = +relative
       absolute = +absolute
-
+      hour = (hour-1) % 6
       if country is "country" or country.length is 0 then return
 
       data[country].total = total if not data[country].total?
@@ -167,7 +167,8 @@ load_local = (data)->
       [total, country, day, hour, relative, absolute] = item
       relative = +relative
       absolute = +absolute
-#      console.log(item)
+      day = +day
+      day = (day+6) % 7
       if country is "country" or country.length is 0 then return
 
       data[country].total = total if not data[country].total?
