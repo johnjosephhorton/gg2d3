@@ -8,7 +8,8 @@ compare =
     str = selectedCountries.join('/')
     while str.slice(-2) is "//"
       str = str.slice(0,str.length-1)
-    route.navigate("#/compare/#{compare.log_q}/#{str}")
+    console.log(str,encodeURI(str))
+    route.navigate(encodeURI("#/compare/#{compare.log_q}/#{str}"))
 
 selectedCountries = (()->
     arr = ["United States", "Canada", "Russia", "India"]

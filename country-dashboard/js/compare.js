@@ -9,7 +9,8 @@ compare = {
     while (str.slice(-2) === "//") {
       str = str.slice(0, str.length - 1);
     }
-    return route.navigate("#/compare/" + compare.log_q + "/" + str);
+    console.log(str, encodeURI(str));
+    return route.navigate(encodeURI("#/compare/" + compare.log_q + "/" + str));
   }
 };
 
