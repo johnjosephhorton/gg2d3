@@ -39,7 +39,7 @@ updateActivityData = ()->
       tmp =  _.chain(data.working[c].local_hours)
         .flatten().value()
 
-      instance = _.map(tmp,(d)-> d/d3.sum(tmp))
+      instance = _.map(tmp,(d)-> d/data.working[c].total)
       enumerated = ({x: i*60*60, y: instance[i]} for i in _.range(instance.length))
       data.activity.normal.push(
         data: enumerated

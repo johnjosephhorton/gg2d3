@@ -101,7 +101,7 @@ createWatchWeek = ()->
       hour = h%24
       "#{day}, #{hour}:00-#{(hour+1)%24}:00"
       ),
-    yFormatter: (y)->  "#{y} total workers online "
+    yFormatter: (y)->  "#{Math.round(y)} total workers online "
   })
 
 createWatchMap = ()->
@@ -203,6 +203,7 @@ updateNameMap = ()->
       country = d.properties.name
       percent = data.watch.relative[country]?[watch.hour]
       number = data.watch.absolute[country]?[watch.hour]
+      console.log(percent,number) if country is "Russia"
       if percent and number > 10
         if not watch.abs_q
           watch.rscale(percent)

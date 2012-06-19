@@ -137,9 +137,10 @@ load_utc = function(data) {
       country = item[0], absolute = item[1], total = item[2], relative = item[3], day = item[4], hour = item[5];
       relative = +relative;
       absolute = +absolute;
-      hour = (hour - 1) % 6;
+      day = +day;
+      day = (day + 6) % 7;
       if (country === "country" || country.length === 0) return;
-      if (!(data[country].total != null)) data[country].total = total;
+      data[country].total = total;
       if (!(data[country]["utc_hours"] != null)) {
         zero = function() {
           var i, _results;
@@ -210,6 +211,7 @@ load_local = function(data) {
     };
     _.map(rawData, addToData);
     fs.writeFileSync("working_data.json", JSON.stringify(data));
+    calculate_global(data);
     return load_sorted_by_category(data);
   }).on('error', function(error) {
     return console.log(error.message);
@@ -248,17 +250,17 @@ load_sorted_by_category = function(data) {
       sorted_by_category.absolute[category][sub] = c;
     }
   }
-  fs.writeFileSync("sorted.json", JSON.stringify(sorted_by_category));
-  return calculate_global(data);
+  return fs.writeFileSync("sorted.json", JSON.stringify(sorted_by_category));
 };
 
 calculate_global = function(data) {
-  var all_hours, country, global, hour, sum, tmp;
+  var all_hours, country, d, global, hour, sum, tmp;
   global = {};
   all_hours = [];
   for (country in data) {
     hour = data[country];
-    all_hours.push(hour.hours);
+    d = data[country].local_hours;
+    if (d != null) all_hours.push(d);
   }
   sum = _.reduce(_.flatten(all_hours), function(a, b) {
     return a + b;

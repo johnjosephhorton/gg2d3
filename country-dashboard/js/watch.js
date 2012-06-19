@@ -124,7 +124,7 @@ createWatchWeek = function() {
       return "" + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00";
     }),
     yFormatter: function(y) {
-      return "" + y + " total workers online ";
+      return "" + (Math.round(y)) + " total workers online ";
     }
   });
 };
@@ -220,6 +220,7 @@ updateNameMap = function() {
     country = d.properties.name;
     percent = (_ref = data.watch.relative[country]) != null ? _ref[watch.hour] : void 0;
     number = (_ref2 = data.watch.absolute[country]) != null ? _ref2[watch.hour] : void 0;
+    if (country === "Russia") console.log(percent, number);
     if (percent && number > 10) {
       if (!watch.abs_q) {
         return watch.rscale(percent);

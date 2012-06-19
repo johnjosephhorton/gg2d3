@@ -65,7 +65,7 @@ updateActivityData = function() {
     });
     tmp = _.chain(data.working[c].local_hours).flatten().value();
     instance = _.map(tmp, function(d) {
-      return d / d3.sum(tmp);
+      return d / data.working[c].total;
     });
     enumerated = (function() {
       var _j, _len2, _ref, _results;

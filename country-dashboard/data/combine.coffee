@@ -129,10 +129,11 @@ load_utc = (data)->
       [country, absolute, total, relative, day, hour] = item
       relative = +relative
       absolute = +absolute
-      hour = (hour-1) % 6
+      day = +day
+      day = (day+6) % 7
       if country is "country" or country.length is 0 then return
 
-      data[country].total = total if not data[country].total?
+      data[country].total = total
 
      #Init empty arrays to deal with sparse arrays
       if not data[country]["utc_hours"]?
@@ -183,6 +184,7 @@ load_local = (data)->
 
     _.map(rawData,addToData)
     fs.writeFileSync("working_data.json",JSON.stringify(data))
+    calculate_global(data)
     load_sorted_by_category(data)
   )
   .on('error',(error)->
@@ -205,14 +207,15 @@ load_sorted_by_category = (data)->
 
   fs.writeFileSync("sorted.json",JSON.stringify(sorted_by_category))
 
-  calculate_global(data)
+
 
 
 calculate_global = (data)->
   global = {}
   all_hours = []
   for country,hour of data
-    all_hours.push hour.hours
+    d = data[country].local_hours
+    all_hours.push(d) if d?
 
   sum = _.reduce(_.flatten(all_hours),(a,b)-> a+b)
   tmp  = _.reduce all_hours, (matrix_a,matrix_b)->
