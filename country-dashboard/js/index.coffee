@@ -15,7 +15,7 @@ HashBangs = Backbone.Router.extend
     "compare/:log/*countries": "showCompare"
 
     "watch" : 'showWatch'
-    "watch/:hour" : 'showWatch'
+    "watch/:abs/:hour" : 'showWatch'
 
     "bubble" : 'showBubble'
     "bubble/:country" : 'showBubble'
@@ -62,16 +62,13 @@ HashBangs = Backbone.Router.extend
       createCompareChart()
     updateCompareChart()
 
-  showWatch: (hour)->
+  showWatch: (abs,hour)->
     if showing isnt "watch"
       $("#main").html($("#watch").html())
       showing="watch"
       updateTopLinks()
       createWatchChart()
-    if hour
-      updateWatchChart(hour)
-    else
-      updateWatchChart()
+    updateWatchChart(abs,hour)
 
   showBubble: (givenCountry)->
     if showing isnt "bubble"

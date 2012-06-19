@@ -1,11 +1,19 @@
-var createWatchChart, createWatchMap, createWatchWeek, last, orderWatchData, playing, updateNameMap, updateWatchChart, watch;
+var createWatchChart, createWatchMap, createWatchWeek, orderWatchData, playing, updateNameMap, updateWatchChart, watch;
 
 watch = {
-  max: 0,
-  hour: 0
+  max: {
+    absolute: 0,
+    relative: 0
+  },
+  hour: 0,
+  abs_q: false
 };
 
 playing = false;
+
+watch.navigate = function() {
+  return route.navigate("#/watch/" + watch.abs_q + "/" + watch.hour);
+};
 
 orderWatchData = function() {
   var abs, country, i, instance, ranges, rel, time;
@@ -19,8 +27,8 @@ orderWatchData = function() {
     rel = _.chain(data.working[country].utc_hours).flatten().map(function(n) {
       return n / data.working[country].total;
     }).value();
-    watch.max = Math.max(watch.max, d3.max(rel));
-    console.log(watch.max, country);
+    watch.max.relative = Math.max(watch.max.relative, d3.max(rel));
+    watch.max.absolute = Math.max(watch.max.absolute, d3.max(abs));
     data.watch.relative[country] = rel;
     data.watch.absolute[country] = abs;
   }
@@ -43,9 +51,27 @@ orderWatchData = function() {
 };
 
 createWatchChart = function() {
+  var type_update;
   orderWatchData();
   createWatchMap();
-  return createWatchWeek();
+  createWatchWeek();
+  $("#radio-scale").button();
+  type_update = function() {
+    updateWatchChart();
+    return watch.navigate();
+  };
+  $("#radio-scale > button:first").click(function() {
+    if (watch.abs_q) {
+      watch.abs_q = false;
+      return type_update();
+    }
+  });
+  return $("#radio-scale > button:last").click(function() {
+    if (!watch.abs_q) {
+      watch.abs_q = true;
+      return type_update();
+    }
+  });
 };
 
 createWatchWeek = function() {
@@ -105,7 +131,8 @@ createWatchWeek = function() {
 
 createWatchMap = function() {
   var feature, fishPolygon, i, refish, size, _i, _len, _ref, _results;
-  watch.scale = d3.scale.linear().range(["white", "blue"]).domain([0, watch.max]);
+  watch.rscale = d3.scale.linear().range(["white", "blue"]).domain([0, watch.max.relative]);
+  watch.ascale = d3.scale.log().range(["white", "red"]).domain([0.01, watch.max.absolute]);
   size = $("#watchmap").parent().width();
   watch.map = d3.select("#watchmap").append("svg").attr("height", size * 0.7).attr("width", size);
   watch.map.projection = d3.geo.mercator().scale(size).translate([size / 2, size / 2]);
@@ -169,19 +196,23 @@ createWatchMap = function() {
   return _results;
 };
 
-updateWatchChart = function(h) {
+updateWatchChart = function(abs, h) {
   var day, hour, week;
   if (h) watch.hour = +h;
-  route.navigate("watch/" + watch.hour);
+  if (abs) watch.abs_q = abs === "true";
+  watch.navigate();
   week = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   day = week[Math.floor(watch.hour / 24)];
   hour = watch.hour % 24;
   watch.text = "" + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00 GMT";
   $("#watch-time").text("Activity Map for " + watch.text);
+  if (watch.abs_q) {
+    $("#radio-scale > button:last").button('toggle');
+  } else {
+    $("#radio-scale > button:first").button('toggle');
+  }
   return updateNameMap();
 };
-
-last = 0;
 
 updateNameMap = function() {
   return watch.map.selectAll("path").transition().delay(100).attr("fill", function(d, i) {
@@ -190,9 +221,11 @@ updateNameMap = function() {
     percent = (_ref = data.watch.relative[country]) != null ? _ref[watch.hour] : void 0;
     number = (_ref2 = data.watch.absolute[country]) != null ? _ref2[watch.hour] : void 0;
     if (percent && number > 10) {
-      last = percent;
-      console.log("Number", country, percent);
-      return watch.scale(percent);
+      if (!watch.abs_q) {
+        return watch.rscale(percent);
+      } else {
+        return watch.ascale(number);
+      }
     } else {
       return "white";
     }

@@ -1,6 +1,9 @@
   #Watch chart methods and objects
-watch = {max: 0 , hour:0}
+watch = {max: {absolute: 0, relative:0} , hour:0, abs_q: false}
 playing = false
+
+watch.navigate = ()->
+    route.navigate("#/watch/#{watch.abs_q}/#{watch.hour}")
 
 orderWatchData = ()->
   data.watch = {relative: {}, absolute:{}}
@@ -13,9 +16,9 @@ orderWatchData = ()->
           .map((n)->n/data.working[country].total)
           .value()
 
-    watch.max = Math.max(watch.max,d3.max(rel))
-    console.log(watch.max,country)
-    #Shift to get everything roughly back to GMT
+    watch.max.relative = Math.max(watch.max.relative,d3.max(rel))
+    watch.max.absolute = Math.max(watch.max.absolute,d3.max(abs))
+
     data.watch.relative[country] = rel
     data.watch.absolute[country] = abs
 
@@ -29,6 +32,25 @@ createWatchChart = ()->
   orderWatchData()
   createWatchMap()
   createWatchWeek()
+
+  $("#radio-scale").button()
+
+  type_update = ()->
+    updateWatchChart()
+    watch.navigate()
+
+  $("#radio-scale > button:first").click(()->
+    if watch.abs_q
+      watch.abs_q = false
+      type_update()
+  )
+
+  $("#radio-scale > button:last").click(()->
+    if !watch.abs_q
+      watch.abs_q = true
+      type_update()
+  )
+
 
 createWatchWeek = ()->
   watch.chart = new Rickshaw.Graph({
@@ -83,9 +105,13 @@ createWatchWeek = ()->
   })
 
 createWatchMap = ()->
-  watch.scale = d3.scale.linear()
+  watch.rscale = d3.scale.linear()
     .range(["white","blue"])
-    .domain([0,watch.max])
+    .domain([0,watch.max.relative])
+
+  watch.ascale = d3.scale.log()
+    .range(["white","red"])
+    .domain([0.01,watch.max.absolute])
 
   size = $("#watchmap").parent().width()
 
@@ -152,18 +178,24 @@ createWatchMap = ()->
 
   $("#watchmap").on(i,refish) for i in ["mousemove","mousein","mouseout","touch","touchmove"]
 
-updateWatchChart = (h)->
+updateWatchChart = (abs,h)->
   if h then watch.hour = +h
-  route.navigate("watch/#{watch.hour}")
+  if abs then watch.abs_q = (abs is "true")
+  watch.navigate()
 
   week=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
   day = week[Math.floor(watch.hour/24)]
   hour = watch.hour%24
   watch.text = "#{day}, #{hour}:00-#{(hour+1)%24}:00 GMT"
   $("#watch-time").text( "Activity Map for #{watch.text}")
+  if watch.abs_q
+    $("#radio-scale > button:last").button('toggle')
+  else
+    $("#radio-scale > button:first").button('toggle')
+
   updateNameMap()
 
-last = 0
+
 updateNameMap = ()->
   watch.map.selectAll("path")
     .transition().delay(100)
@@ -172,9 +204,10 @@ updateNameMap = ()->
       percent = data.watch.relative[country]?[watch.hour]
       number = data.watch.absolute[country]?[watch.hour]
       if percent and number > 10
-        last = percent
-        console.log("Number",country,percent)
-        watch.scale(percent)
+        if not watch.abs_q
+          watch.rscale(percent)
+        else
+          watch.ascale(number)
       else
         "white"
     )

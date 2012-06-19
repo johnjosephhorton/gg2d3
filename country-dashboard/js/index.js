@@ -15,7 +15,7 @@ HashBangs = Backbone.Router.extend({
     "compare": "showCompare",
     "compare/:log/*countries": "showCompare",
     "watch": 'showWatch',
-    "watch/:hour": 'showWatch',
+    "watch/:abs/:hour": 'showWatch',
     "bubble": 'showBubble',
     "bubble/:country": 'showBubble',
     "rank": 'showRank',
@@ -65,18 +65,14 @@ HashBangs = Backbone.Router.extend({
     }
     return updateCompareChart();
   },
-  showWatch: function(hour) {
+  showWatch: function(abs, hour) {
     if (showing !== "watch") {
       $("#main").html($("#watch").html());
       showing = "watch";
       updateTopLinks();
       createWatchChart();
     }
-    if (hour) {
-      return updateWatchChart(hour);
-    } else {
-      return updateWatchChart();
-    }
+    return updateWatchChart(abs, hour);
   },
   showBubble: function(givenCountry) {
     if (showing !== "bubble") {
