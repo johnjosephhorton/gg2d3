@@ -125,7 +125,7 @@ load_normalized = function(data) {
 
 load_utc = function(data) {
   rawData = [];
-  return csv().fromPath(__dirname + '/contractor_activity_over_time_local.csv').toPath(__dirname + '/sample.out').transform(function(data) {
+  return csv().fromPath(__dirname + '/contractor_activity_over_time_UTC.csv').toPath(__dirname + '/sample.out').transform(function(data) {
     data.unshift(data.pop());
     return data;
   }).on('data', function(data, index) {
@@ -134,8 +134,7 @@ load_utc = function(data) {
     var addToData;
     addToData = function(item) {
       var absolute, country, day, hour, i, morezeroes, relative, total, zero;
-      total = item[0], country = item[1], day = item[2], hour = item[3], relative = item[4], absolute = item[5];
-      if (country === "United States") console.log(item);
+      country = item[0], absolute = item[1], total = item[2], relative = item[3], day = item[4], hour = item[5];
       relative = +relative;
       absolute = +absolute;
       if (country === "country" || country.length === 0) return;

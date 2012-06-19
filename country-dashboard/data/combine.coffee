@@ -115,7 +115,7 @@ load_normalized = (data)->
 load_utc = (data)->
   rawData = []
   csv()
-  .fromPath(__dirname+'/contractor_activity_over_time_local.csv')
+  .fromPath(__dirname+'/contractor_activity_over_time_UTC.csv')
     .toPath(__dirname+'/sample.out')
   .transform((data)->
       data.unshift(data.pop())
@@ -126,8 +126,7 @@ load_utc = (data)->
   )
   .on('end',(count)->
     addToData = (item)->
-      [total, country, day, hour, relative, absolute] = item
-      console.log(item) if country is "United States"
+      [country, absolute, total, relative, day, hour] = item
       relative = +relative
       absolute = +absolute
 
