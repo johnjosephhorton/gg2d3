@@ -236,13 +236,16 @@ createCompareLines = ()->
       h = x/3600
       day = week[Math.floor(h/24)]
       hour = h%24
-
-      "#{day}, #{hour}:00-#{(hour+1)%24}:00"),
+      this.time = "#{day}, #{hour}:00-#{(hour+1)%24}:00"
+      null
+    )
     yFormatter: (y)->
+      t = ""
       if compare.log_q
-        Math.round(y*100)/100 +  " log workers online, which is about #{Math.round(Math.exp(y))} workers"
+        t += Math.round(y*100)/100 +  " log workers online, which is about #{Math.round(Math.exp(y))} workers"
       else
-        Math.floor(y) + " workers online"
+        t += Math.floor(y) + " workers online"
+      t+"<br />"+this.time
   })
 
   compare.normal.hover = new Rickshaw.Graph.HoverDetail({
@@ -251,12 +254,13 @@ createCompareLines = ()->
       h = x/3600
       day = week[Math.floor(h/24)]
       hour = h%24
-
-      "#{day}, #{hour}:00-#{(hour+1)%24}:00"),
+      this.time = "#{day}, #{hour}:00-#{(hour+1)%24}:00"
+      null
+    )
     yFormatter: (y)->
       p = Math.round(y*100*100)/100
 
-      "#{p}% of registered workers were active"
+      "#{p}% of registered workers were active <br /> #{this.time}"
   })
 
   #Errors get thrown all over the place here. Unsure why.

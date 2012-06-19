@@ -99,9 +99,10 @@ createWatchWeek = ()->
       h = x/3600
       day = week[Math.floor(h/24)]
       hour = h%24
-      "#{day}, #{hour}:00-#{(hour+1)%24}:00"
+      this.time = "#{day}, #{hour}:00-#{(hour+1)%24}:00"
+      null
       ),
-    yFormatter: (y)->  "#{Math.round(y)} total workers online "
+    yFormatter: (y)->  "#{Math.round(y)} total workers online <br /> #{this.time}"
   })
 
 createWatchMap = ()->

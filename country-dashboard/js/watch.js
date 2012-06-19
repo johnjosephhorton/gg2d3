@@ -121,10 +121,11 @@ createWatchWeek = function() {
       h = x / 3600;
       day = week[Math.floor(h / 24)];
       hour = h % 24;
-      return "" + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00";
+      this.time = "" + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00";
+      return null;
     }),
     yFormatter: function(y) {
-      return "" + (Math.round(y)) + " total workers online ";
+      return "" + (Math.round(y)) + " total workers online <br /> " + this.time;
     }
   });
 };

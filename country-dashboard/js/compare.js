@@ -295,14 +295,18 @@ createCompareLines = function() {
       h = x / 3600;
       day = week[Math.floor(h / 24)];
       hour = h % 24;
-      return "" + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00";
+      this.time = "" + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00";
+      return null;
     }),
     yFormatter: function(y) {
+      var t;
+      t = "";
       if (compare.log_q) {
-        return Math.round(y * 100) / 100 + (" log workers online, which is about " + (Math.round(Math.exp(y))) + " workers");
+        t += Math.round(y * 100) / 100 + (" log workers online, which is about " + (Math.round(Math.exp(y))) + " workers");
       } else {
-        return Math.floor(y) + " workers online";
+        t += Math.floor(y) + " workers online";
       }
+      return t + "<br />" + this.time;
     }
   });
   compare.normal.hover = new Rickshaw.Graph.HoverDetail({
@@ -312,12 +316,13 @@ createCompareLines = function() {
       h = x / 3600;
       day = week[Math.floor(h / 24)];
       hour = h % 24;
-      return "" + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00";
+      this.time = "" + day + ", " + hour + ":00-" + ((hour + 1) % 24) + ":00";
+      return null;
     }),
     yFormatter: function(y) {
       var p;
       p = Math.round(y * 100 * 100) / 100;
-      return "" + p + "% of registered workers were active";
+      return "" + p + "% of registered workers were active <br /> " + this.time;
     }
   });
   try {
