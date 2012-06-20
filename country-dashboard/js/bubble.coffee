@@ -77,7 +77,7 @@ createBubbleMap = ()->
     _.map(polygon, (list)->
       _.map(list,(tuple)->
         p = bubble.map.projection(tuple)
-        c =  bubble.map.fisheye({x : p[0], y : p[1]})
+        c = bubble.map.fisheye({x : p[0], y : p[1]})
         bubble.map.projection.invert([c.x, c.y])))
 
   refish = (e)->
