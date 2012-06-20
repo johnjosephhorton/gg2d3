@@ -130,3 +130,7 @@
 a{
   text-decoration: none;
 }
+
+.x_tick{
+  margin-bottom: -20px !important;
+}
