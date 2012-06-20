@@ -54,7 +54,7 @@ createWatchChart = ()->
 
 createWatchWeek = ()->
   watch.chart = new Rickshaw.Graph({
-      renderer: "line"
+      renderer: "area"
       element: document.querySelector("#global-weekly")
       height: $("#comparemap").parent().height()/2
       width: $("#global-weekly").parent().width()
