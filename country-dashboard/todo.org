@@ -19,10 +19,8 @@
    Perhaps in the "Compare", the popup should contain information
    about all countries, to allow for easier comparison. (e.g., "peru 37
    workers online, venezuela 3 workers online")
-** Restyle Rickshaw.min.css
-   The names of the days in the plot are covered by the plot lines in
-   the Compare. Perhaps move below the x-axis (and boldface them?)
-   e. Would have been nice to be able to deselect a country from the
+** Compare delesect by legend
+   Would have been nice to be able to deselect a country from the
    legend.
 ** Fix clicking problem
    Perhaps add the ability to "click" on a specific time and "freeze"
@@ -39,7 +37,6 @@
 ** Make fisheye only pop up for certain small countries
    The fisheye effect seems gimmicky when done for big countries.
    Perhaps it can be enabled only over small selection areas?
-
 * Later features
 ** Deeper dive into activity in the watch section
    Perhaps add the ability to select a given week of the year, in the
