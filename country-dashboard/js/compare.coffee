@@ -16,6 +16,17 @@ selectedCountries = (()->
     arr.push(null) for i in _.range(compare.rainbow.length-arr.length)
     arr)()
 
+toggleSelectedCountry = (country)->
+  if not data.working[country]? or not data.working[country].local_hours?
+    return;
+  i = selectedCountries.indexOf(country)
+  if i is -1
+    selectedCountries[selectedCountries.indexOf(null)]= country
+  else if _.filter(selectedCountries, (n)-> not _.isNull(n)).length isnt 1
+    selectedCountries[i] = null
+  compare.navigate()
+  updateCompareChart()
+
 updateActivityData = ()->
     data.activity = {absolute: [], normal: []}
 
@@ -54,6 +65,9 @@ createCompareChart = ()->
   createCompareMap()
   createCompareLines()
   createCompareLegend()
+  createControls()
+
+createControls = ()->
   $(".active-ex").tooltip(
     placement: "right"
     title: "Active here means that the worker billed time for an hourly project. Fixed rate projects are not included in these graphs."
@@ -75,6 +89,16 @@ createCompareChart = ()->
     if !compare.log_q
       compare.log_q = true
       log_update()
+  )
+
+  $("#country_typeahead").typeahead(
+    source: _.keys(data.working)
+  )
+  .change((e)->
+    country = this.value
+    if country and data.working[country]?
+      toggleSelectedCountry(country)
+      this.value = ""
   )
 
 updateCompareChart = ()->
@@ -115,15 +139,7 @@ createCompareMap =  ()->
     .each((d)-> d.org = d.geometry.coordinates)
     .on('click', (d,i)->
       clicked= d.properties.name
-      if not data.working[clicked]? or not data.working[clicked].local_hours?
-        return;
-      i = selectedCountries.indexOf(clicked)
-      if i is -1
-        selectedCountries[selectedCountries.indexOf(null)]= clicked
-      else if _.filter(selectedCountries, (n)-> not _.isNull(n)).length isnt 1
-        selectedCountries[i] = null
-      compare.navigate()
-      updateCompareChart()
+      toggleSelectedCountry(clicked)
     )
 
   feature.each((d,i)->
@@ -297,6 +313,10 @@ updateCompareLegend = ()->
   legend = $("#comparelegend")
   #hack
   legend.empty()
+
+  deselect = (country)->
+    (e)->
+      toggleSelectedCountry(country)
   for i in _.range(selectedCountries.length)
     cq = selectedCountries[i]
     if cq
@@ -307,6 +327,9 @@ updateCompareLegend = ()->
         display: "inline-block"
         "margin-right": "10px"
         "background-color":compare.rainbow[i]
-      c.text(cq).prepend(box)
+
+      remover = $("<i>").click(deselect(cq)).addClass("icon-remove").css("float","right")
+
+      c.text(cq).prepend(box).append(remover)
 
       legend.append(c)

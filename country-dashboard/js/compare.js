@@ -1,4 +1,4 @@
-var compare, createCompareChart, createCompareLegend, createCompareLines, createCompareMap, selectedCountries, updateActivityData, updateCompareChart, updateCompareLegend, updateCompareLines, updateCompareMap;
+var compare, createCompareChart, createCompareLegend, createCompareLines, createCompareMap, createControls, selectedCountries, toggleSelectedCountry, updateActivityData, updateCompareChart, updateCompareLegend, updateCompareLines, updateCompareMap;
 
 compare = {
   rainbow: _.flatten([d3.scale.category20().range(), d3.scale.category20b().range(), d3.scale.category20c().range()]),
@@ -24,6 +24,23 @@ selectedCountries = (function() {
   }
   return arr;
 })();
+
+toggleSelectedCountry = function(country) {
+  var i;
+  if (!(data.working[country] != null) || !(data.working[country].local_hours != null)) {
+    return;
+  }
+  i = selectedCountries.indexOf(country);
+  if (i === -1) {
+    selectedCountries[selectedCountries.indexOf(null)] = country;
+  } else if (_.filter(selectedCountries, function(n) {
+    return !_.isNull(n);
+  }).length !== 1) {
+    selectedCountries[i] = null;
+  }
+  compare.navigate();
+  return updateCompareChart();
+};
 
 updateActivityData = function() {
   var c, enumerated, i, instance, tmp, transform, _i, _len;
@@ -91,10 +108,14 @@ updateActivityData = function() {
 };
 
 createCompareChart = function() {
-  var log_update;
   createCompareMap();
   createCompareLines();
   createCompareLegend();
+  return createControls();
+};
+
+createControls = function() {
+  var log_update;
   $(".active-ex").tooltip({
     placement: "right",
     title: "Active here means that the worker billed time for an hourly project. Fixed rate projects are not included in these graphs."
@@ -111,10 +132,20 @@ createCompareChart = function() {
       return log_update();
     }
   });
-  return $("#radio-scale > button:last").click(function() {
+  $("#radio-scale > button:last").click(function() {
     if (!compare.log_q) {
       compare.log_q = true;
       return log_update();
+    }
+  });
+  return $("#country_typeahead").typeahead({
+    source: _.keys(data.working)
+  }).change(function(e) {
+    var country;
+    country = this.value;
+    if (country && (data.working[country] != null)) {
+      toggleSelectedCountry(country);
+      return this.value = "";
     }
   });
 };
@@ -148,19 +179,7 @@ createCompareMap = function() {
   }).on('click', function(d, i) {
     var clicked;
     clicked = d.properties.name;
-    if (!(data.working[clicked] != null) || !(data.working[clicked].local_hours != null)) {
-      return;
-    }
-    i = selectedCountries.indexOf(clicked);
-    if (i === -1) {
-      selectedCountries[selectedCountries.indexOf(null)] = clicked;
-    } else if (_.filter(selectedCountries, function(n) {
-      return !_.isNull(n);
-    }).length !== 1) {
-      selectedCountries[i] = null;
-    }
-    compare.navigate();
-    return updateCompareChart();
+    return toggleSelectedCountry(clicked);
   });
   feature.each(function(d, i) {
     return $(this).tooltip({
@@ -361,9 +380,14 @@ updateCompareLines = function() {
 createCompareLegend = function() {};
 
 updateCompareLegend = function() {
-  var box, c, cq, i, legend, _i, _len, _ref, _results;
+  var box, c, cq, deselect, i, legend, remover, _i, _len, _ref, _results;
   legend = $("#comparelegend");
   legend.empty();
+  deselect = function(country) {
+    return function(e) {
+      return toggleSelectedCountry(country);
+    };
+  };
   _ref = _.range(selectedCountries.length);
   _results = [];
   for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -378,7 +402,8 @@ updateCompareLegend = function() {
         "margin-right": "10px",
         "background-color": compare.rainbow[i]
       });
-      c.text(cq).prepend(box);
+      remover = $("<i>").click(deselect(cq)).addClass("icon-remove").css("float", "right");
+      c.text(cq).prepend(box).append(remover);
       _results.push(legend.append(c));
     } else {
       _results.push(void 0);
