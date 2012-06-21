@@ -1,37 +1,36 @@
 * Home
 ** Redo pictures and make them bigger. 
 * About
-** Rewrite copy to use different words
-   "connect", ever going -> ever-going
 * Compare
-** Load time
-   I also noticed that the chart took a long time to load. Is there a way
-   to have a "percent loaded" counter? I could not quite understand if my
-   browser was crashed or if my connection was too slow, etc. and I was
-   ready to give up, until the visualization loaded.
 * Watch Activity
 * Bubble
 ** Fix the legend somehow
 * General
 ** Figure out what is going on with the bubbles getting stuck, Russia Bug
-* Doable features
-** Popover in the compare section?
+** Load time
+   I also noticed that the chart took a long time to load. Is there a way
+   to have a "percent loaded" counter? I could not quite understand if my
+   browser was crashed or if my connection was too slow, etc. and I was
+   ready to give up, until the visualization loaded.
+* Feedback
+** Doable features
+*** Popover in the compare section?
    Perhaps in the "Compare", the popup should contain information
    about all countries, to allow for easier comparison. (e.g., "peru 37
    workers online, venezuela 3 workers online")
-** Fix clicking problem
+*** Fix clicking problem
    Perhaps add the ability to "click" on a specific time and "freeze"
    the map so that it does not change when you hover the mouse over the
    chart? Would be useful for people that want to click and capture a
    snapshot that they can then share with others. Right now you need to
    move the mouse out of the chart very carefully to ensure that you do
    not change the selected time
-* Questionable features
-** Make fisheye only pop up for certain small countries
+** Questionable features
+*** Make fisheye only pop up for certain small countries
    The fisheye effect seems gimmicky when done for big countries.
    Perhaps it can be enabled only over small selection areas?
-* Later features
-** Deeper dive into activity in the watch section
+** Later features
+*** Deeper dive into activity in the watch section
    Perhaps add the ability to select a given week of the year, in the
    watch section. 
 
