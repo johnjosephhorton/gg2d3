@@ -1,7 +1,7 @@
 * Home
-** Redo pictures and make them bigger. 
 * About
 * Compare
+** Use new data 
 * Watch Activity
 * Bubble
 * General
