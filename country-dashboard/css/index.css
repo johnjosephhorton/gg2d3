@@ -3,9 +3,15 @@
 }
 
 #table{
+
 }
 
-.row:nth-child(odd){
+.action > a > img{
+  width: 100%;
+}
+
+.action > p{
+  text-align: left;
 }
 /* Brand management */
 .odesk-logo{
