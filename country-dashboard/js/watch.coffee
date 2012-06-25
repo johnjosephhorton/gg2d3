@@ -6,7 +6,7 @@ watch.navigate = ()->
     route.navigate("#/watch/#{watch.abs_q}/#{watch.hour}")
 
 orderWatchData = ()->
-  data.watch = {relative: {}, absolute:{}}
+  data.watch = {relative: {}, absolute:{}, normal_relative: {}}
 
   for country of data.working when data.working[country].normal_hours?
 
@@ -15,12 +15,14 @@ orderWatchData = ()->
           .flatten()
           .map((n)->n/data.working[country].total)
           .value()
-    rel = _.map(rel, (n)-> n/d3.max(rel))
+
+    normal_rel = _.map(rel, (n)-> n/d3.max(rel))
 
     watch.max.relative = Math.max(watch.max.relative,d3.max(rel))
     watch.max.absolute = Math.max(watch.max.absolute,d3.max(abs))
 
     data.watch.relative[country] = rel
+    data.watch.normal_relative[country] = normal_rel
     data.watch.absolute[country] = abs
 
   instance = _.flatten(data.global.reduced)
@@ -124,7 +126,7 @@ createWatchWeek = ()->
 createWatchMap = ()->
   watch.rscale = d3.scale.linear()
     .range(["white","blue"])
-    .domain([0,watch.max.relative])
+    .domain([0,1])
 
   watch.ascale = d3.scale.log()
     .range(["white","red"])
@@ -218,9 +220,8 @@ updateNameMap = ()->
     .transition().delay(100)
     .attr("fill",(d,i)->
       country = d.properties.name
-      percent = data.watch.relative[country]?[watch.hour]
+      percent = data.watch.normal_relative[country]?[watch.hour]
       number = data.watch.absolute[country]?[watch.hour]
-      console.log(percent,number) if country is "Russia"
       if percent and number > 10
         if not watch.abs_q
           watch.rscale(percent)

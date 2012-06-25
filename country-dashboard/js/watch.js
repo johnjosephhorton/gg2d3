@@ -16,10 +16,11 @@ watch.navigate = function() {
 };
 
 orderWatchData = function() {
-  var abs, country, i, instance, ranges, rel, time;
+  var abs, country, i, instance, normal_rel, ranges, rel, time;
   data.watch = {
     relative: {},
-    absolute: {}
+    absolute: {},
+    normal_relative: {}
   };
   for (country in data.working) {
     if (!(data.working[country].normal_hours != null)) continue;
@@ -27,12 +28,13 @@ orderWatchData = function() {
     rel = _.chain(data.working[country].utc_hours).flatten().map(function(n) {
       return n / data.working[country].total;
     }).value();
-    rel = _.map(rel, function(n) {
+    normal_rel = _.map(rel, function(n) {
       return n / d3.max(rel);
     });
     watch.max.relative = Math.max(watch.max.relative, d3.max(rel));
     watch.max.absolute = Math.max(watch.max.absolute, d3.max(abs));
     data.watch.relative[country] = rel;
+    data.watch.normal_relative[country] = normal_rel;
     data.watch.absolute[country] = abs;
   }
   instance = _.flatten(data.global.reduced);
@@ -146,7 +148,7 @@ createWatchWeek = function() {
 
 createWatchMap = function() {
   var feature, fishPolygon, i, refish, size, _i, _len, _ref, _results;
-  watch.rscale = d3.scale.linear().range(["white", "blue"]).domain([0, watch.max.relative]);
+  watch.rscale = d3.scale.linear().range(["white", "blue"]).domain([0, 1]);
   watch.ascale = d3.scale.log().range(["white", "red"]).domain([0.01, watch.max.absolute]);
   size = $("#watchmap").parent().width();
   watch.map = d3.select("#watchmap").append("svg").attr("height", size * 0.7).attr("width", size);
@@ -233,9 +235,8 @@ updateNameMap = function() {
   return watch.map.selectAll("path").transition().delay(100).attr("fill", function(d, i) {
     var country, number, percent, _ref, _ref2;
     country = d.properties.name;
-    percent = (_ref = data.watch.relative[country]) != null ? _ref[watch.hour] : void 0;
+    percent = (_ref = data.watch.normal_relative[country]) != null ? _ref[watch.hour] : void 0;
     number = (_ref2 = data.watch.absolute[country]) != null ? _ref2[watch.hour] : void 0;
-    if (country === "Russia") console.log(percent, number);
     if (percent && number > 10) {
       if (!watch.abs_q) {
         return watch.rscale(percent);
