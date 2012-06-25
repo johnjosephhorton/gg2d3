@@ -132,8 +132,8 @@ createBubbleMap = function() {
 
 createBubbles = function() {
   var box, c, cats, h, i, t, w, _len, _results;
-  w = $("#bubblechart").parent().width();
-  h = $("#bubblemap").height() * 3;
+  w = $("#bubblechart").parent().parent().width();
+  h = $("#bubblemap").height() * 1.5;
   bubble.bubble = d3.select("#bubblechart").append("svg").attr("width", w).attr("height", h).attr("class", "pack").append("g").attr("transform", "translate(0,0)");
   bubble.width = w;
   bubble.height = h;
@@ -288,8 +288,8 @@ updateBubbles = function() {
   })());
   node.each(function(d, i) {
     var t;
-    t = "" + d.className + " <br /> " + d.value + " projects completed <br />      " + (Math.round(100 * d.value / s)) + "% of total projects completed";
-    return $(this).attr('data-original-title', t).tooltip('fixTitle');
+    t = ["Category: " + d.packageName, "Subcategory: " + d.className, "" + d.value + " projects completed", "" + (Math.round(100 * d.value / s)) + "% of total projects completed"];
+    return $(this).attr('data-original-title', t.join("<br />")).tooltip('fixTitle');
   });
   return $("#bubble-projects").text("Total projects completed: " + s);
 };
