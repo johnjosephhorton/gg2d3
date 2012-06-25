@@ -328,8 +328,8 @@ updateCompareLegend = ()->
         "margin-right": "10px"
         "background-color":compare.rainbow[i]
 
-      remover = $("<i>").click(deselect(cq)).addClass("icon-remove").css("float","right")
 
-      c.text(cq).prepend(box).append(remover)
+
+      c.text(cq).prepend(box).click(deselect(cq))
 
       legend.append(c)

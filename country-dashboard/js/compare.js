@@ -380,7 +380,7 @@ updateCompareLines = function() {
 createCompareLegend = function() {};
 
 updateCompareLegend = function() {
-  var box, c, cq, deselect, i, legend, remover, _i, _len, _ref, _results;
+  var box, c, cq, deselect, i, legend, _i, _len, _ref, _results;
   legend = $("#comparelegend");
   legend.empty();
   deselect = function(country) {
@@ -402,8 +402,7 @@ updateCompareLegend = function() {
         "margin-right": "10px",
         "background-color": compare.rainbow[i]
       });
-      remover = $("<i>").click(deselect(cq)).addClass("icon-remove").css("float", "right");
-      c.text(cq).prepend(box).append(remover);
+      c.text(cq).prepend(box).click(deselect(cq));
       _results.push(legend.append(c));
     } else {
       _results.push(void 0);
