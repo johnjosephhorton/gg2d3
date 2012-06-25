@@ -15,6 +15,7 @@ orderWatchData = ()->
           .flatten()
           .map((n)->n/data.working[country].total)
           .value()
+    rel = _.map(rel, (n)-> n/d3.max(rel))
 
     watch.max.relative = Math.max(watch.max.relative,d3.max(rel))
     watch.max.absolute = Math.max(watch.max.absolute,d3.max(abs))

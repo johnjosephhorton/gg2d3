@@ -27,6 +27,9 @@ orderWatchData = function() {
     rel = _.chain(data.working[country].utc_hours).flatten().map(function(n) {
       return n / data.working[country].total;
     }).value();
+    rel = _.map(rel, function(n) {
+      return n / d3.max(rel);
+    });
     watch.max.relative = Math.max(watch.max.relative, d3.max(rel));
     watch.max.absolute = Math.max(watch.max.absolute, d3.max(abs));
     data.watch.relative[country] = rel;
