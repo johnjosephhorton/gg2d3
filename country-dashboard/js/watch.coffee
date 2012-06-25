@@ -89,13 +89,28 @@ createWatchWeek = ()->
   watch.xAxis.render()
   watch.yAxis.render()
 
+  dragging = false
+
+  watch.chart.vis.on("click", ()->
+   updateWatchChart()
+  )
+
+  watch.chart.vis.on("mousedown", ()->
+    dragging = true
+    console.log dragging
+  )
+
+  watch.chart.vis.on("mouseup", ()->
+    dragging = false
+    console.log dragging
+  )
+
   watch.hover = new Rickshaw.Graph.HoverDetail({
     graph: watch.chart,
     xFormatter: ((x)->
       #HACKKKKKKKK
       watch.hour = x/3600
-      playing = false
-      updateWatchChart()
+      if dragging then updateWatchChart()
       h = x/3600
       day = week[Math.floor(h/24)]
       hour = h%24

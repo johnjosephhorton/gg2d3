@@ -75,7 +75,7 @@ createWatchChart = function() {
 };
 
 createWatchWeek = function() {
-  var a, ticks, time, timer, week;
+  var a, dragging, ticks, time, timer, week;
   watch.chart = new Rickshaw.Graph({
     renderer: "area",
     element: document.querySelector("#global-weekly"),
@@ -111,13 +111,24 @@ createWatchWeek = function() {
   });
   watch.xAxis.render();
   watch.yAxis.render();
+  dragging = false;
+  watch.chart.vis.on("click", function() {
+    return updateWatchChart();
+  });
+  watch.chart.vis.on("mousedown", function() {
+    dragging = true;
+    return console.log(dragging);
+  });
+  watch.chart.vis.on("mouseup", function() {
+    dragging = false;
+    return console.log(dragging);
+  });
   return watch.hover = new Rickshaw.Graph.HoverDetail({
     graph: watch.chart,
     xFormatter: (function(x) {
       var day, h, hour;
       watch.hour = x / 3600;
-      playing = false;
-      updateWatchChart();
+      if (dragging) updateWatchChart();
       h = x / 3600;
       day = week[Math.floor(h / 24)];
       hour = h % 24;
