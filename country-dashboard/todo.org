@@ -1,7 +1,6 @@
 * Home
 * About
 * Compare
-** Use new data 
 * Watch Activity
 * Bubble
 * General
