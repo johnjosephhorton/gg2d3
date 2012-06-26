@@ -218,15 +218,22 @@ createCompareMap = function() {
     }
     compare.map.fisheye.center([x, y]);
     return compare.map.selectAll("path").attr("d", function(d) {
-      var clone, processed, type;
-      clone = $.extend({}, d);
-      type = clone.geometry.type;
+      var ob, processed, type;
+      type = d.geometry.type;
       processed = type === "Polygon" ? fishPolygon(d.org) : _.map(d.org, fishPolygon);
-      clone.geometry.coordinates = processed;
-      return compare.map.path(clone);
+      ob = {
+        geometry: {
+          type: type,
+          coordinates: processed
+        },
+        id: d.id,
+        properties: d.properties,
+        type: d.type
+      };
+      return compare.map.path(ob);
     });
   };
-  _ref = ["mousemove", "mousein", "mouseout", "touch", "touchmove"];
+  _ref = ["mousemove", "mousein", "mouseout", "mouseover", "touch", "touchmove"];
   _results = [];
   for (_i = 0, _len = _ref.length; _i < _len; _i++) {
     i = _ref[_i];

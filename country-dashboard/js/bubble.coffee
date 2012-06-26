@@ -102,11 +102,17 @@ createBubbleMap = ()->
     bubble.map.fisheye.center([x,y])
     bubble.map.selectAll("path")
      .attr("d",(d)->
-       clone = $.extend({},d)
-       type = clone.geometry.type
-       processed = if type is "Polygon" then fishPolygon(d.org) else _.map(d.org,fishPolygon)
-       clone.geometry.coordinates = processed
-       bubble.map.path(clone)
+      type = d.geometry.type
+      processed = if type is "Polygon" then fishPolygon(d.org) else _.map(d.org,fishPolygon)
+      ob =
+        geometry:
+          type: type
+          coordinates: processed
+        id: d.id
+        properties: d.properties
+        type: d.type
+
+      bubble.map.path ob
     )
 
   $("#bubblemap").on(i,refish) for i in ["mousemove","mousein","mouseout","touch","touchmove"]

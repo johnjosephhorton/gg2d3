@@ -188,11 +188,18 @@ createWatchMap = ()->
     watch.map.fisheye.center([x,y])
     watch.map.selectAll("path")
      .attr("d",(d)->
-       clone = $.extend({},d)
-       type = clone.geometry.type
-       processed = if type is "Polygon" then fishPolygon(d.org) else _.map(d.org,fishPolygon)
-       clone.geometry.coordinates = processed
-       watch.map.path(clone)
+      type = d.geometry.type
+      processed = if type is "Polygon" then fishPolygon(d.org) else _.map(d.org,fishPolygon)
+
+      ob =
+        geometry:
+          type: type
+          coordinates: processed
+        id: d.id
+        properties: d.properties
+        type: d.type
+
+      watch.map.path ob
     )
 
   $("#watchmap").on(i,refish) for i in ["mousemove","mousein","mouseout","touch","touchmove"]

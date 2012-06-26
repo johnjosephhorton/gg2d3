@@ -176,14 +176,21 @@ createCompareMap =  ()->
     compare.map.fisheye.center([x,y])
     compare.map.selectAll("path")
      .attr("d",(d)->
-       clone = $.extend({},d)
-       type = clone.geometry.type
-       processed = if type is "Polygon" then fishPolygon(d.org) else _.map(d.org,fishPolygon)
-       clone.geometry.coordinates = processed
-       compare.map.path(clone)
+      type = d.geometry.type
+      processed = if type is "Polygon" then fishPolygon(d.org) else _.map(d.org,fishPolygon)
+
+      ob =
+        geometry:
+          type: type
+          coordinates: processed
+        id: d.id
+        properties: d.properties
+        type: d.type
+
+      compare.map.path ob
     )
 
-  $("#comparemap").on(i,refish) for i in ["mousemove","mousein","mouseout","touch","touchmove"]
+  $("#comparemap").on(i,refish) for i in ["mousemove","mousein","mouseout","mouseover","touch","touchmove"]
 
 updateCompareMap = ()->
   compare.map.selectAll("path")

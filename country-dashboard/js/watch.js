@@ -196,12 +196,19 @@ createWatchMap = function() {
     }
     watch.map.fisheye.center([x, y]);
     return watch.map.selectAll("path").attr("d", function(d) {
-      var clone, processed, type;
-      clone = $.extend({}, d);
-      type = clone.geometry.type;
+      var ob, processed, type;
+      type = d.geometry.type;
       processed = type === "Polygon" ? fishPolygon(d.org) : _.map(d.org, fishPolygon);
-      clone.geometry.coordinates = processed;
-      return watch.map.path(clone);
+      ob = {
+        geometry: {
+          type: type,
+          coordinates: processed
+        },
+        id: d.id,
+        properties: d.properties,
+        type: d.type
+      };
+      return watch.map.path(ob);
     });
   };
   _ref = ["mousemove", "mousein", "mouseout", "touch", "touchmove"];
