@@ -46,12 +46,7 @@ HashBangs = Backbone.Router.extend
     if countries
       selectedCountries = _.map(countries.split("/"), (c)-> if c.length is 0 then null else decodeURI(c))
     else
-      selectedCountries = _.chain(data.working).keys()
-        .intersect(worldCountries)
-        .intersect()
-        .filter((d)-> data.working[d].normal_hours?)
-        .shuffle().value()
-        .slice(10,20)
+      selectedCountries = ["Philippines","India","Bangladesh","Pakistan","Russia","Ukraine","United States"]
     while selectedCountries.length isnt 60 #compare.rainbow.length
       selectedCountries.push(null)
 

@@ -50,9 +50,7 @@ HashBangs = Backbone.Router.extend({
         }
       });
     } else {
-      selectedCountries = _.chain(data.working).keys().intersect(worldCountries).intersect().filter(function(d) {
-        return data.working[d].normal_hours != null;
-      }).shuffle().value().slice(10, 20);
+      selectedCountries = ["Philippines", "India", "Bangladesh", "Pakistan", "Russia", "Ukraine", "United States"];
     }
     while (selectedCountries.length !== 60) {
       selectedCountries.push(null);

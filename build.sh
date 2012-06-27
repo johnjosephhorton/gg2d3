@@ -10,3 +10,5 @@ cd ../css/
 cat swatchmaker/swatch/bootstrap.css index.css rickshaw.min.css jquery-ui-1.8.20.custom.css > together.css
 
 uglifycss together.css > ../../prod-country-dashboard/css/index.css
+
+cd ../..
