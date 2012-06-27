@@ -4,7 +4,6 @@
 * Watch Activity
 * Bubble
 * General
-** Figure out what is going on with the bubbles getting stuck, Russia Bug
 ** Load time
    I also noticed that the chart took a long time to load. Is there a way
    to have a "percent loaded" counter? I could not quite understand if my

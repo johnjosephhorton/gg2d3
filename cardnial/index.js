@@ -40,9 +40,9 @@ svg
     .on("mouseout", refish);
 
 var xFisheye = d3.fisheye.scale(d3.scale.identity)
-    .domain([-width/2,width/2]).focus(360);
+    .domain([-width/2,width/2]).focus(10);
 var yFisheye = d3.fisheye.scale(d3.scale.identity)
-    .domain([-height/2,height/2]).focus(90);
+    .domain([-height/2,height/2]).focus(10);
 
 
 
