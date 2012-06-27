@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Country Dashboard, from oDesk</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="./css/index.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="./assets/favicon.ico">
+  </head>
+
+  <body>
+    <div class="background-globe">
+      <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+      xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+           viewBox="0 0 100 100"
+      enable-background="new 0 0 100 100" space="preserve"> 
+        <path d="M100,50C100,77.614,77.614,100,50,100C22.386,100,0,77.614,0,50C0,22.386,22.386,0,50,0C77.614,0,100,22.386,100,50z
+	         M24.024,47.545c0.231-7.002,1.444-13.7,3.478-19.893l-16.703-0.019C7.412,33.56,5.328,40.327,4.941,47.545H24.024z M47.559,27.635
+	         H32.673c-2.218,6.213-3.523,12.898-3.77,19.91h18.655V27.635z M47.559,4.937c-5.256,4.698-9.693,10.769-12.899,17.772h12.899V4.937z
+	         M14.032,22.708H29.35c2.577-6.159,6.12-11.869,10.201-16.596C29.015,8.488,20.001,14.842,14.032,22.708z M95.059,47.545
+	         c-0.387-7.219-2.472-13.985-5.858-19.912l-16.705,0.019c2.035,6.193,3.248,12.891,3.479,19.893H95.059z M52.441,47.545h18.656
+	         c-0.247-7.012-1.553-13.697-3.771-19.91H52.441V47.545z M52.441,22.708h12.9c-3.207-7.003-7.644-13.074-12.9-17.772V22.708z
+	         M60.448,6.113C64.53,10.84,68.074,16.55,70.65,22.708h15.318C80,14.842,70.987,8.488,60.448,6.113z M4.941,52.455
+	         c0.387,7.217,2.471,13.985,5.858,19.91l16.703-0.018c-2.034-6.192-3.247-12.891-3.478-19.893H4.941z M47.559,52.455H28.903
+	         c0.247,7.013,1.552,13.697,3.77,19.91h14.886V52.455z M47.559,77.292H34.659c3.207,7.004,7.643,13.074,12.899,17.771V77.292z
+	         M39.551,93.887c-4.081-4.729-7.625-10.437-10.201-16.596H14.032C20.001,85.157,29.015,91.511,39.551,93.887z M75.974,52.455
+	         c-0.23,7.002-1.443,13.7-3.479,19.893l16.705,0.018c3.387-5.925,5.472-12.693,5.858-19.91H75.974z M52.441,72.365h14.886
+	         c2.218-6.213,3.523-12.897,3.771-19.91H52.441V72.365z M52.441,95.063c5.257-4.697,9.693-10.768,12.9-17.771h-12.9V95.063z
+	         M85.968,77.292H70.65c-2.576,6.159-6.12,11.867-10.202,16.596C70.987,91.511,80,85.157,85.968,77.292z"></path>
+      </svg>      
+    </div>
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="#/home">Country Dashboard</a>
+          <a class="odesk-logo" href="http://www.odesk.com"></a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="vertical-divide"></li>
+              <li id="link-about"><a href="#/about">About</a></li>
+              <li id="link-compare"><a href="#/compare">Compare Activity</a></li>
+              <li id="link-watch"><a href="#/watch">Watch Activity</a></li>
+              <li id="link-bubble"><a href="#/bubble">Project Bubbles</a></li>
+              <!--<li id="link-rank"><a href="#/rank">Project Ranks</a></li>-->
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <a href="https://github.com/johnjosephhorton/gg2d3/tree/master/country-dashboard">
+        <img style="position: absolute; top: 0; right: 0; border: 0;"
+             src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+             alt="Fork me on GitHub">
+      </a>
+    </div>
+    
+    <section id="main" class="tab">
+      <div class="container">
+        <div class="row">
+          <div class="offset8 span4">
+            <h1> Loading... </h1>
+            <p>
+              This webpage works best using the latest version of
+              Google Chrome. It is also functional in the latest
+              Firefox and Internet Explorer 9, but it will not work in
+              Internet Explorer 8 and lower versions..
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="home" class="tab hidden">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <div class="span12 jumbotron masthead">
+            <h1>Explore our world</h1>
+            <p>
+              Dive into the countries of oDesk
+            </p>
+
+          </div>
+        </div>
+
+        <div class="row-fluid front-buttons">
+          <div class="span1"></div>
+
+          <div class="row-fluid span10">
+
+            <div class="span4 well action">
+              <a href="#/compare">
+                <img src="./assets/compare.png" ></img> 
+              </a>
+              <br /> <br />
+              <p>Compare the level of activity between countries. </p>
+              <p><a class="btn btn-large" href="#/compare">Compare Activity</a></p>
+            </div>
+
+            <div class="span4 well action">
+              <a href="#/watch">
+                <img src="./assets/watch.png">
+              </a>
+              <br /> <br />
+              <p>Watch the oDesk market throughout a week.</p>
+              <p><a class="btn btn-large" href="#/watch">Watch
+                  Activity</a></p>
+            </div>
+
+            <div class="span4 well action">
+              <a href="#/bubble">
+                <img src="./assets/bubble.png">
+                </a>
+              <br /> <br />
+              <p>Explore projects being done on oDesk.</p>
+              <p><a class="btn btn-large" href="#/bubble">Project Bubbles</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="tab hidden">
+      <div class="container">
+        <div class="row">
+          <div class="span12">
+            <div class="row">
+              <div class="span6">
+                <div class="well">
+                  <h1>oDesk serves the world</h1>
+                  <p>
+                    Over 250,000 businesses worldwide have used oDesk
+                    to work with contractors. We've helped people
+                    connect across oceans, mountains, and cultures. We
+                    want to provide you with a way to explore oDesk
+                    and get a global perspective of our
+                    marketplace. If you feel inspired, head
+                    over to oDesk and <a rel="nofollow"
+                    class="buttonYellow postJobButton"
+                    href="http://www.odesk.com/w/postjob.php"
+                    alt="Post a job for free" title="Post a job for
+                    free">post a job for free</a>
+                    or <a href="http://www.odesk.com/w/professionals.php"
+                    alt="Looking for work?" title="Looking for
+                    work?">start looking for work</a>.
+                  </p>
+                </div>
+              </div>
+              <div class="span6">
+                <div class="well">
+                  <h1>Acknowledgements</h1>
+                  <p>
+                    This dashboard rests on the shoulders of open
+                    source giants:
+                    <ul>
+                      <li><a href="http://www.d3js.org">d3.js</a></li>
+                      <li><a href="https://github.com/shutterstock/rickshaw">Rickshaw</a></li>
+                      <li><a href="http://www.jquery.com">jQuery</a></li>
+                      <li><a href="http://twitter.github.com/bootstrap/index.html">Bootstrap</a></li>
+                      <li><a href="http://www.bootswatch.com">Bootswatch</a></li>
+                      <li><a href="http://backbonejs.org/">Backbone</a></li>
+                      <li> “Globe” symbol in the background by Proletkult Graphik,
+                        from <a href="http://thenounproject.com/">The Noun
+                          Project</a> collection.</li>
+                    </ul>
+                    To give back, we
+                    have <a href="https://github.com/johnjosephhorton/gg2d3/tree/master/country-dashboard">
+                      open sourced </a> this project.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="well">
+          <h1>Contributors</h1>
+          <div class="row">
+            <div class="offset1 span3">
+      
+                <img src="./assets/horton.jpg" height=200>
+                <p>
+                  <a href="https://twitter.com/#!/johnjhorton">John
+                    Horton</a>
+                  <br /> 
+                  Labor Economist, oDesk
+                </p>
+      
+            </div>
+
+            <div class="span3">
+      
+                <img src="./assets/panos.jpg" height=200>
+                <p>
+                  <a href="https://twitter.com/#!/ipeirotis">Panos Ipeirotis</a>
+                  <br />
+                  Academic in residence, oDesk
+                </p>
+      
+            </div>
+
+            <div class=" span3">
+      
+                <img src="./assets/maril.jpg" height=200>
+                <p>
+                  <a href="https://twitter.com/#!/ZackMaril">Zack Maril</a>
+                  <br />
+                  Visualization
+                  Consultant, <a href="https://www.odesk.com/users/~~80bea7ba2750c34b"> oDesk
+                  </a>
+                  <br />
+                </p>
+      
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="compare" class="tab hidden">
+      <div class="container-fluid">
+        <div class="row-fluid">
+
+          <div class="span4">
+            <div class="well">
+              <h1>Compare Activity</h1>
+              <p>
+                There are contractors from over 180 different countries
+                on oDesk, each representing a distinct culture. This
+                section lets you cross these boundaries and compare each
+                country according to their own local time. Examples to
+                get you started:
+                <a href="#/compare/true/Spain/Portugal/United%20States/Canada/France/United Kingdom/Italy/Japan/"> G8
+                  countries</a>, 
+                <a href="#/compare/false/Bolivia/Argentina/Brazil/Uruguay/Peru/Colombia/Venezuela">
+                  South America</a>, and <a href="#/compare/true/Russia/United%20States/Sweden/Finland/Canada/">a
+                  selection of Northern countries</a>.           
+              </p>
+            </div>
+
+            <div class="well">
+              <h3>Map</h3>
+              <p>Click on a country to toggle its selection. Hover to
+                display names.</p>
+              <div id="comparemap"></div>
+            </div>
+          </div>
+
+          <div class="span6">            
+            <div class="well">
+              <h3>Number of
+              workers <span class="active-ex">active</span> during the
+              week</h3>
+              <div class="row-fluid">
+                <div class="span8">
+                  <p>A chart of the number of workers active over the
+                    course of the week. Hover to see the time interval,
+                    country name, and number of workers online. 
+                  </p>
+                </div>
+                <div class="span1"></div>
+                <div class="span3">
+                  Y-Scale
+                  <div class="btn-group" id="radio-scale" data-toggle="buttons-radio">
+                    <button class="btn">Abs</button>
+                    <button class="btn">Log</button>
+                  </div>                  
+
+                </div>
+              </div>
+              <div class="">
+                <div id="absolute"></div>                
+              </div>
+              <br />
+            </div>
+
+            <div class="well">
+              <h3>Percentage of registered workers that were <span class="active-ex">active</span></h3>
+              <p> A chart of the percentage of registered workers that
+                were active in a country
+                over the course of a week. Hover to see the time
+                interval, country name, and relative number of workers
+                online.</p>
+              <div class="">
+                <div id="normalized"></div>                
+              </div>
+              <br />
+            </div>
+
+          </div>
+
+          <div class="span2">
+
+            <div class="well">
+              <h3>Countries</h3>
+              Type below to add more countries. Click on a country to
+              deselect it.
+              <input class="span12" type="text" id="country_typeahead"></input>
+              <div id="comparelegend"></div>                
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section id="watch" class="tab hidden">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <div class="span6">
+            <div class="well">
+              <h3 id="watch-time"></h3>              
+              <p> The map below shows the level of activity in each
+                country. It represents the average activity for the 52
+                weeks of 2011. The darker the color of the country,
+                the more active the country was on average during the
+                current time.  Hover over the country to see more
+                information.
+              </p>
+              <div class="btn-group" id="radio-scale" data-toggle="buttons-radio">
+                <button class="btn">Relative</button>
+                <button class="btn">Absolute</button>
+              </div>                  
+              <div id="watchmap"></div>
+            </div>
+          </div>
+          <div class="span6">
+            <div class="well">
+              <h1> Watch the World Work </h1>
+              <p>
+                oDesk has created one of the first truly global labor
+                marketplaces. With our ever growing network of
+                contractors, clients are able to outsource any sort of
+                work at any time of the day. This section provides a way
+                to watch and understand the dynamics of the activity in
+                the oDesk market over the course of a week. Start by
+                dragging your mouse across the line chart below.
+              </p>
+            </div>
+            <div class="well">
+              <h3>Weekly Global Activity</h3>
+              <p>
+                The graph below shows the ratio of contractors working
+                during the given interval to the total number of hours
+                worked during the week. <b>Click and drag on the chart
+                to update the map</b>. 
+              </p>
+              <div id="global-weekly"></div>
+              <br />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="bubble" class="tab hidden">
+      <div class="container-fluid">
+        <div class="row-fluid">
+
+          <div class="span5">
+
+            <div class="well">
+              <h1>Projects Galore</h1>
+              <p>
+                The oDesk marketplace has contractors who can complete
+                almost any type of job. This section allows you to
+                explore the types of projects completed within each
+                country. Every major category has several
+                sub-categories, representing a more specific type of
+                work. Examples to get you
+                started: <a href="#/bubble/Thailand">Thailand</a>,
+                <a href="#/bubble/Finland"> Finland</a>, and
+                <a href="#/bubble/Chile"> Chile</a>. Click on the map
+                below to switch countries. 
+              </p>
+            </div>            
+
+            <div class="well">
+              <h3>Map of Projects Completed</h3>
+              <p> The redder the country is the
+                greater the number of projects that have been completed
+                in the country. Click on a country to select it for the
+                bubble chart. </p>
+              <div id="bubblemap"></div>
+            </div>              
+
+          </div>
+
+        <div class="span7">
+            <div class="well">
+              <h3 id="bubble-title"></h3>
+              <h4 id="bubble-projects"></h4>
+              <p> Below is a chart that packs together the
+                sub-categories based on the number of projects
+                completed in both the specific sub-category and major
+                category overall. Hover over a bubble to see the full
+                name of the category, sub-category and the percentage
+                of projects completed.
+              </p>
+              <div id="bubblechart"></div>                
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="rank" class="tab hidden">
+      <div class="container-fluid">
+
+        <div class="row-fluid">
+
+          <div id="main-pills" class="span2">
+            <h3>
+              Main Category
+            </h3>
+              <ul class="nav nav-pills nav-stacked">
+              </ul>
+          </div>
+
+          <div id="sub-pills" class="span2">
+            <h3>
+              Sub Category
+            </h3>
+
+            <ul class="nav nav-pills nav-stacked">                
+            </ul>
+          </div>
+          
+          <div class="span8">
+            <div class="row-fluid">
+              <div class="span12">
+                <div class="row-fluid">
+                  <div id="winners-absolute" class="span6">
+                    <h3>
+                      Top 20 Countries Absolutely
+                    </h3> 
+                    Top 20 countries for the category and sub category, ranked
+                    by the number of projects completed by each country. 
+                  </div>
+
+                  <div id="winners-relative" class="span6">
+                    <h3>
+                      Top 20 Countries Relatively
+                    </h3>
+                    <p>
+                      Top 20 countries for the category and sub category,
+                      ranked by the percentage of total projects completed by
+                      each country.
+                    </p>
+                  </div>
+
+                  <div class="fluid-row">
+                    <div class="span6" id="relative-table"></div>
+                    <div class="span6" id="absolute-table"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>        
+      </div>
+    </section>
+
+    <section id="footer" class="tab">
+      <div class="container-fluid">
+        <div class="row-fluid">
+        <footer>
+          <p>&copy; oDesk 2012</p>
+        </footer>
+        </div>
+      </div>
+    </section>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="./js/index.js"></script>
+
+  </body>
+</html>
