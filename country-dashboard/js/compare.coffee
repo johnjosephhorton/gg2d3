@@ -178,7 +178,6 @@ createCompareMap =  ()->
      .attr("d",(d)->
       type = d.geometry.type
       processed = if type is "Polygon" then fishPolygon(d.org) else _.map(d.org,fishPolygon)
-
       ob =
         geometry:
           type: type
@@ -186,7 +185,6 @@ createCompareMap =  ()->
         id: d.id
         properties: d.properties
         type: d.type
-
       compare.map.path ob
     )
 
@@ -334,9 +332,8 @@ updateCompareLegend = ()->
         display: "inline-block"
         "margin-right": "10px"
         "background-color":compare.rainbow[i]
+      remover = $("<i>").addClass("icon-remove").css("float","right")
 
-
-
-      c.text(cq).prepend(box).click(deselect(cq))
+      c.text(cq).prepend(box).append(remover).click(deselect(cq))
 
       legend.append(c)
