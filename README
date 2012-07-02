@@ -1,0 +1,1 @@
+This is the repo used for the development of the [oDesk country dashboard](https://www.odesk.com/blog/2012/07/visualizationsoftheoconomy). For an explanation of the interesting bits, see [this thread](https://groups.google.com/forum/?fromgroups#!topic/d3-js/I2a7AxbVOQs).
